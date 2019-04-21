@@ -100,11 +100,7 @@ export default class App extends Component {
               return <Text key={i} style={ this.state.current == i ? styles.navDotsItemActive : styles.navDotsItem} id={i} onPress={this.dotNav.bind(this,i)}></Text>
             })
           }
-          {/* <Text style={ this.state.current == 1 ? styles.navDotsItemActive : styles.navDotsItem} id={this.state.id_1} onPress={this.dotNav.bind(this,this.state.id_1)}></Text>
-          <Text style={ this.state.current == 2 ? styles.navDotsItemActive : styles.navDotsItem} id={this.state.id_2} onPress={this.dotNav.bind(this,this.state.id_2)}></Text>
-          <Text style={ this.state.current == 3 ? styles.navDotsItemActive : styles.navDotsItem} id={this.state.id_2} onPress={this.dotNav.bind(this,this.state.id_3)}></Text> */}
         </View>
-        {this.state.description_2}
         <View style={styles.wrapperArrow}>
           <Text onPress={this.prev.bind(this)} style={styles.navArrow}>Prev</Text>
           <Text onPress={this.next.bind(this)} style={styles.navArrow}>Next</Text>
