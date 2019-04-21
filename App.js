@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, Image, Alert} from 'react-native';
+import {StyleSheet, Text, View, Image} from 'react-native';
 
 import slideImg1 from './uploads/img/Welcome.png';
 import slideImg2 from './uploads/img/everyday.png';
@@ -73,7 +73,7 @@ export default class App extends Component {
           {
             this.state.slides.map( (item, i) => {
                 return ( 
-                  <View key={i} renderSeparator={i} id={i} style={ this.state.current == i ? styles.activeSlide : styles.sliderComponentStyle }>
+                  <View key={i} id={i} style={ this.state.current == i ? styles.activeSlide : styles.sliderComponentStyle }>
                     <View style={styles.container}>
                         <Text style={styles.subtitleStyle}>
                             {item.subTitle}
@@ -81,8 +81,7 @@ export default class App extends Component {
                         <Text style={styles.titleStyle}>
                             {item.title}
                         </Text>
-                        <Image source={item.image}
-                        style={styles.imageStyle} />
+                        <Image source={item.image} style={styles.imageStyle} />
                         <View style={styles.wrapperDescriptionStyle}>
                             <Text style={styles.descriptionStyle}>
                                 {item.description}
@@ -92,7 +91,7 @@ export default class App extends Component {
                   </View>
                 )
             } )
-          } 
+          }
         </View>
         <View style={styles.navDots}>
           {
