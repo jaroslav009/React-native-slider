@@ -41,10 +41,11 @@ export default class App extends Component {
           subTitle: 'Answer and compete!',
           title: ' Compare your results with others',
           image: slideImg3,
-        },       
+        },
+       
       ],     
 
-      current: 1,
+      current: 0,
     }
 
     this.dotNav = this.dotNav.bind(this);
@@ -56,13 +57,13 @@ export default class App extends Component {
   }
 
   prev() {
-    if(this.state.current == 1) return;
+    if(this.state.current == 0) return;
     let prev = this.state.current - 1;
     this.setState({ current: prev });
   }
 
   next() {
-    if(this.state.current == this.state.slides.length) return;
+    if(this.state.current == this.state.slides.length-1) return;
     let next = parseInt(this.state.current) + 1;
     this.setState({ current: next });
   }
@@ -75,7 +76,7 @@ export default class App extends Component {
           {
             this.state.slides.map( (item, i) => {
                 return ( 
-                  <View key={i} id={item.id} style={ this.state.current == item.id ? styles.activeSlide : styles.sliderComponentStyle }>
+                  <View key={i} renderSeparator={i} id={i} style={ this.state.current == i ? styles.activeSlide : styles.sliderComponentStyle }>
                     <View style={styles.container}>
                         <Text style={styles.subtitleStyle}>
                             {item.subTitle}
@@ -96,15 +97,16 @@ export default class App extends Component {
             } )
           } 
         </View>
-
         <View style={styles.navDots}>
           {
             this.state.slides.map( (item, i) => {
-              return <Text key={i} style={ this.state.current == item.id ? styles.navDotsItemActive : styles.navDotsItem} id={i} onPress={this.dotNav.bind(this,item.id)}></Text>
+              return <Text key={i} style={ this.state.current == i ? styles.navDotsItemActive : styles.navDotsItem} id={i} onPress={this.dotNav.bind(this,i)}></Text>
             })
           }
+          {/* <Text style={ this.state.current == 1 ? styles.navDotsItemActive : styles.navDotsItem} id={this.state.id_1} onPress={this.dotNav.bind(this,this.state.id_1)}></Text>
+          <Text style={ this.state.current == 2 ? styles.navDotsItemActive : styles.navDotsItem} id={this.state.id_2} onPress={this.dotNav.bind(this,this.state.id_2)}></Text>
+          <Text style={ this.state.current == 3 ? styles.navDotsItemActive : styles.navDotsItem} id={this.state.id_2} onPress={this.dotNav.bind(this,this.state.id_3)}></Text> */}
         </View>
-
         {this.state.description_2}
         <View style={styles.wrapperArrow}>
           <Text onPress={this.prev.bind(this)} style={styles.navArrow}>Prev</Text>
