@@ -19,7 +19,6 @@ export default class App extends Component {
     this.state = {
       slides: [
         {
-          id: 1,
           description: 'Log in with institutional email or sign up as attending user',
           subTitle: 'Create an account',
           title: 'Welcome to radQD, your daily quiz game!',
@@ -28,7 +27,6 @@ export default class App extends Component {
           
 
         {
-          id: 2,
           description: 'Quiz questions will be available worldwide for exactly 60 seconds with the answer shown at 12:01pm EST. Be sure to log in early to not miss a second!',
           subTitle: 'Be there on time',
           title: 'Everyday we post new quiz at 12:00pm EST',
@@ -36,7 +34,6 @@ export default class App extends Component {
         },
 
         {
-          id: 3,
           description: 'Be sure to visit the leaderboards as you progress against other institutions.',
           subTitle: 'Answer and compete!',
           title: ' Compare your results with others',
