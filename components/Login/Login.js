@@ -98,6 +98,7 @@ export default class Login extends Component {
                         </Text>
                         
                     </View>
+                    <View style={styles.borderWindowBottom}></View>
                 </View>
             </ScrollView>
         )   
@@ -169,5 +170,14 @@ const styles = StyleSheet.create({
     errText: {
         color: '#FF6464',
         fontSize: 14,
+    },
+    borderWindowBottom: {
+        textAlign: 'center',
+        borderBottomColor: '#E4E4E4',
+        borderBottomWidth: 4,
+        width: '50%',
+        bottom: -0,
+        left: '30%',
+        marginTop: 10
     }
 })
