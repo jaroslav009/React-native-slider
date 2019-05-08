@@ -10,6 +10,7 @@ import React, {Component} from 'react';
 import {View} from 'react-native';
 import WrapSlider from './components/Slider/WrapSlider';
 import Login from './components/Login/Login';
+import Register from './components/Register/Register';
 
 export default class App extends Component {
   
@@ -17,7 +18,8 @@ export default class App extends Component {
       return (
         <View>
           {/* <WrapSlider /> */}
-          <Login />
+          {/* <Login /> */}
+          <Register />
         </View>
       );
   }
