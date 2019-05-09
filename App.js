@@ -11,6 +11,7 @@ import {View} from 'react-native';
 import WrapSlider from './components/Slider/WrapSlider';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
+import Dashboard from './components/Dashboard/Dashboard';
 
 export default class App extends Component {
   
@@ -19,7 +20,8 @@ export default class App extends Component {
         <View>
           {/* <WrapSlider /> */}
           {/* <Login /> */}
-          <Register />
+          {/* <Register /> */}
+          <Dashboard />
         </View>
       );
   }
