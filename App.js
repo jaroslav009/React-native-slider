@@ -12,6 +12,7 @@ import WrapSlider from './components/Slider/WrapSlider';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
 import Dashboard from './components/Dashboard/Dashboard';
+import Leaderboard from './components/Leaderboard/Leaderboard';
 
 export default class App extends Component {
   
@@ -21,7 +22,8 @@ export default class App extends Component {
           {/* <WrapSlider /> */}
           {/* <Login /> */}
           {/* <Register /> */}
-          <Dashboard />
+          {/* <Dashboard /> */}
+          <Leaderboard />
         </View>
       );
   }

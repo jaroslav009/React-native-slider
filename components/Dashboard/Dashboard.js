@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View, Image, Button, ScrollView, Dimensions, Picker } from 'react-native';
-// import { BarChart, Grid, StackedBarChart } from 'react-native-svg-charts'
 
 import Header from '../Header/Header';
 import Chart from '../Chart/Chart';
@@ -26,6 +25,11 @@ export default class Dashboard extends Component {
             <View style={{paddingBottom: 10}}>
                 <ScrollView style={styles.wrapperDashboard}>
                     <Header />
+
+                    <View style={styles.wrapperQuiz}>
+                        <Text style={styles.textQuiz}>Take the quiz</Text>
+                    </View>
+
                     {/* Hero section */}
                     <View style={styles.wrapperHero}>
                         <Image source={body} style={styles.backgroundImage} />
@@ -38,7 +42,8 @@ export default class Dashboard extends Component {
                         </View>
                     </View>
                     {/* Hero section */}
-
+                    
+                    {/* Diagrams */}
                     <View style={styles.wrapperDiagram}>
                         <View style={styles.containerPerfomanceDiagram}>
                             <View style={styles.wrapperTimePerfomance}>
@@ -94,6 +99,8 @@ export default class Dashboard extends Component {
                             <Chart data={data2} maxPoint={100} />
                         </View>
                     </View>
+                    {/* Diagrams */}
+
                     <View style={styles.borderWindowBottom}></View>
                 </ScrollView>
             </View>
@@ -220,5 +227,19 @@ const styles = StyleSheet.create({
         bottom: -0,
         left: '30%',
         marginTop: 30
+    },
+    wrapperQuiz: {
+        backgroundColor: '#1D8EAB',
+        paddingTop: 20,
+        paddingBottom: 20,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    textQuiz: {
+        fontSize: 20,
+        color: '#fff',
+        fontWeight: 'bold'
     }
 })
