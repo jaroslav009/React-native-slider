@@ -13,6 +13,7 @@ import Login from './components/Login/Login';
 import Register from './components/Register/Register';
 import Dashboard from './components/Dashboard/Dashboard';
 import Leaderboard from './components/Leaderboard/Leaderboard';
+import Profile from './components/Profile/Profie';
 
 export default class App extends Component {
   
@@ -23,7 +24,8 @@ export default class App extends Component {
           {/* <Login /> */}
           {/* <Register /> */}
           {/* <Dashboard /> */}
-          <Leaderboard />
+          {/* <Leaderboard /> */}
+          <Profile />
         </View>
       );
   }
