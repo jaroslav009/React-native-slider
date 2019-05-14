@@ -14,6 +14,11 @@ import Register from './components/Register/Register';
 import Dashboard from './components/Dashboard/Dashboard';
 import Leaderboard from './components/Leaderboard/Leaderboard';
 import Profile from './components/Profile/Profie';
+import Quiz from './components/Quiz/Quiz';
+import QuizItem from './components/Quiz/QuizItem';
+import Slack from './components/Slack/Slack';
+import About from './components/About/About';
+import Settings from './components/Settings/Settings';
 
 export default class App extends Component {
   
@@ -25,7 +30,12 @@ export default class App extends Component {
           {/* <Register /> */}
           {/* <Dashboard /> */}
           {/* <Leaderboard /> */}
-          <Profile />
+          {/* <Profile /> */}
+          {/* <Quiz /> */}
+          {/* <QuizItem /> */}
+          {/* <Slack /> */}
+          {/* <About /> */}
+          <Settings />
         </View>
       );
   }

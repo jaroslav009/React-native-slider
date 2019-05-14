@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, Animated, ScrollView, Dimensions, Picker, TextInput, TouchableHighlight} from 'react-native';
+import {StyleSheet, Text, View, Image, ScrollView, Dimensions, Picker} from 'react-native';
 import Header from '../Header/Header';
 
 import arrowLeft from '../../uploads/img/left-arrow.png'
@@ -43,9 +43,8 @@ export default class Profile extends Component {
                                     this.setState({filterAnsw: itemValue})
                                 }>
                                 <Picker.Item label="All" value="all" />
-                                <Picker.Item label="Last 14 days" value="lastSecondWeek" />
-                                <Picker.Item label="Last 21 days" value="lastThirdWeek" />
-                                <Picker.Item label="Last Month" value="lastMonth" />
+                                <Picker.Item label="Correct" value="correct" />
+                                <Picker.Item label="Wrong" value="wrong" />
                             </Picker>
                         </View>
                     </View>

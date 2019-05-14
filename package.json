@@ -7,7 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "expo": "^32.0.6",
+    "@react-native-community/blur": "^3.3.1",
     "react": "16.8.3",
     "react-native": "^0.59.6",
     "react-native-datepicker": "^1.7.2",
