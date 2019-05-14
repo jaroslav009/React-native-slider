@@ -53,6 +53,11 @@ export default class Settings extends Component {
                 <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
                     <View>  
                         <Image style={styles.arrowLeft} source={arrowLeft} />
+                        <View style={styles.titleWrapper}>
+                            <Text style={{color: '#3E3F42', fontSize: 24}}> DEVON SMITH </Text>
+                            <Text style={{color: '#3E3F42', fontSize: 16}}>Emory University</Text>
+                            <Text style={{color: '#9EA0A5', fontSize: 16}}>Med Student</Text>
+                        </View>
                         <View style={styles.wrapperFormLogin}>
                             <View style={styles.itemInputForm}>
                                 <Text style={styles.labelInput}>Name</Text>
@@ -97,7 +102,7 @@ export default class Settings extends Component {
                         </View>
                         <View>
                             <TouchableHighlight onPress={this._logOut} underlayColor="#fff" style={styles.buttonLog}>
-                                <Text style={{color: '#FF6464'}}>Log Out</Text>
+                                <Text style={{color: '#FF6464', fontSize: 16}}>Log Out</Text>
                             </TouchableHighlight>
                         </View>
                     </View>
@@ -163,9 +168,9 @@ const styles = StyleSheet.create({
         borderBottomColor: '#E4E4E4',
         borderBottomWidth: 4,
         width: '50%',
-        bottom: -0,
+        bottom: 20,
         left: '30%',
-        marginTop: '90%'
+        marginTop: '70%'
     },
     imageSelect: {
         width: 17, 
@@ -197,5 +202,13 @@ const styles = StyleSheet.create({
     labelInput: {
         paddingLeft: 10,
         fontSize: 12,
+    },
+    titleWrapper: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 17,
+        marginTop: 17,
     }
 })
