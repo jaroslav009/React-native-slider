@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, TouchableHighlight } from 'react-native';
+import {StyleSheet, Text, View, TextInput, Image, ScrollView, Dimensions, TouchableHighlight } from 'react-native';
 import Logo from '../BasicComponents/Logo';
 
 import Header from '../Header/Header'

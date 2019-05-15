@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View, Image, Button, ScrollView, Dimensions, Picker } from 'react-native';
+import { createStackNavigator, createAppContainer } from 'react-navigation';
 
 import Header from '../Header/Header';
 import Chart from '../Chart/Chart';
-
+import Menu from '../Header/Menu';
 import body from '../../uploads/img/body.png'
 import upArrow from '../../uploads/img/up-arrow.png';
 import downArrow from '../../uploads/img/sort-down-triangular-symbol.png';
@@ -18,6 +19,7 @@ export default class Dashboard extends Component {
     }
 
     render() {
+        
         const data = [ [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }], [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }] ]
         const data2 = [ [{ number: 10, name: 'M' }, { number: 20, name: 'T' }, { number: 24, name: 'W' }, { number: 23, name: 'T'}, { number: 0, name: 'F' }, { number: 25, name: 'S' }, { number: 0, name: 'S' }], [{ number: 0, name: 'M' }, { number: 0, name: 'T' }, { number: 32, name: 'W' }, { number: 22, name: 'T'}, { number: 21, name: 'F' }, { number: 22, name: 'S' }, { number: 21, name: 'S' }] ]
 
@@ -25,7 +27,6 @@ export default class Dashboard extends Component {
             <View style={{paddingBottom: 10}}>
                 <ScrollView style={styles.wrapperDashboard}>
                     <Header />
-
                     <View style={styles.wrapperQuiz}>
                         <Text style={styles.textQuiz}>Take the quiz</Text>
                     </View>
