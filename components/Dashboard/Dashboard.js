@@ -1,10 +1,8 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, Button, ScrollView, Dimensions, Picker } from 'react-native';
-import { createStackNavigator, createAppContainer } from 'react-navigation';
+import {StyleSheet, Text, View, Image, Button, ScrollView, Dimensions, Picker, TouchableHighlight } from 'react-native';
 
 import Header from '../Header/Header';
 import Chart from '../Chart/Chart';
-import Menu from '../Header/Menu';
 import body from '../../uploads/img/body.png'
 import upArrow from '../../uploads/img/up-arrow.png';
 import downArrow from '../../uploads/img/sort-down-triangular-symbol.png';
@@ -13,9 +11,17 @@ export default class Dashboard extends Component {
 
     constructor(props) {
         super(props);
+        let today = new Date();
         this.state = {
             timePickerPersonal: '',
+            date: today.getHours()+':'+today.getMinutes(),
         }
+        this._itemMenu = this._itemMenu.bind(this);
+    }
+
+    _itemMenu() {
+        alert(this.props.navigation.navigate('Settings'))
+        this.props.navigation.navigate('Settings')
     }
 
     render() {
@@ -26,7 +32,7 @@ export default class Dashboard extends Component {
         return (
             <View style={{paddingBottom: 10}}>
                 <ScrollView style={styles.wrapperDashboard}>
-                    <Header />
+                   <Header navigation={this.props.navigation} page="Dashboard" />
                     <View style={styles.wrapperQuiz}>
                         <Text style={styles.textQuiz}>Take the quiz</Text>
                     </View>
@@ -242,5 +248,6 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: '#fff',
         fontWeight: 'bold'
-    }
+    },
+    
 })

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View, TextInput, Image, ScrollView, Dimensions, TouchableHighlight } from 'react-native';
-import Logo from '../BasicComponents/Logo';
+// import Logo from '../BasicComponents/Logo';
 
 import Header from '../Header/Header'
 
@@ -25,15 +25,19 @@ export default class Settings extends Component {
 
     constructor(props) {
         super(props);
+        let today = new Date();
         this.state = {
             textEmail: 'fewfew@efwe.com',
             textPassword: 'fefwefew',
             textName: 'fefwefew',
             errorEmail: true,
             errorPassword: true,
+            date: today.getHours()+':'+today.getMinutes(),
+            open: false,
         }
         this._resetPass = this._resetPass.bind(this);
         this._logOut = this._logOut.bind(this);
+        this._back = this._back.bind(this);
     }
 
     _logOut() {
@@ -46,13 +50,20 @@ export default class Settings extends Component {
         })
     }
 
+    _back() {
+        this.props.navigation.goBack()
+    }
+
+
     render() {
         return (
             <ScrollView>
-                <Header />
+                <Header navigation={this.props.navigation} />
                 <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
                     <View>  
+                    <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
                         <Image style={styles.arrowLeft} source={arrowLeft} />
+                    </TouchableHighlight>
                         <View style={styles.titleWrapper}>
                             <Text style={{color: '#3E3F42', fontSize: 24}}> DEVON SMITH </Text>
                             <Text style={{color: '#3E3F42', fontSize: 16}}>Emory University</Text>
@@ -210,5 +221,66 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 17,
         marginTop: 17,
+    },
+    header: {
+        backgroundColor: '#fff',
+        paddingTop: 20,
+        paddingBottom: 20,
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 100, height: 100 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 5,
+    },
+    burger: {
+        width: 30,
+        height: 25
+    },
+    styleAddReminder: {
+        width: 30,
+        height: 30
+    },
+    timeWrapper: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center'
+    },
+    time: {
+        fontSize: 16,
+        marginRight: 10,
+        color: '#3E3F42'
+    },
+    menuContainer: {
+        width: '100%',
+        zIndex: 1000,
+        paddingLeft: 40,
+        paddingRight: 40,
+        display: 'flex',
+        flexDirection: 'row'
+    },
+    greyText: {
+        color: '#9EA0A5',
+    },
+    containerMenu: {
+        marginTop: '50%',
+        display: 'flex',
+        flexDirection: 'column',
+        zIndex: 100000,
+        position: 'absolute',
+        top: Dimensions.get('window').height/6,
+        left: 40,
+        backgroundColor: '#fff',
+    },
+    versionApp: {
+        marginTop: '80%',
+        zIndex: 100000,
+        position: 'absolute',
+        top: (Dimensions.get('window').height/2)+70,
+        left: 40
     }
 })

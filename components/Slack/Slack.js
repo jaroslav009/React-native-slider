@@ -7,14 +7,25 @@ import arrowLeft from '../../uploads/img/left-arrow.png'
 import slack from '../../uploads/img/slack.png'
 
 export default class Slack extends Component {
+
+    constructor(props) {
+        super(props);
+        this._back = this._back.bind(this);
+    }
+
+    _back() {
+        this.props.navigation.goBack()
+    }
+
     render() {
         return(
             <ScrollView style={{height: '100%', backgroundColor: '#FAFAFD'}}>
-                <Header />
+                <Header navigation={this.props.navigation} />
                 <View style={{paddingLeft: 32, paddingRight: 32}}>
                     <View style={styles.arroweftCont}>
-                        <Image style={{width: 22, height: 15}} source={arrowLeft} />
-                       
+                        <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
+                            <Image style={{width: 22, height: 15}} source={arrowLeft} />
+                        </TouchableHighlight>
                     </View>
                     <Text style={styles.contSlack}>
                     If you'd like to join in on further disussion about today's quiz, please join us on Slack. There you can meet with others in your area and around the country all participating in radQD.
@@ -35,7 +46,6 @@ export default class Slack extends Component {
 const styles = StyleSheet.create({
     arroweftCont: {
         marginTop: 20,
-        marginLeft: 20
     },
     contSlack: {
         color: '#3E3F42',

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, ScrollView, Dimensions, Picker} from 'react-native';
+import {StyleSheet, Text, View, Image, ScrollView, Dimensions, Picker, TouchableHighlight} from 'react-native';
 import Header from '../Header/Header';
 
 import arrowLeft from '../../uploads/img/left-arrow.png'
@@ -16,13 +16,19 @@ export default class Profile extends Component {
         this.state = {
             filterAnsw: '',
         }
+        this._back = this._back.bind(this);
+    }
+    _back() {
+        this.props.navigation.goBack()
     }
     render() {
         return (
             <ScrollView style={styles.profile}>
-                <Header />
+                <Header navigation={this.props.navigation} />
                 <View style={styles.wrapperProfile}>
-                    <Image style={styles.arrowLeft} source={arrowLeft} />
+                    <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
+                        <Image style={styles.arrowLeft} source={arrowLeft} />
+                    </TouchableHighlight>
                     <View style={styles.containerTitleProfile}>
                         <Text style={styles.titleProfie}>
                             EMORY UNIVERSITY

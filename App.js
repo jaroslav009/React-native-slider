@@ -22,39 +22,21 @@ import Settings from './components/Settings/Settings';
 import { createStackNavigator, createAppContainer } from "react-navigation";
 
 import Header from './components/Header/Header'
-class HomeScreen extends React.Component {
-  render() {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Home Screen</Text>
-        <Button
-          title="Go to Details"
-          onPress={() => this.props.navigation.navigate('Header')}
-        />
-      </View>
-    );
-  }
-}
-
-class DetailsScreen extends React.Component {
-  render() {
-    return (                                                                                                                                                                                                                                                                                                                       
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text>Details Screen</Text>
-      </View>
-    );
-  }
-}
 const AppNavigator = createStackNavigator({
-    Home: HomeScreen,
-    Details: DetailsScreen,
-    Header: Header,
-    Dashboard: Dashboard
+    Header: {screen: Header},
+    Dashboard: {screen: Dashboard},
+    Leaderboard: {screen: Leaderboard},
+    Profile: {screen: Profile},
+    Quiz: {screen: Quiz},
+    QuizItem: {screen: QuizItem},
+    Slack: {screen: Slack},
+    About: {screen: About},
+    Settings: {screen : Settings}
   },
   {
     contentComponent: 'Header',
-    initialRouteName: 'Header',
-    headerMode: 'none'
+    initialRouteName: 'Dashboard',
+    headerMode: 'Header'
   }
 );
 

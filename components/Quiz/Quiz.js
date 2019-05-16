@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, ScrollView, TouchableHighlight} from 'react-native';
+import {StyleSheet, Text, View, Image, ScrollView, TouchableHighlight, Animated} from 'react-native';
 
 import Header from '../Header/Header';
 
@@ -21,7 +21,7 @@ export default class Quiz extends Component {
                     class: 'A',
                     title: "Everything's Alright",
                     cancel: false,
-                    border: -1
+                    border: new Animated.Value(0)
                 },
                 {
                     voice: '39 (39%)',
@@ -29,53 +29,86 @@ export default class Quiz extends Component {
                     class: 'B',
                     title: "Patient is healthy",
                     cancel: true,
-                    border: -1
-                }
+                    border: new Animated.Value(0)
+                },
+                {
+                    voice: '39 (39%)',
+                    time: 'Avg: 32 sec.',
+                    class: 'C',
+                    title: "Patient is healthy",
+                    cancel: true,
+                    border: new Animated.Value(0)
+                },
+                {
+                    voice: '39 (39%)',
+                    time: 'Avg: 32 sec.',
+                    class: 'D',
+                    title: "Patient is healthy",
+                    cancel: true,
+                    border: new Animated.Value(0)
+                },
+                {
+                    voice: '37 (52%)',
+                    time: 'Avg: 32 sec.',
+                    class: 'E',
+                    title: "Everything's Alright",
+                    cancel: false,
+                    border: new Animated.Value(0)
+                },
             ],
             laterKey: null,
         }
         this.touchElement = this.touchElement.bind(this);
+        this._back = this._back.bind(this);
     }
 
     touchElement(key) {
         if(this.state.laterKey == null) {
             this.setState({ laterKey: key });
         }
-        this.setState(state => {
-            const list = state.dataQuiz[key].border = 2;
-                
-            
-            return {
-                list,
-            };
-        });
+        Animated.timing(
+            this.state.dataQuiz[key].border,
+            {
+              toValue: 2,
+              duration: 400,
+            },
+        ).start();
+
         if(this.state.laterKey != null) {
-            this.setState(state => {
-                const list2 = state.dataQuiz[this.state.laterKey].border = 0;
-                return {
-                    list2,
-                };
-            });
+            Animated.timing(
+                this.state.dataQuiz[this.state.laterKey].border,
+                {
+                  toValue: 0,
+                  duration: 400,
+                },
+            ).start();
         }
         
         this.setState({ laterKey: key });
     }
 
+    _back() {
+        this.props.navigation.goBack()
+    }
+
     render() {
         return (
             <ScrollView>
-                <Header />
+                <Header navigation={this.props.navigation} />
                 <View>
-                    <View style={styles.arroweftCont}>
+                    <TouchableHighlight onPress={() => this._back()} underlayColor="#fff" style={styles.arroweftCont}>
                         <Image style={{width: 22, height: 15}} source={arrowLeft} />
-                    </View>
+                    </TouchableHighlight>
                     <Image style={styles.backgrImg} source={nature1} />
                     <View style={styles.containerQuiz}>
                         {
                             this.state.dataQuiz.map((value, key) => {
                                 return (
-                                    <TouchableHighlight key={key} underlayColor="white" style={{width: '70%'}} onPress={() => this.touchElement(key) }>
-                                        <View style={[styles.itemQuiz, {borderWidth: this.state.dataQuiz[key].border, borderColor: value.cancel == true ? '#1D8EAB' : '#FF6464'}]}>
+                                    <TouchableHighlight key={key} underlayColor="white" style={{width: '80%'}} onPress={() => this.touchElement(key) }>
+                                        <Animated.View style={[styles.itemQuiz, {
+                                            borderWidth: this.state.dataQuiz[key].border, 
+                                            padding: this.state.dataQuiz[key].border == -1 ? 2 : 0,
+                                            borderColor: value.cancel == true ? '#1D8EAB' : '#FF6464'}]}>
                                             <View style={styles.topPartItem}>
                                                 <View style={{display: 'flex', flexDirection: 'row', paddingLeft: 12, paddingRight: 12}}>
                                                     <Image source={userFill} />
@@ -96,7 +129,7 @@ export default class Quiz extends Component {
                                                     <Image source={value.cancel == true ? check : cancel} />
                                                 </View>
                                             </View>
-                                        </View>
+                                        </Animated.View>
                                     </TouchableHighlight>
                                 )
                             })

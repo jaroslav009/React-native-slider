@@ -71,6 +71,7 @@ export default class Leaderboard extends Component {
             ]
         }
         this._graphShow = this._graphShow.bind(this);
+        this._back = this._back.bind(this);
     }
 
     _graphShow(arg) {
@@ -106,12 +107,18 @@ export default class Leaderboard extends Component {
         
     }
 
+    _back() {
+        this.props.navigation.goBack()
+    }
+
     render() {
         return (
             <ScrollView style={styles.leader}>
-                <Header />
+                <Header navigation={this.props.navigation} />
                 <View style={styles.wrapperLeader}>
-                    <Image style={styles.arrowLeft} source={arrowLeft} />
+                    <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
+                        <Image style={styles.arrowLeft} source={arrowLeft} />
+                    </TouchableHighlight>
                     <View style={styles.filterContainer}>
                         <Text style={styles.filterTitle}>Leaderboard</Text>
                         <View>

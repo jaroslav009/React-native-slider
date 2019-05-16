@@ -1,20 +1,26 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, ScrollView, TouchableHighlight, findNodeHandle, ImageBackground} from 'react-native';
+import {StyleSheet, Text, View, Image, ScrollView, TouchableHighlight } from 'react-native';
 
 import Header from '../Header/Header';
 
 import arrowLeft from '../../uploads/img/left-arrow.png'
 
 export default class About extends Component {
+    constructor(props) {
+        super(props);
+        this._back = this._back.bind(this);
+    }
+    _back() {
+        this.props.navigation.goBack()
+    }
     render() {
         return(
             <ScrollView style={{height: '100%', backgroundColor: '#FAFAFD'}}>
-                <Header />
+                <Header navigation={this.props.navigation} />
                 <View style={{paddingLeft: 32, paddingRight: 32}}>
-                    <View style={styles.arroweftCont}>
+                    <TouchableHighlight onPress={() => this._back()} underlayColor="#fff" style={styles.arroweftCont}>
                         <Image style={{width: 22, height: 15}} source={arrowLeft} />
-                       
-                    </View>
+                    </TouchableHighlight>
                     
                     <Text style={styles.contSlack}>
                         - Technology framework triple bottom line because strategy compelling; social enterprise move the needle cultivate. Capacity building, ideate, granular communities change-makers; and invest.                    
