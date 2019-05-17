@@ -16,7 +16,7 @@ export default class About extends Component {
     render() {
         return(
             <ScrollView style={{height: '100%', backgroundColor: '#FAFAFD'}}>
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} page="About" />
                 <View style={{paddingLeft: 32, paddingRight: 32}}>
                     <TouchableHighlight onPress={() => this._back()} underlayColor="#fff" style={styles.arroweftCont}>
                         <Image style={{width: 22, height: 15}} source={arrowLeft} />
@@ -44,13 +44,13 @@ export default class About extends Component {
 const styles = StyleSheet.create({
     arroweftCont: {
         marginTop: 20,
-        marginLeft: 20
     },
     contSlack: {
         color: '#3E3F42',
         fontSize: 14,
         lineHeight: 20,
-        marginTop: 30
+        marginTop: 30,
+        fontFamily: 'SFUIText-Regular'
     },
     borderWindowBottom: {
         textAlign: 'center',

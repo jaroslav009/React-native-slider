@@ -81,7 +81,8 @@ const styles = StyleSheet.create({
     textName: {
         textAlign: 'center',
         marginTop: 10,
-        color: '#9EA0A5'
+        color: '#9EA0A5',
+        fontFamily: 'SFUIText-Regular'
     },
     wrapperChartTop: {
         display: 'flex',

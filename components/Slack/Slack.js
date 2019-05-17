@@ -20,7 +20,7 @@ export default class Slack extends Component {
     render() {
         return(
             <ScrollView style={{height: '100%', backgroundColor: '#FAFAFD'}}>
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} page="Perfomance" />
                 <View style={{paddingLeft: 32, paddingRight: 32}}>
                     <View style={styles.arroweftCont}>
                         <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
@@ -31,7 +31,7 @@ export default class Slack extends Component {
                     If you'd like to join in on further disussion about today's quiz, please join us on Slack. There you can meet with others in your area and around the country all participating in radQD.
                     </Text>
 
-                    <Image source={slack} />
+                    <Image style={{marginTop: 30}} source={slack} />
 
                 </View>
                 <View style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
@@ -51,7 +51,8 @@ const styles = StyleSheet.create({
         color: '#3E3F42',
         fontSize: 16,
         lineHeight: 20,
-        marginTop: 30
+        marginTop: 30,
+        fontFamily: 'SFUIText-Regular'
     },
     borderWindowBottom: {
         textAlign: 'center',

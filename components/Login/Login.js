@@ -162,7 +162,8 @@ const styles = StyleSheet.create({
     join: {
         color: '#1D8EAB',
         textTransform: 'uppercase',
-        fontWeight: '400'
+        fontFamily: 'SFUIText-Bold',
+        fontSize: 14
     },
     wrapperJoin: {
         marginTop: Dimensions.get('window').height > 600 ? '100%' : '3%',

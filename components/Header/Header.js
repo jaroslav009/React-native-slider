@@ -5,6 +5,7 @@ import { BlurView, VibrancyView } from "@react-native-community/blur";
 import Logo from '../BasicComponents/Logo';
 import burger from '../../uploads/img/burger3x.png'
 import addReminder from '../../uploads/img/add-reminder3x.png'
+import logoImg from '../../uploads/img/logo.png'
 
 export default class Header extends Component {
 
@@ -16,7 +17,6 @@ export default class Header extends Component {
             open: false,
             fadeAnim: new Animated.Value(-1000),
             opacBack: new Animated.Value(0),
-            viewRef: null
         }
         this._itemMenu = this._itemMenu.bind(this);
         this._openMenu = this._openMenu.bind(this);
@@ -34,14 +34,14 @@ export default class Header extends Component {
             this.state.fadeAnim,            // The animated value to drive
             {
               toValue: 0,
-              duration: 1000
+              duration: 400
             }
         ).start();
         Animated.timing(                  // Animate over time
             this.state.opacBack,            // The animated value to drive
             {
               toValue: 1,
-              duration: 1000
+              duration: 400
             }
         ).start();
         this.setState({ open: true })        
@@ -53,21 +53,16 @@ export default class Header extends Component {
             this.state.fadeAnim,            // The animated value to drive
             {
               toValue: -1000,                   // Animate to opacity: 1 (opaque)
-              duration: 1000
+              duration: 400
             }
         ).start(); 
         Animated.timing(                  // Animate over time
             this.state.opacBack,            // The animated value to drive
             {
               toValue: 0,
-              duration: 1000
+              duration: 400
             }
         ).start();
-    }
-
-    imageLoaded() {
-        console.log('hello', findNodeHandle(this.backgroundImage))
-        this.setState({ viewRef: findNodeHandle(this.backgroundImage) });
     }
 
     render() {
@@ -79,7 +74,7 @@ export default class Header extends Component {
                         height:  Dimensions.get('window').height+200,
                         position: 'absolute',
                         elevation: 5,
-                        backgroundColor: 'rgba(52, 52, 52, 0.4)',
+                        backgroundColor: 'rgba(52, 52, 52, 0.6)',
                         transform: [
                             { translateX: this.state.fadeAnim },
                         ]
@@ -93,39 +88,73 @@ export default class Header extends Component {
                             
                             <View style={styles.containerMenu}>
                             <View style={{paddingTop: 50, paddingBottom: 50}}>
-                                <Text style={{fontSize: 24, color: '#3E3F42'}}>DEVON</Text>
+                                <Text style={{fontSize: 24, color: '#3E3F42', fontFamily: 'SFUIText-Semibold'}}>DEVON</Text>
                                 <Text style={[styles.greyText, {fontSize: 16}]}>173 Correct Answers</Text>
                             </View>
-                                <TouchableHighlight onPress={() => this._itemMenu('Dashboard')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {fontSize: 24, marginTop: 15}]}>Dashboard</Text>
+                                <TouchableHighlight onPress={() => this._itemMenu('Dashboard')} underlayColor="#fff" style={{
+                                        zIndex: 100000,
+                                    }}>
+                                    <Text style={[styles.greyText, 
+                                        {
+                                            fontSize: 24,
+                                            marginTop: 15,
+                                            color: this.props.page == 'Dashboard' ? '#333' : '#9EA0A5' 
+                                        }]}>Dashboard</Text>
                                 </TouchableHighlight>
 
                                 <TouchableHighlight onPress={() => this._itemMenu('Leaderboard')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {fontSize: 24, marginTop: 20}]}>Leadboard</Text>
+                                    <Text style={[styles.greyText, {
+                                        fontSize: 24,
+                                        marginTop: 20,
+                                        color: this.props.page == 'Leadboard' ? '#333' : '#9EA0A5' 
+                                        }]}>Leadboard</Text>
                                 </TouchableHighlight>
 
                                 <TouchableHighlight onPress={() => this._itemMenu('Slack')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {fontSize: 24, marginTop: 20}]}>Perfomance</Text>
+                                    <Text style={[styles.greyText, {
+                                        fontSize: 24, 
+                                        marginTop: 20,
+                                        color: this.props.page == 'Perfomance' ? '#333' : '#9EA0A5' 
+                                        }]}>Perfomance</Text>
                                 </TouchableHighlight>
 
                                 <TouchableHighlight onPress={() => this._itemMenu('Settings')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {fontSize: 24, marginTop: 20}]}>Account</Text>
+                                    <Text style={[styles.greyText, {
+                                        fontSize: 24, 
+                                        marginTop: 20,
+                                        color: this.props.page == 'Account' ? '#333' : '#9EA0A5' 
+                                        }]}>Account</Text>
                                 </TouchableHighlight>
                                 
                                 <TouchableHighlight onPress={() => this._itemMenu('About')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {fontSize: 24, marginTop: 20}]}>About</Text>
+                                    <Text style={[styles.greyText, {
+                                        fontSize: 24, 
+                                        marginTop: 20,
+                                        color: this.props.page == 'About' ? '#333' : '#9EA0A5' 
+                                        }]}>About</Text>
                                 </TouchableHighlight>
 
                                 <TouchableHighlight onPress={() => this._itemMenu('Quiz')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {fontSize: 24, marginTop: 20}]}>Quiz</Text>
+                                    <Text style={[styles.greyText, {
+                                        fontSize: 24, 
+                                        marginTop: 20,
+                                        color: this.props.page == 'Quiz' ? '#333' : '#9EA0A5' 
+                                        }]}>Quiz</Text>
                                 </TouchableHighlight>
 
                                 <TouchableHighlight onPress={() => this._itemMenu('Profile')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {fontSize: 24, marginTop: 20}]}>Profile</Text>
+                                    <Text style={[styles.greyText, {
+                                        fontSize: 24, 
+                                        marginTop: 20,
+                                        color: this.props.page == 'Profile' ? '#333' : '#9EA0A5' 
+                                        }]}>Profile</Text>
                                 </TouchableHighlight>
                                 
                                 <TouchableHighlight onPress={() => this._itemMenu()} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[{fontSize: 24, marginTop: 20, color: '#FF6464'}]}>Log out</Text>
+                                    <Text style={[{
+                                        fontSize: 24, 
+                                        marginTop: 20, 
+                                        color: '#FF6464'}]}>Log out</Text>
                                 </TouchableHighlight>
                             </View>
                             <View style={styles.versionApp}>
@@ -136,38 +165,33 @@ export default class Header extends Component {
                             width: '100%', 
                             height: '100%', 
                             opacity: 0,
+                            backgroundColor: '#333',
                             position: 'absolute',
-                            elevation: 1,
                             }}
                         >
-                        <View></View>
+                            <View></View>
                         </TouchableHighlight>
                         
                 </Animated.View>
                 <View style={styles.header}>
-
-                <BlurView
+                {/* <BlurView
                                 style={styles.absolute}
                                 viewRef={this.state.viewRef}
                                 blurType="extraDark"
                                 blurAmount={2}
-                            />
+                            /> */}
 
                 
                     <TouchableHighlight style={styles.openMenu} onPress={() => this._openMenu() } underlayColor="#fff">
                         <Image source={burger} style={styles.burger} />
                     </TouchableHighlight>
-                    <Logo />
+                    <Image source={logoImg} style={{width: 80, height: 23}} />
                     
                     <View style={styles.timeWrapper}>
                         <Text style={styles.time}>{this.state.date}</Text>
                         <Image 
                         source={addReminder} 
                         style={styles.styleAddReminder} 
-                        onLoadEnd={this.imageLoaded.bind(this)} 
-                        ref={img => {
-                            this.backgroundImage = img;
-                        }}
                         />
                     </View>
                     
@@ -225,6 +249,7 @@ const styles = StyleSheet.create({
     },
     greyText: {
         color: '#9EA0A5',
+        fontFamily: 'SFUIText-Semibold'
     },
     containerMenu: {
         display: 'flex',
@@ -244,14 +269,14 @@ const styles = StyleSheet.create({
     },
     absolute: {
         position: "absolute",
-        top: 0,
-        bottom: 0,
-        right: 0,
+        // top: 0,
+        // bottom: 0,
+        // left: 0,
         width: '100%',
         height: '100%',
-        // backgroundColor: '#333',
-        zIndex: 10000000000000000,
-        // opacity: 0.5
+        backgroundColor: '#333',
+        zIndex: 1000000000000000000000,
+        opacity: 0.3
       }
 })
 

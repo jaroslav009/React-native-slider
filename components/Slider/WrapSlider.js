@@ -29,7 +29,7 @@ export default class WrapSlider extends Component {
                 {
                     description: 'Be sure to visit the leaderboards as you progress against other institutions.',
                     subTitle: 'Answer and compete!',
-                    title: ' Compare your results with others',
+                    title: 'Compare your results with others',
                     image: slideImg3,
                 },
             
@@ -117,11 +117,7 @@ export default class WrapSlider extends Component {
                 <View style={styles.wrapperArrow}>
                 
                 <Text onPress={this.prev.bind(this)} style={styles.navArrow}>
-                <Animated.Text style={[styles.navArrowActive, {
-                    color: colorArrow
-                } ]}>
                     Prev
-                </Animated.Text>
                 </Text>
                 <Text onPress={this.next.bind(this)} style={styles.navArrow}>Next</Text>
                 </View>
@@ -159,29 +155,28 @@ const styles = StyleSheet.create({
     navDotsItem: {
       backgroundColor: '#B5BBDF',
       opacity: 0.2,
-      borderRadius: 100,
+      borderRadius: 200,
       marginRight: 10,
-      padding: 10,
-      paddingBottom: 0,
-      paddingTop: 0,
+      width: 10,
+      height: 10,
       alignSelf: 'center'
     },
     navDotsItemActive: {
       backgroundColor: '#1D8EAB',
       borderRadius: 200,
       marginRight: 10,
-      padding: 10,
-      paddingBottom: 1,
-      paddingTop: 1,
+      width: 10,
+      height: 10,
       alignSelf: 'center'
     },
     navArrow: {
       color: '#677495',
-      fontSize: 18,
+      fontSize: 14,
+      fontFamily: 'SFUIText-Medium'
     },
     navArrowActive: {
       color: 'red',
-      fontSize: 18,
+      fontSize: 14,
     },
     wrapperArrow: {
       display: 'flex',
@@ -203,14 +198,15 @@ const styles = StyleSheet.create({
     subtitleStyle: {
         color: "#3E4A59",
         fontSize: 16,
-        lineHeight: 18
+        lineHeight: 18,
+        fontFamily: 'SFUIText-Regular'
     },
     titleStyle: {
         color: '#1D8EAB',
         fontSize: 30,
         lineHeight: 36,
         marginBottom: 65,
-        fontWeight: 'bold'
+        fontFamily: 'SFUIText-Bold'
     },
     imageStyle: {
         alignSelf: 'center',

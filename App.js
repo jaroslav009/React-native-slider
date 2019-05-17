@@ -31,12 +31,14 @@ const AppNavigator = createStackNavigator({
     QuizItem: {screen: QuizItem},
     Slack: {screen: Slack},
     About: {screen: About},
-    Settings: {screen : Settings}
+    Settings: {screen : Settings},
+    WrapSlider: {screen : WrapSlider},
+    Login: {screen : Login},
+    Register: {screen : Register},
   },
   {
-    contentComponent: 'Header',
-    initialRouteName: 'Dashboard',
-    headerMode: 'Header'
+    initialRouteName: 'QuizItem',
+    headerMode: 'none'
   }
 );
 

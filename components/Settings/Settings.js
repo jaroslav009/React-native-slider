@@ -27,17 +27,24 @@ export default class Settings extends Component {
         super(props);
         let today = new Date();
         this.state = {
-            textEmail: 'fewfew@efwe.com',
-            textPassword: 'fefwefew',
-            textName: 'fefwefew',
+            defaultEmail: 'fewfew@efwe.com',
+            defaultPassword: 'fefwefew',
+            defaultName: 'fefwefew',
+            changeEmail: 'fewfew@efwe.com',
+            changePassword: 'fefwefew',
+            changeName: 'fefwefew',
             errorEmail: true,
             errorPassword: true,
             date: today.getHours()+':'+today.getMinutes(),
             open: false,
+            changeButton: 'none',
         }
         this._resetPass = this._resetPass.bind(this);
         this._logOut = this._logOut.bind(this);
         this._back = this._back.bind(this);
+        this._nameFunc = this._nameFunc.bind(this);
+        this._emailFunc = this._emailFunc.bind(this);
+        this._passwordFunc = this._passwordFunc.bind(this);
     }
 
     _logOut() {
@@ -46,7 +53,7 @@ export default class Settings extends Component {
 
     _resetPass() {
         this.setState({
-            textPassword: '',
+            changePassword: '',
         })
     }
 
@@ -54,19 +61,54 @@ export default class Settings extends Component {
         this.props.navigation.goBack()
     }
 
+    _nameFunc(text) {
+        this.setState({ changeName: text });
+        if(text == this.state.defaultName) {
+            this.setState({ changeButton: 'none' });
+        } else {
+            this.setState({ changeButton: 'flex' });
+        }
+    }
+    _passwordFunc(text) {
+        this.setState({changePassword: text, errorPassword: validatePassword(text)});
+        
+        if(validatePassword(text) == false) {
+            this.setState({ changeButton: 'none' });
+            return;
+        }
+
+        if(text == this.state.defaultPassword) {
+            this.setState({ changeButton: 'none' });
+        } else {
+            this.setState({ changeButton: 'flex' });
+        }
+    }
+
+    _emailFunc(text) {
+        this.setState({ changeEmail: text, errorEmail: validateEmail(text) });
+        if(validateEmail(text) == false) {
+            this.setState({ changeButton: 'none' });
+            return;
+        }
+        if(text == this.state.defaultEmail) {
+            this.setState({ changeButton: 'none' });
+        } else {
+            this.setState({ changeButton: 'flex' });
+        }
+    }
 
     render() {
         return (
             <ScrollView>
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} page="Account" />
                 <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
                     <View>  
                     <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
                         <Image style={styles.arrowLeft} source={arrowLeft} />
                     </TouchableHighlight>
                         <View style={styles.titleWrapper}>
-                            <Text style={{color: '#3E3F42', fontSize: 24}}> DEVON SMITH </Text>
-                            <Text style={{color: '#3E3F42', fontSize: 16}}>Emory University</Text>
+                            <Text style={{color: '#3E3F42', fontSize: 24, fontFamily: 'SFUIText-Semibold'}}> DEVON SMITH </Text>
+                            <Text style={{color: '#3E3F42', fontSize: 16, fontFamily: 'SFUIText-Semibold'}}>Emory University</Text>
                             <Text style={{color: '#9EA0A5', fontSize: 16}}>Med Student</Text>
                         </View>
                         <View style={styles.wrapperFormLogin}>
@@ -74,36 +116,39 @@ export default class Settings extends Component {
                                 <Text style={styles.labelInput}>Name</Text>
                                 <TextInput
                                     style={styles.inputForm}
-                                    onChangeText={(text) => { this.setState({ textName: text }) }} 
+                                    onChangeText={(text) => this._nameFunc(text) } 
                                     placeholder="Name"
                                     placeholderTextColor="#3E3F42" 
-                                    value={this.state.textName}
+                                    value={this.state.changeName}
+                                    defaultValue={this.state.defaultName}
                                 />
                                 <Image source={edit} style={{position: 'absolute', right: 10, top: '30%'}} />
                             </View>
 
-                            <View style={{marginTop: 15}}>
+                            <View style={{marginTop: 20}}>
                                 <Text style={styles.labelInput}>Email</Text>
                                 <TextInput
                                     style={styles.inputForm}
-                                    onChangeText={(text) => { this.setState({ errorEmail: validateEmail(text), textEmail: text }) }} 
+                                    onChangeText={(text) => this._emailFunc(text) } 
                                     placeholder="Email"
                                     placeholderTextColor="#3E3F42"
-                                    value={this.state.textEmail}
+                                    value={this.state.changeEmail}
+                                    defaultValue={this.state.defaultEmail}
                                 />
                                 <Image source={edit} style={{position: 'absolute', right: 10, top: '30%'}} />
                                 <Text style={[styles.errText, {opacity: this.state.errorEmail == false ? 1 : 0}]}>Enter correct email address</Text>
                             </View>
                            
-                            <View style={styles.itemInputForm}>
+                            <View style={[styles.itemInputForm, {marginTop: 20}]}>
                                 <Text style={styles.labelInput}>Password</Text>
                                 <TextInput
                                     style={styles.inputForm}
-                                    onChangeText={(text) => this.setState({textPassword: text, errorPassword: validatePassword(text)})}
+                                    onChangeText={(text) => this._passwordFunc(text) }
                                     placeholder="Password"
                                     placeholderTextColor="#3E3F42" 
                                     secureTextEntry={true}
-                                    value={this.state.textPassword}
+                                    value={this.state.changePassword}
+                                    defaultValue={this.state.defaultPassword}
                                 />
                                 <TouchableHighlight onPress={this._resetPass} underlayColor="#fff" style={styles.resetBtn}>
                                     <Text style={{color: '#9EA0A5'}}>Reset</Text>
@@ -114,6 +159,11 @@ export default class Settings extends Component {
                         <View>
                             <TouchableHighlight onPress={this._logOut} underlayColor="#fff" style={styles.buttonLog}>
                                 <Text style={{color: '#FF6464', fontSize: 16}}>Log Out</Text>
+                            </TouchableHighlight>
+                        </View>
+                        <View style={{marginTop: 30, display: this.state.changeButton}}>
+                            <TouchableHighlight onPress={this._logOut} underlayColor="#1D8EAB" style={[styles.buttonLog, {backgroundColor: '#1D8EAB'}]}>
+                                <Text style={{color: '#fff', fontSize: 16}}>Save changes</Text>
                             </TouchableHighlight>
                         </View>
                     </View>
@@ -181,7 +231,7 @@ const styles = StyleSheet.create({
         width: '50%',
         bottom: 20,
         left: '30%',
-        marginTop: '70%'
+        marginTop: '60%'
     },
     imageSelect: {
         width: 17, 
@@ -203,12 +253,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         elevation: 3,
         paddingBottom: 10,
-        paddingTop: 10
+        paddingTop: 10,
+        borderRadius: 5
     },
     resetBtn: {
         position: 'absolute', 
         right: 10, 
-        top: '25%',
+        top: '30%',
     },
     labelInput: {
         paddingLeft: 10,

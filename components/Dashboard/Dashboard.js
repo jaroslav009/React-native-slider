@@ -41,7 +41,7 @@ export default class Dashboard extends Component {
                     <View style={styles.wrapperHero}>
                         <Image source={body} style={styles.backgroundImage} />
                         <View style={styles.wrapperHeroText}>
-                            <Text style={styles.textWelcome}>Welcom, Devan!</Text>
+                            <Text style={[styles.textWelcome]}>Welcom, Devan!</Text>
                             <Text style={styles.textRad}>
                                 <Text style={styles.numberRad}>173 </Text>
                                 rad
@@ -73,7 +73,7 @@ export default class Dashboard extends Component {
                             </View>
                             <View style={styles.answerDiagram}>
                                 <Text style={styles.textAnswer}>Correct answers</Text>
-                                <Text style={styles.textAnswer}>4</Text>
+                                <Text style={[styles.textAnswer, {fontSize: 20}]}>4</Text>
                             </View>
                             <Chart data={data} maxPoint={100} />
                         </View>
@@ -101,7 +101,7 @@ export default class Dashboard extends Component {
                             </View>
                             <View style={styles.answerDiagram}>
                                 <Text style={styles.textAnswer}>Correct answers</Text>
-                                <Text style={styles.textAnswer}>54</Text>
+                                <Text style={[styles.textAnswer, {fontSize: 20}]}>54</Text>
                             </View>
                             <Chart data={data2} maxPoint={100} />
                         </View>
@@ -152,18 +152,21 @@ const styles = StyleSheet.create({
         
     },
     textWelcome: {
-        fontSize: 40,
-        color: '#3E3F42'
+        fontSize: 30,
+        color: '#3E3F42',
+        fontFamily: 'SFUIText-Regular'
     },
     textRad: {
-        fontSize: 30,
+        fontSize: 20,
         marginTop: 20,
-        color: "#3E3F42"
+        color: "#3E3F42",
+        fontFamily: 'SFUIText-Regular'
     },
     numberRad: {
-        fontSize: 35,
+        fontSize: 25,
         color: '#3E3F42',
-        fontWeight: '400'
+        fontWeight: '400',
+        fontFamily: 'SFUIText-Regular'
     },
     wrapperTimePerfomance: {
         display: 'flex',
@@ -176,7 +179,8 @@ const styles = StyleSheet.create({
     },
     textPerfomance: {
         color: '#9EA0A5',
-        fontSize: 14
+        fontSize: 12,
+        fontFamily: 'SFUIText-Medium'
     },
     upArrow: {
         width: 8,
@@ -214,7 +218,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderBottomColor: 'red',
         borderBottomWidth: 2,
-        fontSize: 18
+        fontSize: 14,
+        fontFamily: 'SFUIText-Regular'
     },
     answerDiagram: {
         display: 'flex',
@@ -223,8 +228,9 @@ const styles = StyleSheet.create({
         marginTop: 20
     },
     textAnswer: {
-        fontSize: 18,
-        color: '#3E3F42'
+        fontSize: 14,
+        color: '#3E3F42',
+        fontFamily: 'SFUIText-Medium'
     },
     borderWindowBottom: {
         textAlign: 'center',
@@ -247,7 +253,8 @@ const styles = StyleSheet.create({
     textQuiz: {
         fontSize: 20,
         color: '#fff',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontFamily: 'SFUIText-Semibold'
     },
     
 })

@@ -94,7 +94,7 @@ export default class Quiz extends Component {
     render() {
         return (
             <ScrollView>
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} page="Quiz" />
                 <View>
                     <TouchableHighlight onPress={() => this._back()} underlayColor="#fff" style={styles.arroweftCont}>
                         <Image style={{width: 22, height: 15}} source={arrowLeft} />
@@ -122,8 +122,8 @@ export default class Quiz extends Component {
                                             </View>
                                             <View style={styles.bottomItem}>
                                                 <View style={{display: 'flex', flexDirection: 'row'}}>
-                                                    <Text style={[styles.greenText, {fontSize: 16}]}>{value.class}</Text>
-                                                    <Text style={{marginLeft: 16, color: '#3E3F42', fontSize: 16}}>{value.title}</Text>
+                                                    <Text style={[styles.greenText, {fontSize: 16, fontFamily: 'SFUIText-Semibold'}]}>{value.class}</Text>
+                                                    <Text style={{marginLeft: 16, color: '#3E3F42', fontSize: 16, fontFamily: 'SFUIText-Semibold'}}>{value.title}</Text>
                                                 </View>
                                                 <View style={[styles.checkStyle, { borderColor: value.cancel == true ? '#1D8EAB' : '#FF6464' }]}>
                                                     <Image source={value.cancel == true ? check : cancel} />

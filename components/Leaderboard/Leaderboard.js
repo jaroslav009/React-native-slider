@@ -114,7 +114,7 @@ export default class Leaderboard extends Component {
     render() {
         return (
             <ScrollView style={styles.leader}>
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} page="Leadboard" />
                 <View style={styles.wrapperLeader}>
                     <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
                         <Image style={styles.arrowLeft} source={arrowLeft} />
@@ -224,6 +224,7 @@ const styles = StyleSheet.create({
     filterTitle: {
         fontSize: 18,
         color: '#3E3F42',
+        fontFamily: 'SFUIText-Regular'
     },
     upArrow: {
         width: 8,
@@ -264,7 +265,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#FAFAFD',
         fontSize: 18,
         position: 'absolute',
-        right: -30
+        right: -30,
+        fontFamily: 'SFUIText-Regular'
     },
     pickerStyle2: {
         height: 50, 

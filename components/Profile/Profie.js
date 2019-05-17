@@ -24,7 +24,7 @@ export default class Profile extends Component {
     render() {
         return (
             <ScrollView style={styles.profile}>
-                <Header navigation={this.props.navigation} />
+                <Header navigation={this.props.navigation} page="Profile" />
                 <View style={styles.wrapperProfile}>
                     <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
                         <Image style={styles.arrowLeft} source={arrowLeft} />
@@ -79,7 +79,7 @@ export default class Profile extends Component {
                                         A
                                     </Text>    
                                     <View style={styles.titleItem}>
-                                        <Text>Everything's alright</Text>
+                                        <Text style={styles.titleBottomPart}>Everything's alright</Text>
                                     </View>
                                 </View>
                                 <View style={styles.checkStyle}>
@@ -113,7 +113,7 @@ export default class Profile extends Component {
                                     </Text>
                                     
                                     <View style={styles.titleItem}>
-                                        <Text>We should ask House</Text>
+                                        <Text style={styles.titleBottomPart}>We should ask House</Text>
                                     </View>
                                 </View>
                                 <View style={[styles.checkStyle, { borderColor: '#FF6464' }]}>
@@ -155,11 +155,13 @@ const styles = StyleSheet.create({
     titleProfie: {
         color: '#3E3F42',
         fontSize: 24,
+        fontFamily: 'SFUIText-Semibold'
     },
     subTitleProf: {
         color: '#3E3F42',
         fontSize: 16,
-        marginTop: 5
+        marginTop: 5,
+        fontFamily: 'SFUIText-Semibold'
     },
      pickerStyle: {
         width: Dimensions.get('window').width > 600 ? 110 : 120, 
@@ -193,7 +195,8 @@ const styles = StyleSheet.create({
     },
     answText: {
         color: '#3E3F42',
-        fontSize: 20
+        fontSize: 20,
+        fontFamily: 'SFUIText-Semibold'
     },
     greyText: {
         color: '#707070',
@@ -235,7 +238,7 @@ const styles = StyleSheet.create({
         color: '#1D8EAB',
         fontSize: 16,
         marginRight: 15,
-        fontWeight: 'bold'
+        fontFamily: 'SFUIText-Semibold'
     },
     titleItem: {
         color: '#3E3F42',
@@ -257,4 +260,9 @@ const styles = StyleSheet.create({
         left: '30%',
         marginTop: 30
     },
+    titleBottomPart: {
+        fontFamily: 'SFUIText-Semibold',
+        fontSize: 16,
+        color: '#3E3F42'
+    }
 })
