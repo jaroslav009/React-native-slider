@@ -47,10 +47,10 @@ const styles = StyleSheet.create({
     },
     contSlack: {
         color: '#3E3F42',
-        fontSize: 14,
-        lineHeight: 20,
+        fontSize: 16,
         marginTop: 30,
-        fontFamily: 'SFUIText-Regular'
+        fontFamily: 'SFUIText-Regular',
+        lineHeight: 26
     },
     borderWindowBottom: {
         textAlign: 'center',

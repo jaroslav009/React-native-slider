@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions } from 'react-native';
+import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import Logo from '../BasicComponents/Logo';
-import DatePicker from 'react-native-datepicker'
+import DatePicker from 'react-native-datepicker';
+// import firebase from 'react-native-firebase';
 
 // Images
 import mail from '../../uploads/img/mail.png'
@@ -33,12 +34,24 @@ export default class Register extends Component {
             errorPassword: true,
             errorDate: true,
             dateSelected: '',
-            date:""
+            date:"",
+            authentication: false,
         }
         this._onPressLearnMore = this._onPressLearnMore.bind(this);
     }
 
+    // componentDidMount() {
+    //     firebase.auth()
+    //     .signInAnonymously()
+    //     .then(credential => {
+    //         if (credential) {
+    //         console.log('default app user ->', credential.user.toJSON());
+    //         }
+    //     });
+    // }
+
     _onPressLearnMore() {
+        
         if(this.state.textEmail.length == 0 && this.state.textPassword == 0 && this.state.date == '') {
             this.setState({ errorEmail: false, errorPassword: false, errorDate: false });
         } else if(this.state.textEmail.length == 0) {
@@ -50,10 +63,22 @@ export default class Register extends Component {
         }
         else if(this.state.errorPassword == false || this.state.errorEmail == false || this.state.errorDate == false) {
             return;
+        } else {
+            // All good
+            this.setState({ authentication: true })
         }
+        
     }
 
     render() {
+        if(this.state.authentication == true) {
+            return (
+                <View style={styles.containerActivity}>
+                    <ActivityIndicator size="large" /> 
+                </View>
+                
+            )
+        } 
         return (
             <ScrollView>
                 <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
@@ -120,7 +145,7 @@ export default class Register extends Component {
                         <View>
                             <Button
                                 onPress={this._onPressLearnMore}
-                                title="Log in"
+                                title="Sign up"
                                 color={this.state.errorEmail == false || this.state.errorPassword == false ? '#9EA0A5' : '#1D8EAB'}
                             />
                         </View>
@@ -230,5 +255,11 @@ const styles = StyleSheet.create({
         height: '100%',
         opacity: 0,
         zIndex: 100000
+    },
+    containerActivity: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: Dimensions.get('window').height
     }
 })

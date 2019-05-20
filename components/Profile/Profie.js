@@ -38,7 +38,9 @@ export default class Profile extends Component {
                         </Text>
                     </View>
                     <View style={styles.containerAnswer}>
-                        <Text style={styles.answText}>732 Answers</Text>
+                        <View style={{marginTop: 11}}>
+                            <Text style={styles.answText}>732 Answers</Text>
+                        </View>
                         <View>
                             <Image source={upArrow} style={styles.upArrow} />
                             <Image source={downArrow} style={styles.downArrow} />

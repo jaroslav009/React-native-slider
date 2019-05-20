@@ -120,7 +120,9 @@ export default class Leaderboard extends Component {
                         <Image style={styles.arrowLeft} source={arrowLeft} />
                     </TouchableHighlight>
                     <View style={styles.filterContainer}>
-                        <Text style={styles.filterTitle}>Leaderboard</Text>
+                        <View style={{marginTop: 11}}>
+                            <Text style={styles.filterTitle}>Leaderboard</Text>
+                        </View>
                         <View>
                             <Image source={upArrow} style={styles.upArrow} />
                             <Image source={downArrow} style={styles.downArrow} />
@@ -219,7 +221,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 30
+        marginTop: 30,
+        alignItems: 'flex-start'
     },
     filterTitle: {
         fontSize: 18,

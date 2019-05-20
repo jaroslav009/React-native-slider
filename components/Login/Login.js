@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, AppState } from 'react-native';
+import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 
 import Logo from '../BasicComponents/Logo';
 
@@ -29,6 +29,7 @@ export default class Login extends Component {
             textPassword: '',
             errorEmail: true,
             errorPassword: true,
+            authentication: false,
         }
         this._onPressLearnMore = this._onPressLearnMore.bind(this);
     }
@@ -42,10 +43,20 @@ export default class Login extends Component {
             this.setState({ errorPassword: false })
         } else if(this.state.textEmail && this.state.textPassword == false) {
             return;
+        } else {
+            // All good
+            this.setState({ authentication: true })
         }
     }
 
     render() {
+        if(this.state.authentication == true) {
+            return (
+                <View style={styles.containerActivity}>
+                    <ActivityIndicator size="large" />
+                </View>
+            )
+        }
         return (
             <ScrollView>
                 <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
@@ -180,5 +191,11 @@ const styles = StyleSheet.create({
         bottom: -0,
         left: '30%',
         marginTop: 10
+    },
+    containerActivity: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: Dimensions.get('window').height
     }
 })

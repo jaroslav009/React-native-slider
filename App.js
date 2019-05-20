@@ -7,7 +7,6 @@
  */
 
 import React, {Component} from 'react';
-import {View, Text, Button} from 'react-native';
 import WrapSlider from './components/Slider/WrapSlider';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
@@ -37,7 +36,7 @@ const AppNavigator = createStackNavigator({
     Register: {screen : Register},
   },
   {
-    initialRouteName: 'QuizItem',
+    initialRouteName: 'Login',
     headerMode: 'none'
   }
 );
