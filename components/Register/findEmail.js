@@ -134,7 +134,7 @@ export default function findEmail(email) {
         'marshall.edu',
         'wvu.edu',
         'mcw.edu',
-        
+
     ];
     for(let i = 0; i < arrEmail.length; i++) {
         if(email.indexOf(arrEmail[i]) != -1) {
@@ -145,9 +145,7 @@ export default function findEmail(email) {
         }
     }
     return {
-        university: 'Other',
-        state: 'Other',
         email: email,
-        univerId: 'Other'
+        lastPart: 'other',
     }
 }
