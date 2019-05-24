@@ -54,11 +54,6 @@ export default class Register extends Component {
         }
         this._onPressLearnMore = this._onPressLearnMore.bind(this);
     }
-
-    componentDidMount() {
-        console.log('componentDidMount');
-        console.log(findEmail('fewfew@efwf.uab.edu'))
-    }
     
     _onPressLearnMore() {
         
@@ -85,20 +80,27 @@ export default class Register extends Component {
                 console.log('auth data user ');
                 let idUser = makeid(10)
                 let dataUserEmail = findEmail(this.state.textEmail.toLowerCase());
-                dataUserEmail.born = this.state.date;
-                firebase.database().ref("users/" + idUser).set(dataUserEmail)
+                firebase.database().ref("users/" + idUser).set({
+                    email: this.state.textEmail,
+                    born: this.state.date
+                })
                 .then(() => {
                     console.log('success');
-                    firebase.database().ref("university/" + dataUserEmail.univerId + "/" + idUser).set(dataUserEmail)
-                    .then(() => {
-                        this.props.navigation.navigate('RegisterDataUser', {
-                            id: idUser,
-                            univerId: dataUserEmail.univerId,
-                        });
-                    })
-                    .catch((err) => {
-                        console.log('failed univer', err);
-                    })
+                    firebase.database().ref("university").orderByChild("lastPart").equalTo(dataUserEmail.lastPart).on("child_added", (snapshot) => {
+                        firebase.database().ref("university/" + snapshot.key + "/" + idUser).set({
+                            email: this.state.textEmail,
+                            born: this.state.date
+                        })
+                        .then(() => {
+                            this.props.navigation.navigate('RegisterDataUser', {
+                                id: idUser,
+                                univerId: snapshot.key,
+                            });
+                        })
+                        .catch((err) => {
+                            console.log('failed univer', err);
+                        })
+                    });
                 }).catch((err) => {
                     console.log('failed', err);
                 })
