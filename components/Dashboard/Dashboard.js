@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, Button, ScrollView, Dimensions, Picker, TouchableHighlight } from 'react-native';
+import {StyleSheet, Text, View, Image, ActivityIndicator, ScrollView, Dimensions, Picker, TouchableHighlight } from 'react-native';
 
 import Header from '../Header/Header';
 import Chart from '../Chart/Chart';
 import body from '../../uploads/img/body.png'
 import upArrow from '../../uploads/img/up-arrow.png';
 import downArrow from '../../uploads/img/sort-down-triangular-symbol.png';
+import firebase from 'react-native-firebase';
 
 export default class Dashboard extends Component {
 
@@ -15,8 +16,27 @@ export default class Dashboard extends Component {
         this.state = {
             timePickerPersonal: '',
             date: today.getHours()+':'+today.getMinutes(),
+            dataUser: {},
+            authentication: true,
         }
         this._itemMenu = this._itemMenu.bind(this);
+    }
+
+    componentDidMount() {
+        firebase.auth().onAuthStateChanged((user) => {
+            if(user){
+                console.log('user email', user.email);
+            }
+            firebase.database().ref("users").orderByChild("email").equalTo(user.email).on("child_added", (snapshot) => { 
+                console.log('snapshot');
+                console.log(snapshot.key);
+                firebase.database().ref("users/"+snapshot.key).on("value", (data) => {
+                    console.log('data.toJSON()');
+                    console.log(data.toJSON());
+                    this.setState({ dataUser: data.toJSON(), authentication: false })
+                });
+            });
+        })
     }
 
     _itemMenu() {
@@ -25,7 +45,15 @@ export default class Dashboard extends Component {
     }
 
     render() {
-        
+        if(this.state.authentication == true) {
+            return (
+                <View style={styles.containerActivity}>
+                    <ActivityIndicator size="large" /> 
+                </View>
+            )
+        } 
+        console.log('state')
+        console.log(this.state.dataUser.age)
         const data = [ [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }], [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }] ]
         const data2 = [ [{ number: 10, name: 'M' }, { number: 20, name: 'T' }, { number: 24, name: 'W' }, { number: 23, name: 'T'}, { number: 0, name: 'F' }, { number: 25, name: 'S' }, { number: 0, name: 'S' }], [{ number: 0, name: 'M' }, { number: 0, name: 'T' }, { number: 32, name: 'W' }, { number: 22, name: 'T'}, { number: 21, name: 'F' }, { number: 22, name: 'S' }, { number: 21, name: 'S' }] ]
 
@@ -41,7 +69,7 @@ export default class Dashboard extends Component {
                     <View style={styles.wrapperHero}>
                         <Image source={body} style={styles.backgroundImage} />
                         <View style={styles.wrapperHeroText}>
-                            <Text style={[styles.textWelcome]}>Welcom, Devan!</Text>
+                            <Text style={[styles.textWelcome]}>Welcom, {this.state.dataUser.firstName}!</Text>
                             <Text style={styles.textRad}>
                                 <Text style={styles.numberRad}>173 </Text>
                                 rad
@@ -256,5 +284,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontFamily: 'SFUIText-Semibold'
     },
-    
+    containerActivity: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: Dimensions.get('window').height
+    }
 })

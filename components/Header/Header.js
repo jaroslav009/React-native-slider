@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View, Image, TouchableHighlight, Dimensions, Animated, findNodeHandle } from 'react-native';
-import { BlurView, VibrancyView } from "@react-native-community/blur";
+import firebase from 'react-native-firebase';
 
 import Logo from '../BasicComponents/Logo';
 import burger from '../../uploads/img/burger3x.png'
@@ -17,14 +17,45 @@ export default class Header extends Component {
             open: false,
             fadeAnim: new Animated.Value(-1000),
             opacBack: new Animated.Value(0),
+            dataUser: {},
         }
         this._itemMenu = this._itemMenu.bind(this);
         this._openMenu = this._openMenu.bind(this);
+        this._logOut = this._logOut.bind(this);
         this._closeMenu = this._closeMenu.bind(this);
     }
 
     _itemMenu(item) {
         this.props.navigation.navigate(item)
+    }
+    // TO DO
+    _logOut() {
+        
+        firebase.auth().signOut().then(() => {
+            this.props.navigation.navigate('Login')
+        }).catch((err) => {
+            console.log('err log out', err);
+        })
+
+    }
+
+    componentDidMount() {
+        firebase.auth().onAuthStateChanged((user) => {
+            if(user){
+                console.log('user logged', user.email);
+                firebase.database().ref("users").orderByChild("email").equalTo(user.email).on("child_added", (snapshot) => { 
+                    console.log('snapshot');
+                    console.log(snapshot.key);
+                    firebase.database().ref("users/"+snapshot.key).on("value", (data) => {
+                        console.log('data.toJSON()');
+                        console.log(data.toJSON());
+                        this.setState({ dataUser: data.toJSON() })
+                    });
+                });
+            } else {
+                this.props.navigation.navigate('Login');
+            }
+        })
     }
 
     _openMenu() {
@@ -88,7 +119,7 @@ export default class Header extends Component {
                             
                             <View style={styles.containerMenu}>
                             <View style={{paddingTop: 50, paddingBottom: 50}}>
-                                <Text style={{fontSize: 24, color: '#3E3F42', fontFamily: 'SFUIText-Semibold'}}>DEVON</Text>
+                                <Text style={{fontSize: 24, color: '#3E3F42', fontFamily: 'SFUIText-Semibold'}}>{this.state.dataUser.firstName}</Text>
                                 <Text style={[styles.greyText, {fontSize: 16}]}>173 Correct Answers</Text>
                             </View>
                                 <TouchableHighlight onPress={() => this._itemMenu('Dashboard')} underlayColor="#fff" style={{
@@ -150,7 +181,7 @@ export default class Header extends Component {
                                         }]}>Profile</Text>
                                 </TouchableHighlight>
                                 
-                                <TouchableHighlight onPress={() => this._itemMenu()} underlayColor="#fff" style={{zIndex: 100000}}>
+                                <TouchableHighlight onPress={() => this._logOut()} underlayColor="#fff" style={{zIndex: 100000}}>
                                     <Text style={[{
                                         fontSize: 24, 
                                         marginTop: 20, 

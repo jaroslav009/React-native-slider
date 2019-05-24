@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "700981069189",
+    "firebase_url": "https://radqdweb.firebaseio.com",
+    "project_id": "radqdweb",
+    "storage_bucket": "radqdweb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700981069189:android:bdda3018bb58ca0a",
+        "android_client_info": {
+          "package_name": "com.awesomeproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "700981069189-1oflgdhotvpkc6odugtmt8jbks84d2hk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDYlqKVV0e8OgonpBeDSOGajikcY0_8A8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "700981069189-1oflgdhotvpkc6odugtmt8jbks84d2hk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700981069189:android:f0793b655be37ca5",
+        "android_client_info": {
+          "package_name": "com.readqd.readqd"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "700981069189-1oflgdhotvpkc6odugtmt8jbks84d2hk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDYlqKVV0e8OgonpBeDSOGajikcY0_8A8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "700981069189-1oflgdhotvpkc6odugtmt8jbks84d2hk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,7 +2,9 @@ import React, {Component} from 'react';
 import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import Logo from '../BasicComponents/Logo';
 import DatePicker from 'react-native-datepicker';
-// import firebase from 'react-native-firebase';
+import firebase from 'react-native-firebase';
+
+import findEmail from './findEmail';
 
 // Images
 import mail from '../../uploads/img/mail.png'
@@ -16,12 +18,22 @@ function validateEmail(email) {
   }
   
 function validatePassword(pass) {
-    if(pass.length < 4) {
+    if(pass.length < 6) {
         return false;
     } else {
         return true;
     }
 }
+
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+ }
 
 export default class Register extends Component {
 
@@ -30,26 +42,24 @@ export default class Register extends Component {
         this.state = {
             textEmail: '',
             textPassword: '',
+            textUser: '',
+            errorUser: true,
             errorEmail: true,
             errorPassword: true,
             errorDate: true,
             dateSelected: '',
             date:"",
             authentication: false,
+            authErr: false,
         }
         this._onPressLearnMore = this._onPressLearnMore.bind(this);
     }
 
-    // componentDidMount() {
-    //     firebase.auth()
-    //     .signInAnonymously()
-    //     .then(credential => {
-    //         if (credential) {
-    //         console.log('default app user ->', credential.user.toJSON());
-    //         }
-    //     });
-    // }
-
+    componentDidMount() {
+        console.log('componentDidMount');
+        console.log(findEmail('fewfew@efwf.uab.edu'))
+    }
+    
     _onPressLearnMore() {
         
         if(this.state.textEmail.length == 0 && this.state.textPassword == 0 && this.state.date == '') {
@@ -65,7 +75,39 @@ export default class Register extends Component {
             return;
         } else {
             // All good
+            
             this.setState({ authentication: true })
+            firebase
+            .auth()
+            .createUserWithEmailAndPassword(this.state.textEmail, this.state.textPassword, this.state.date)
+            .then(() => {
+                this.setState({ authentication: false, authErr: false });
+                console.log('auth data user ');
+                let idUser = makeid(10)
+                let dataUserEmail = findEmail(this.state.textEmail.toLowerCase());
+                dataUserEmail.born = this.state.date;
+                firebase.database().ref("users/" + idUser).set(dataUserEmail)
+                .then(() => {
+                    console.log('success');
+                    firebase.database().ref("university/" + dataUserEmail.univerId + "/" + idUser).set(dataUserEmail)
+                    .then(() => {
+                        this.props.navigation.navigate('RegisterDataUser', {
+                            id: idUser,
+                            univerId: dataUserEmail.univerId,
+                        });
+                    })
+                    .catch((err) => {
+                        console.log('failed univer', err);
+                    })
+                }).catch((err) => {
+                    console.log('failed', err);
+                })
+                
+            })
+            .catch(error => {
+                console.log('error', error)
+                this.setState({ authentication: false, authErr: true });
+            })
         }
         
     }
@@ -76,7 +118,6 @@ export default class Register extends Component {
                 <View style={styles.containerActivity}>
                     <ActivityIndicator size="large" /> 
                 </View>
-                
             )
         } 
         return (
@@ -90,6 +131,9 @@ export default class Register extends Component {
                             </Text>
                         </View>
                         <View style={styles.wrapperFormLogin}>
+                            <View>
+                                <Text style={[styles.errText, {opacity: this.state.authErr == true ? 1 : 0}]}>Such user exists</Text>
+                            </View>
                             <View style={styles.itemInputForm}>
                                 <TextInput
                                     style={styles.inputForm}
@@ -145,7 +189,7 @@ export default class Register extends Component {
                         <View>
                             <Button
                                 onPress={this._onPressLearnMore}
-                                title="Sign up"
+                                title="Next step"
                                 color={this.state.errorEmail == false || this.state.errorPassword == false ? '#9EA0A5' : '#1D8EAB'}
                             />
                         </View>

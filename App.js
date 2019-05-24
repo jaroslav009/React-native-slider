@@ -10,6 +10,7 @@ import React, {Component} from 'react';
 import WrapSlider from './components/Slider/WrapSlider';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
+import RegisterDataUser from './components/Register/RegisterDataUser';
 import Dashboard from './components/Dashboard/Dashboard';
 import Leaderboard from './components/Leaderboard/Leaderboard';
 import Profile from './components/Profile/Profie';
@@ -34,9 +35,10 @@ const AppNavigator = createStackNavigator({
     WrapSlider: {screen : WrapSlider},
     Login: {screen : Login},
     Register: {screen : Register},
+    RegisterDataUser: {screen : RegisterDataUser}
   },
   {
-    initialRouteName: 'Login',
+    initialRouteName: 'Register',
     headerMode: 'none'
   }
 );

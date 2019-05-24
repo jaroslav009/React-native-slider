@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, TextInput, Image, ScrollView, Dimensions, TouchableHighlight } from 'react-native';
+import {StyleSheet, Text, View, TextInput, Image, ScrollView, Dimensions, TouchableHighlight, ActivityIndicator } from 'react-native';
+import firebase from 'react-native-firebase';
+
 // import Logo from '../BasicComponents/Logo';
 
 import Header from '../Header/Header'
@@ -14,7 +16,7 @@ function validateEmail(email) {
   }
   
 function validatePassword(pass) {
-    if(pass.length < 4) {
+    if(pass.length < 6) {
         return false;
     } else {
         return true;
@@ -27,17 +29,22 @@ export default class Settings extends Component {
         super(props);
         let today = new Date();
         this.state = {
-            defaultEmail: 'fewfew@efwe.com',
-            defaultPassword: 'fefwefew',
-            defaultName: 'fefwefew',
-            changeEmail: 'fewfew@efwe.com',
-            changePassword: 'fefwefew',
-            changeName: 'fefwefew',
+            defaultEmail: '',
+            defaultPassword: '',
+            defaultName: '',
+            changeEmail: '',
+            changePassword: '',
+            changeName: '',
+            newPassword: '',
             errorEmail: true,
             errorPassword: true,
+            errorNewPassword: true,
             date: today.getHours()+':'+today.getMinutes(),
             open: false,
             changeButton: 'none',
+            dataUser: {},
+            authentication: true,
+            idUser: ''
         }
         this._resetPass = this._resetPass.bind(this);
         this._logOut = this._logOut.bind(this);
@@ -45,10 +52,50 @@ export default class Settings extends Component {
         this._nameFunc = this._nameFunc.bind(this);
         this._emailFunc = this._emailFunc.bind(this);
         this._passwordFunc = this._passwordFunc.bind(this);
+        this._changeData = this._changeData.bind(this);
     }
 
-    _logOut() {
-        alert('logout')
+    componentDidMount() {
+        console.log('firebase.auth().currentUser')
+        console.log(firebase.auth().currentUser)
+        let email;
+        let keyUser;
+        firebase.auth().onAuthStateChanged((user) => {
+            if(user){
+                console.log('user email', user.email);
+                email = user.email
+            }
+            firebase.database().ref("users").orderByChild("email").equalTo(email).on("child_added", (snapshot) => { 
+                console.log('snapshot');
+                console.log(snapshot.key);
+                keyUser = snapshot.key;
+                firebase.database().ref("users/"+snapshot.key).on("value", (data) => {
+                    console.log('data.toJSON()');
+                    console.log(data.toJSON().email);
+                    this.setState({ 
+                        dataUser: data.toJSON(), 
+                        authentication: false,
+                        changeName: data.toJSON().username,
+                        changeEmail: data.toJSON().email,
+                        defaultEmail: data.toJSON().email,
+                        defaultName: data.toJSON().username,
+                        idUser: keyUser
+                    })
+                });
+            });
+        })
+    }
+
+    // TO DO
+    async _logOut() {
+        
+        try {
+            await firebase.auth().signOut();
+            // this.props.navigation.navigate('Login')
+        } catch (e) {
+            console.log('err firebae', e);
+        }
+
     }
 
     _resetPass() {
@@ -69,6 +116,7 @@ export default class Settings extends Component {
             this.setState({ changeButton: 'flex' });
         }
     }
+
     _passwordFunc(text) {
         this.setState({changePassword: text, errorPassword: validatePassword(text)});
         
@@ -97,7 +145,62 @@ export default class Settings extends Component {
         }
     }
 
+    reauthenticate = (currentPassword) => {
+        var user = firebase.auth().currentUser;
+        var cred = firebase.auth.EmailAuthProvider.credential(
+            user.email, this.state.changePassword);
+        return user.reauthenticateWithCredential(cred);
+      }
+
+    _changeData() {
+        this.setState({
+            authentication: true
+        })
+        firebase.database().ref("users/" + this.state.idUser).update({
+            username: this.state.changeName,
+            email: this.state.changeEmail
+        }).then(() => {
+            console.log('success');
+            this.reauthenticate(this.state.changePassword).then(() => {
+                var user = firebase.auth().currentUser;
+                user.updatePassword(this.state.newPassword).then(() => {
+                    console.log("Password updated!");
+                    this.setState({
+                        errorNewPassword: true,
+                    })
+                }).catch((error) => {
+                    this.setState({
+                        errorNewPassword: false,
+                    })
+                    console.log(error);
+                    
+                });
+              }).catch((error) => { 
+                this.setState({
+                    errorNewPassword: false,
+                })
+                console.log(error);
+               });
+            this.setState({ 
+                defaultEmail: this.state.changeEmail,
+                defaultName: this.state.changeName,
+                changeButton: 'none',
+                authentication: false
+            });
+        }).catch((err) => {
+            this.setState({ authentication: false });
+            console.log('failed', err);
+        })
+    }
+
     render() {
+        if(this.state.authentication == true) {
+            return (
+                <View style={styles.containerActivity}>
+                    <ActivityIndicator size="large" /> 
+                </View>
+            )
+        } 
         return (
             <ScrollView>
                 <Header navigation={this.props.navigation} page="Account" />
@@ -107,9 +210,9 @@ export default class Settings extends Component {
                         <Image style={styles.arrowLeft} source={arrowLeft} />
                     </TouchableHighlight>
                         <View style={styles.titleWrapper}>
-                            <Text style={{color: '#3E3F42', fontSize: 24, fontFamily: 'SFUIText-Semibold'}}> DEVON SMITH </Text>
-                            <Text style={{color: '#3E3F42', fontSize: 16, fontFamily: 'SFUIText-Semibold'}}>Emory University</Text>
-                            <Text style={{color: '#9EA0A5', fontSize: 16}}>Med Student</Text>
+                            <Text style={{color: '#3E3F42', fontSize: 24, fontFamily: 'SFUIText-Semibold'}}> {this.state.dataUser.firstName} {this.state.dataUser.lastName} </Text>
+                            <Text style={{color: '#3E3F42', fontSize: 16, fontFamily: 'SFUIText-Semibold'}}>{this.state.dataUser.university}</Text>
+                            <Text style={{color: '#9EA0A5', fontSize: 16}}>{this.state.dataUser.proffesion}</Text>
                         </View>
                         <View style={styles.wrapperFormLogin}>
                             <View style={styles.itemInputForm}>
@@ -139,7 +242,7 @@ export default class Settings extends Component {
                                 <Text style={[styles.errText, {opacity: this.state.errorEmail == false ? 1 : 0}]}>Enter correct email address</Text>
                             </View>
                            
-                            <View style={[styles.itemInputForm, {marginTop: 20}]}>
+                            <View style={styles.itemInputForm}>
                                 <Text style={styles.labelInput}>Password</Text>
                                 <TextInput
                                     style={styles.inputForm}
@@ -155,14 +258,26 @@ export default class Settings extends Component {
                                 </TouchableHighlight>
                                 <Text style={[styles.errText, {opacity: this.state.errorPassword == false ? 1 : 0}]}>Enter the password</Text>
                             </View>
+                            <View style={styles.itemInputForm}>
+                                <Text style={styles.labelInput}>New Password</Text>
+                                <TextInput
+                                    style={styles.inputForm}
+                                    onChangeText={(text) => this.setState({ newPassword: text }) }
+                                    placeholder="New password"
+                                    placeholderTextColor="#3E3F42" 
+                                    secureTextEntry={true}
+                                    value={this.state.newPassword}
+                                />
+                                <Text style={[styles.errText, {opacity: this.state.errorNewPassword == false ? 1 : 0}]}>Not correct current password or new password</Text>                                
+                            </View>
                         </View>
                         <View>
-                            <TouchableHighlight onPress={this._logOut} underlayColor="#fff" style={styles.buttonLog}>
+                            <TouchableHighlight onPress={this._logOut} underlayColor="#fff" style={[styles.buttonLog, {marginTop: 20}]}>
                                 <Text style={{color: '#FF6464', fontSize: 16}}>Log Out</Text>
                             </TouchableHighlight>
                         </View>
                         <View style={{marginTop: 30, display: this.state.changeButton}}>
-                            <TouchableHighlight onPress={this._logOut} underlayColor="#1D8EAB" style={[styles.buttonLog, {backgroundColor: '#1D8EAB'}]}>
+                            <TouchableHighlight onPress={this._changeData} underlayColor="#1D8EAB" style={[styles.buttonLog, {backgroundColor: '#1D8EAB'}]}>
                                 <Text style={{color: '#fff', fontSize: 16}}>Save changes</Text>
                             </TouchableHighlight>
                         </View>
@@ -333,5 +448,11 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: (Dimensions.get('window').height/2)+70,
         left: 40
+    },
+    containerActivity: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: Dimensions.get('window').height
     }
 })

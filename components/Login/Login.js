@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
+import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, ActivityIndicator, TouchableHighlight } from 'react-native';
+import firebase from 'react-native-firebase';
 
 import Logo from '../BasicComponents/Logo';
 
@@ -13,7 +14,7 @@ function validateEmail(email) {
   }
   
 function validatePassword(pass) {
-    if(pass.length < 4) {
+    if(pass.length < 6) {
         return false;
     } else {
         return true;
@@ -30,8 +31,10 @@ export default class Login extends Component {
             errorEmail: true,
             errorPassword: true,
             authentication: false,
+            authErr: false,
         }
         this._onPressLearnMore = this._onPressLearnMore.bind(this);
+        this._toRegister = this._toRegister.bind(this);
     }
 
     _onPressLearnMore() {
@@ -46,17 +49,34 @@ export default class Login extends Component {
         } else {
             // All good
             this.setState({ authentication: true })
+            firebase
+            .auth()
+            .signInWithEmailAndPassword(this.state.textEmail, this.state.textPassword)
+            .then(() => {
+                this.setState({ authentication: false, authErr: false });
+                this.props.navigation.navigate('Dashboard')
+            })
+            .catch(error => {
+                console.log('error', error)
+                this.setState({ authentication: false, authErr: true });
+            })
         }
+    }
+
+    _toRegister() {
+        console.log('hello')
+        this.props.navigation.navigate('Register');
+        
     }
 
     render() {
         if(this.state.authentication == true) {
             return (
                 <View style={styles.containerActivity}>
-                    <ActivityIndicator size="large" />
+                    <ActivityIndicator size="large" /> 
                 </View>
             )
-        }
+        } 
         return (
             <ScrollView>
                 <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
@@ -68,6 +88,10 @@ export default class Login extends Component {
                             </Text>
                         </View>
                         <View style={styles.wrapperFormLogin}>
+                            <View>
+                                <Text style={[styles.errText, {opacity: this.state.authErr == true ? 1 : 0}]}>Invalid password or email
+</Text>
+                            </View>
                             <View style={styles.itemInputForm}>
                                 <TextInput
                                     style={styles.inputForm}
@@ -101,14 +125,15 @@ export default class Login extends Component {
                             />
                         </View>
                     </View>
-                    <View style={styles.wrapperJoin}>
+                    <TouchableHighlight style={styles.wrapperJoin} onPress={() => this._toRegister()} underlayColor="#fff">
 
                         <Text style={styles.greyText}>
                             No account yet?
                             <Text style={styles.join}>join now</Text>
                         </Text>
+                            
                         
-                    </View>
+                    </TouchableHighlight>
                     <View style={styles.borderWindowBottom}></View>
                 </View>
             </ScrollView>
@@ -178,6 +203,8 @@ const styles = StyleSheet.create({
     },
     wrapperJoin: {
         marginTop: Dimensions.get('window').height > 600 ? '100%' : '3%',
+        display: 'flex',
+        flexDirection: 'column'
     },
     errText: {
         color: '#FF6464',
