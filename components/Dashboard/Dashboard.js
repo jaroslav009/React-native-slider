@@ -6,7 +6,6 @@ import Chart from '../Chart/Chart';
 import body from '../../uploads/img/body.png'
 import upArrow from '../../uploads/img/up-arrow.png';
 import downArrow from '../../uploads/img/sort-down-triangular-symbol.png';
-import firebase from 'react-native-firebase';
 
 export default class Dashboard extends Component {
 
@@ -23,20 +22,7 @@ export default class Dashboard extends Component {
     }
 
     componentDidMount() {
-        firebase.auth().onAuthStateChanged((user) => {
-            if(user){
-                console.log('user email', user.email);
-            }
-            firebase.database().ref("users").orderByChild("email").equalTo(user.email).on("child_added", (snapshot) => { 
-                console.log('snapshot');
-                console.log(snapshot.key);
-                firebase.database().ref("users/"+snapshot.key).on("value", (data) => {
-                    console.log('data.toJSON()');
-                    console.log(data.toJSON());
-                    this.setState({ dataUser: data.toJSON(), authentication: false })
-                });
-            });
-        })
+        this.setState({ authentication: false })
     }
 
     _itemMenu() {

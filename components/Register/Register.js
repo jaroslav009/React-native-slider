@@ -54,6 +54,14 @@ export default class Register extends Component {
         }
         this._onPressLearnMore = this._onPressLearnMore.bind(this);
     }
+
+    componentDidMount() {
+        firebase.database().ref("university").orderByChild("lastPart").equalTo('uams.edu').on("child_added", (snapshot) => {
+            firebase.database().ref('university/'+snapshot.key).on("value", (data) => {
+                console.log('data', data._value.state)
+            })
+        });
+    }
     
     _onPressLearnMore() {
         
@@ -80,30 +88,39 @@ export default class Register extends Component {
                 console.log('auth data user ');
                 let idUser = makeid(10)
                 let dataUserEmail = findEmail(this.state.textEmail.toLowerCase());
-                firebase.database().ref("users/" + idUser).set({
-                    email: this.state.textEmail,
-                    born: this.state.date
-                })
-                .then(() => {
-                    console.log('success');
-                    firebase.database().ref("university").orderByChild("lastPart").equalTo(dataUserEmail.lastPart).on("child_added", (snapshot) => {
-                        firebase.database().ref("university/" + snapshot.key + "/" + idUser).set({
-                            email: this.state.textEmail,
-                            born: this.state.date
-                        })
-                        .then(() => {
-                            this.props.navigation.navigate('RegisterDataUser', {
-                                id: idUser,
-                                univerId: snapshot.key,
-                            });
+                
+                console.log('success');
+                firebase.database().ref("university").orderByChild("lastPart").equalTo(dataUserEmail.lastPart).on("child_added", (snapshot) => {
+                    
+                    firebase.database().ref('university/'+snapshot.key).once("value", (data) => {
+                        console.log('data success')
+                        firebase.database().ref("users/" + idUser).set({
+                            email: this.state.textEmail.toLowerCase(),
+                            born: this.state.date,
+                            state: data._value.state,
+                            university: data._value.name
+                        }).then(() => {
+                            firebase.database().ref("university/" + snapshot.key + "/" + idUser).set({
+                                email: this.state.textEmail.toLowerCase(),
+                                born: this.state.date,
+                                state: data._value.state
+                            })
+                            .then(() => {
+                                this.props.navigation.navigate('RegisterDataUser', {
+                                    id: idUser,
+                                    univerId: snapshot.key,
+                                });
+                            })
+                            .catch((err) => {
+                                console.log('failed univer', err);
+                            })
                         })
                         .catch((err) => {
-                            console.log('failed univer', err);
+                            console.log('err user', err);
                         })
-                    });
-                }).catch((err) => {
-                    console.log('failed', err);
-                })
+                        
+                    })
+                });
                 
             })
             .catch(error => {

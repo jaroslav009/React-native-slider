@@ -40,29 +40,34 @@ export default class RegisterDataUser extends Component {
         const { navigation } = this.props;
         if(this.state.textUser.length == 0) {
             this.setState({ errorUser: false, authentication: false });
-        } else {
+        } else { 
             // All good
             firebase.database().ref("users/" + navigation.getParam('id', 'NO-ID')).update({
                 username: this.state.textUser,
                 firstName: this.state.textFName,
                 lastName: this.state.textLName,
-                university: this.state.textUniversity,
                 proffesion: this.state.textProffesion
             }).then(() => {
-                console.log('success');
+                console.log('success this.state.textUser' , this.state.textUser);        
                 firebase.database().ref("university/" + navigation.getParam('univerId') + "/" + navigation.getParam('id', 'NO-ID')).update({
                     firstName: this.state.textFName,
                     lastName: this.state.textLName,
-                    proffesion: this.state.textProffesion
-                })
-                this.setState({ authentication: false });
-                this.props.navigation.navigate('Dashboard', {
-                    id: 'idUser'
-                });
+                    proffesion: this.state.textProffesion,
+                    username: this.state.textUser,
+                }).then(() => {
+                    console.log('updarte')
+                    this.setState({ authentication: false });
+                    this.props.navigation.navigate('Dashboard', {
+                        id: 'idUser'
+                    });
+                }).catch((err) => {
+                    return console.log(err);
+                })        
             }).catch((err) => {
                 this.setState({ authentication: false });
                 console.log('failed', err);
             })
+            
         }
     }
 

@@ -44,7 +44,8 @@ export default class Settings extends Component {
             changeButton: 'none',
             dataUser: {},
             authentication: true,
-            idUser: ''
+            idUser: '',
+            university: '',
         }
         this._resetPass = this._resetPass.bind(this);
         this._logOut = this._logOut.bind(this);
@@ -56,7 +57,9 @@ export default class Settings extends Component {
     }
 
     componentDidMount() {
+        
         console.log('firebase.auth().currentUser')
+        
         console.log(firebase.auth().currentUser)
         let email;
         let keyUser;
@@ -65,13 +68,13 @@ export default class Settings extends Component {
                 console.log('user email', user.email);
                 email = user.email
             }
-            firebase.database().ref("users").orderByChild("email").equalTo(email).on("child_added", (snapshot) => { 
+            firebase.database().ref("users").orderByChild("email").equalTo(email).once("child_added", (snapshot) => {
                 console.log('snapshot');
                 console.log(snapshot.key);
                 keyUser = snapshot.key;
-                firebase.database().ref("users/"+snapshot.key).on("value", (data) => {
+                firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                     console.log('data.toJSON()');
-                    console.log(data.toJSON().email);
+                    console.log(data.toJSON());
                     this.setState({ 
                         dataUser: data.toJSON(), 
                         authentication: false,
@@ -79,8 +82,9 @@ export default class Settings extends Component {
                         changeEmail: data.toJSON().email,
                         defaultEmail: data.toJSON().email,
                         defaultName: data.toJSON().username,
-                        idUser: keyUser
-                    })
+                        idUser: keyUser,
+                        university: data.toJSON().university
+                    });
                 });
             });
         })
@@ -91,7 +95,7 @@ export default class Settings extends Component {
         
         try {
             await firebase.auth().signOut();
-            // this.props.navigation.navigate('Login')
+            this.props.navigation.navigate('Login')
         } catch (e) {
             console.log('err firebae', e);
         }
@@ -156,18 +160,21 @@ export default class Settings extends Component {
         this.setState({
             authentication: true
         })
+        
         firebase.database().ref("users/" + this.state.idUser).update({
             username: this.state.changeName,
             email: this.state.changeEmail
         }).then(() => {
             console.log('success');
-            this.reauthenticate(this.state.changePassword).then(() => {
+            console.log('university', this.state.idUser)
+            if(this.state.changePassword != '' && this.state.changePassword != '') {
+                this.reauthenticate(this.state.changePassword).then(() => {
                 var user = firebase.auth().currentUser;
                 user.updatePassword(this.state.newPassword).then(() => {
-                    console.log("Password updated!");
-                    this.setState({
-                        errorNewPassword: true,
-                    })
+                console.log("Password updated!");
+                this.setState({
+                    errorNewPassword: true,
+                })
                 }).catch((error) => {
                     this.setState({
                         errorNewPassword: false,
@@ -175,12 +182,23 @@ export default class Settings extends Component {
                     console.log(error);
                     
                 });
-              }).catch((error) => { 
+              }).catch((error) => {
                 this.setState({
                     errorNewPassword: false,
                 })
                 console.log(error);
                });
+            }
+
+            firebase.database().ref("university").orderByChild("name").equalTo(this.state.university).on("child_added", (snapshot) => { 
+                console.log(snapshot.key);
+                firebase.database().ref("university/" + snapshot.key + "/" + this.state.idUser).update({
+                    username: this.state.changeName,
+                    email: this.state.changeEmail,
+                });
+            });
+            
+            
             this.setState({ 
                 defaultEmail: this.state.changeEmail,
                 defaultName: this.state.changeName,

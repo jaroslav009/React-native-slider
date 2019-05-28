@@ -29,14 +29,14 @@ export default class Header extends Component {
         this.props.navigation.navigate(item)
     }
     // TO DO
-    _logOut() {
+    async _logOut() {
         
-        firebase.auth().signOut().then(() => {
+        try {
+            await firebase.auth().signOut();
             this.props.navigation.navigate('Login')
-        }).catch((err) => {
-            console.log('err log out', err);
-        })
-
+        } catch (e) {
+            console.log('err firebae', e);
+        }
     }
 
     componentDidMount() {
@@ -44,7 +44,6 @@ export default class Header extends Component {
             if(user){
                 console.log('user logged', user.email);
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).on("child_added", (snapshot) => { 
-                    console.log('snapshot');
                     console.log(snapshot.key);
                     firebase.database().ref("users/"+snapshot.key).on("value", (data) => {
                         console.log('data.toJSON()');
