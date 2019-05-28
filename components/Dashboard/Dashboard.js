@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View, Image, ActivityIndicator, ScrollView, Dimensions, Picker, TouchableHighlight } from 'react-native';
+import firebase from 'react-native-firebase';
 
 import Header from '../Header/Header';
 import Chart from '../Chart/Chart';
@@ -22,7 +23,23 @@ export default class Dashboard extends Component {
     }
 
     componentDidMount() {
-        this.setState({ authentication: false })
+        
+        firebase.auth().onAuthStateChanged((user) => {
+            if(user){
+                console.log('user logged', user);
+                firebase.database().ref("users").orderByChild("email").equalTo(user.email).on("child_added", (snapshot) => { 
+                    console.log(snapshot.key);
+                    firebase.database().ref("users/"+snapshot.key).on("value", (data) => {
+                        console.log('data.toJSON()');
+                        console.log(data.toJSON());
+                        this.setState({ dataUser: data.toJSON() })
+                    });
+                    this.setState({ authentication: false })
+                });
+            } else {
+                this.props.navigation.navigate('Login');
+            }
+        })
     }
 
     _itemMenu() {

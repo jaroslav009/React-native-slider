@@ -37,6 +37,20 @@ export default class Login extends Component {
         this._toRegister = this._toRegister.bind(this);
     }
 
+    componentDidMount() {
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+              // User is signed in.
+              console.log('user state');
+              console.log(user._user);
+              this.props.navigation.navigate('Dashboard')
+            } else {
+              // User is signed out.
+              // ...
+            }
+        });
+    }
+
     _onPressLearnMore() {
         if(this.state.textEmail.length == 0 && this.state.textPassword == 0) {
             this.setState({ errorEmail: false, errorPassword: false })
@@ -107,7 +121,7 @@ export default class Login extends Component {
                                     style={styles.inputForm}
                                     onChangeText={(text) => this.setState({textPassword: text, errorPassword: validatePassword(text)})}
                                     placeholder="Password"
-                                    placeholderTextColor="#3E3F42" 
+                                    placeholderTextColor="#3E3F42"
                                     secureTextEntry={true}
                                 />
                                 <Image style={styles.imageInputPass} source={padlock} />

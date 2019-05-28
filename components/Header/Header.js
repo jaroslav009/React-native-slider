@@ -42,7 +42,7 @@ export default class Header extends Component {
     componentDidMount() {
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
-                console.log('user logged', user.email);
+                console.log('user logged', user);
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).on("child_added", (snapshot) => { 
                     console.log(snapshot.key);
                     firebase.database().ref("users/"+snapshot.key).on("value", (data) => {
@@ -118,7 +118,9 @@ export default class Header extends Component {
                             
                             <View style={styles.containerMenu}>
                             <View style={{paddingTop: 50, paddingBottom: 50}}>
-                                <Text style={{fontSize: 24, color: '#3E3F42', fontFamily: 'SFUIText-Semibold'}}>{this.state.dataUser.firstName}</Text>
+                                <Text style={{fontSize: 24, color: '#3E3F42', fontFamily: 'SFUIText-Semibold'}}>
+                                {this.state.dataUser.firstName}
+                                </Text>
                                 <Text style={[styles.greyText, {fontSize: 16}]}>173 Correct Answers</Text>
                             </View>
                                 <TouchableHighlight onPress={() => this._itemMenu('Dashboard')} underlayColor="#fff" style={{

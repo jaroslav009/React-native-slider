@@ -38,7 +38,7 @@ const AppNavigator = createStackNavigator({
     RegisterDataUser: {screen : RegisterDataUser}
   },
   {
-    initialRouteName: 'Register',
+    initialRouteName: 'Dashboard',
     headerMode: 'none'
   }
 );

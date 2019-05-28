@@ -61,6 +61,17 @@ export default class Register extends Component {
                 console.log('data', data._value.state)
             })
         });
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+              // User is signed in.
+              console.log('user state');
+              console.log(user._user);
+              this.props.navigation.navigate('Dashboard')
+            } else {
+              // User is signed out.
+              // ...
+            }
+        });
     }
     
     _onPressLearnMore() {
@@ -100,6 +111,11 @@ export default class Register extends Component {
                             state: data._value.state,
                             university: data._value.name
                         }).then(() => {
+                            firebase.auth().currentUser.sendEmailVerification().then(function() {
+                                console.log('send ')
+                            }, function(error) {
+                                console.log('err send', error)
+                            });
                             firebase.database().ref("university/" + snapshot.key + "/" + idUser).set({
                                 email: this.state.textEmail.toLowerCase(),
                                 born: this.state.date,

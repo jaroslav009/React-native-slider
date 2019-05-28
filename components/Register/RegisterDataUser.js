@@ -33,6 +33,17 @@ export default class RegisterDataUser extends Component {
         console.log('RegisterDataUser');
         const { navigation } = this.props;
         console.log(navigation.getParam('id', 'NO-ID'));
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+              // User is signed in.
+              console.log('user state');
+              console.log(user._user);
+              this.props.navigation.navigate('Dashboard')
+            } else {
+              // User is signed out.
+              // ...
+            }
+        });
     }
     
     _onPressLearnMore() {
@@ -57,7 +68,8 @@ export default class RegisterDataUser extends Component {
                 }).then(() => {
                     console.log('updarte')
                     this.setState({ authentication: false });
-                    this.props.navigation.navigate('Dashboard', {
+                    alert('Confirm your email');
+                    this.props.navigation.navigate('Login', {
                         id: 'idUser'
                     });
                 }).catch((err) => {
