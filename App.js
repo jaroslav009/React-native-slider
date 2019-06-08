@@ -19,6 +19,8 @@ import QuizItem from './components/Quiz/QuizItem';
 import Slack from './components/Slack/Slack';
 import About from './components/About/About';
 import Settings from './components/Settings/Settings';
+import ProfileStudents from './components/Profile/ProfileStudents';
+import QuizShowProfile from './components/Quiz/QuizShowProfile';
 import { createStackNavigator, createAppContainer } from "react-navigation";
 
 import Header from './components/Header/Header'
@@ -35,10 +37,12 @@ const AppNavigator = createStackNavigator({
     WrapSlider: {screen : WrapSlider},
     Login: {screen : Login},
     Register: {screen : Register},
-    RegisterDataUser: {screen : RegisterDataUser}
+    RegisterDataUser: {screen : RegisterDataUser},
+    ProfileStudents: {screen : ProfileStudents},
+    QuizShowProfile: {screen : QuizShowProfile}
   },
   {
-    initialRouteName: 'Dashboard',
+    initialRouteName: 'Profile',
     headerMode: 'none'
   }
 );

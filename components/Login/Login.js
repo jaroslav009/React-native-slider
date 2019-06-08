@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, ActivityIndicator, TouchableHighlight } from 'react-native';
+import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, ActivityIndicator, TouchableHighlight, Alert } from 'react-native';
 import firebase from 'react-native-firebase';
 
 import Logo from '../BasicComponents/Logo';
@@ -32,18 +32,20 @@ export default class Login extends Component {
             errorPassword: true,
             authentication: false,
             authErr: false,
+            errVerifyEmail: false,
         }
         this._onPressLearnMore = this._onPressLearnMore.bind(this);
         this._toRegister = this._toRegister.bind(this);
     }
 
     componentDidMount() {
+        
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
               // User is signed in.
               console.log('user state');
               console.log(user._user);
-              this.props.navigation.navigate('Dashboard')
+            //   this.props.navigation.navigate('Dashboard')
             } else {
               // User is signed out.
               // ...
@@ -68,7 +70,25 @@ export default class Login extends Component {
             .signInWithEmailAndPassword(this.state.textEmail, this.state.textPassword)
             .then(() => {
                 this.setState({ authentication: false, authErr: false });
-                this.props.navigation.navigate('Dashboard')
+                // this.props.navigation.navigate('Dashboard')
+                firebase.auth().onAuthStateChanged((user) => {
+                    if(user){
+                        console.log('user logged', user.emailVerified);
+                        if(user.emailVerified == true) {
+                            this.props.navigation.navigate('Dashboard');
+                        } else {
+                            this.setState({ errVerifyEmail: true });
+                            Alert.alert(
+                                '',
+                                'Verify your email!',
+                                [
+                                  {text: 'OK', onPress: () => console.log('OK Pressed')},
+                                ],
+                                {cancelable: false},
+                            );
+                        }
+                    }
+                })
             })
             .catch(error => {
                 console.log('error', error)
@@ -104,6 +124,8 @@ export default class Login extends Component {
                         <View style={styles.wrapperFormLogin}>
                             <View>
                                 <Text style={[styles.errText, {opacity: this.state.authErr == true ? 1 : 0}]}>Invalid password or email
+</Text>
+                                <Text style={[styles.errText, {opacity: this.state.errVerifyEmail == true ? 1 : 0}]}>You should to activate your account
 </Text>
                             </View>
                             <View style={styles.itemInputForm}>

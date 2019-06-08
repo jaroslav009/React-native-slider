@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View, Image, ScrollView, TouchableHighlight, Animated} from 'react-native';
+import firebase from 'react-native-firebase';
 
 import Header from '../Header/Header';
 
 import arrowLeft from '../../uploads/img/left-arrow.png'
-import nature1 from '../../uploads/img/bench-carved-stones-cemetery-257360.jpg';
 import userFill from '../../uploads/img/user-outlines.png';
-import check from '../../uploads/img/check-circular-button.png';
-import cancel from '../../uploads/img/X.png';
+import check from '../../uploads/img/checked.png';
+import cancel from '../../uploads/img/close.png';
+import cancelGrey from '../../uploads/img/close-grey.png';
 
 export default class Quiz extends Component {
 
@@ -57,34 +58,35 @@ export default class Quiz extends Component {
                 },
             ],
             laterKey: null,
+            data: [],
+            answers: [],
+            allSum: 0,
+            normVar: 0,
         }
-        this.touchElement = this.touchElement.bind(this);
+        // this.touchElement = this.touchElement.bind(this);
         this._back = this._back.bind(this);
     }
 
-    touchElement(key) {
-        if(this.state.laterKey == null) {
-            this.setState({ laterKey: key });
-        }
-        Animated.timing(
-            this.state.dataQuiz[key].border,
-            {
-              toValue: 2,
-              duration: 400,
-            },
-        ).start();
-
-        if(this.state.laterKey != null) {
-            Animated.timing(
-                this.state.dataQuiz[this.state.laterKey].border,
-                {
-                  toValue: 0,
-                  duration: 400,
-                },
-            ).start();
-        }
-        
-        this.setState({ laterKey: key });
+    componentDidMount() {
+        const { navigation } = this.props;
+        console.log('key',navigation.getParam('value'));
+        this.setState({ data: navigation.getParam('value'), answers: navigation.getParam('value').answers });
+        firebase.database().ref( "Cards/Open/"+navigation.getParam('id') ).once("child_added", (snapshot) => { 
+            console.log('snapshot.key',snapshot);
+        });
+        let sum = 0;
+        let boofer = 0;
+        let normVar = 0;
+        navigation.getParam('value').answers.map((value, key) => {
+            if(value.statisticChoose != undefined) {
+                sum = value.statisticChoose + sum;
+            }
+            if(value.statisticChoose > boofer) {
+                normVar = key;
+                boofer = value.statisticChoose;
+            }
+        });
+        this.setState({ allSum: sum, normVar });
     }
 
     _back() {
@@ -92,6 +94,7 @@ export default class Quiz extends Component {
     }
 
     render() {
+        let sum;
         return (
             <ScrollView>
                 <Header navigation={this.props.navigation} page="Quiz" />
@@ -99,38 +102,57 @@ export default class Quiz extends Component {
                     <TouchableHighlight onPress={() => this._back()} underlayColor="#fff" style={styles.arroweftCont}>
                         <Image style={{width: 22, height: 15}} source={arrowLeft} />
                     </TouchableHighlight>
-                    <Image style={styles.backgrImg} source={nature1} />
+                    <Image style={styles.backgrImg} source={{uri: this.state.data.image}} />
                     <View style={styles.containerQuiz}>
+
                         {
-                            this.state.dataQuiz.map((value, key) => {
+                            this.state.answers.map((value, key) => {
+                            let answ;
+                            let borderColor;
+                            if(value.correct == true && this.state.normVar == key) {
+                                answ = check;
+                                borderColor = '#1D8EAB';
+                            } 
+                            else if(this.state.normVar == key && value.correct == undefined) {
+                                answ = cancel;
+                                borderColor = '#FF6464';
+                            } 
+                            else {
+                                answ = cancelGrey;
+                                borderColor = '#9ea0a5';
+                            }
+                            
+                            if(value.statisticChoose == undefined) {
+                                value.statisticChoose = 0;
+                            }
+                            sum = Math.round( (value.statisticChoose*100)/this.state.allSum );
                                 return (
-                                    <TouchableHighlight key={key} underlayColor="white" style={{width: '80%'}} onPress={() => this.touchElement(key) }>
-                                        <Animated.View style={[styles.itemQuiz, {
-                                            borderWidth: this.state.dataQuiz[key].border, 
-                                            padding: this.state.dataQuiz[key].border == -1 ? 2 : 0,
-                                            borderColor: value.cancel == true ? '#1D8EAB' : '#FF6464'}]}>
-                                            <View style={styles.topPartItem}>
-                                                <View style={{display: 'flex', flexDirection: 'row', paddingLeft: 12, paddingRight: 12}}>
-                                                    <Image source={userFill} />
-                                                    <Text style={{marginLeft: 5, fontSize: 12}}>{value.voice}</Text>
-                                                </View>
-                                                <View>
-                                                    <Text style={[styles.greyText, {fontSize: 12, paddingLeft: 12, paddingRight: 12}]}>
-                                                        {value.time}
-                                                    </Text>
-                                                </View>
+                                    <View key={key} style={[styles.itemQuiz, {
+                                        width: '80%',
+                                        borderWidth: this.state.normVar == key ? 2 : 0,
+                                        borderColor: value.correct == true && this.state.normVar == key ? '#1D8EAB' : '#FF6464'
+                                        }]}>
+                                        <View key={key} style={styles.topPartItem}>
+                                            <View style={{display: 'flex', flexDirection: 'row', paddingLeft: 12, paddingRight: 12}}>
+                                                <Image source={userFill} />
+                                                <Text style={{marginLeft: 5, fontSize: 12}}>{value.statisticChoose == undefined ? '0' : value.statisticChoose} ({sum}%)</Text>
                                             </View>
-                                            <View style={styles.bottomItem}>
-                                                <View style={{display: 'flex', flexDirection: 'row'}}>
-                                                    <Text style={[styles.greenText, {fontSize: 16, fontFamily: 'SFUIText-Semibold'}]}>{value.class}</Text>
-                                                    <Text style={{marginLeft: 16, color: '#3E3F42', fontSize: 16, fontFamily: 'SFUIText-Semibold'}}>{value.title}</Text>
-                                                </View>
-                                                <View style={[styles.checkStyle, { borderColor: value.cancel == true ? '#1D8EAB' : '#FF6464' }]}>
-                                                    <Image source={value.cancel == true ? check : cancel} />
-                                                </View>
+                                            <View>
+                                                <Text style={[styles.greyText, {fontSize: 12, paddingLeft: 12, paddingRight: 12}]}>
+                                                    Avg: {value.statTime == undefined ? '0' : value.statTime} sec.
+                                                </Text>
                                             </View>
-                                        </Animated.View>
-                                    </TouchableHighlight>
+                                        </View>
+                                        <View style={styles.bottomItem}>
+                                            <View style={{display: 'flex', flexDirection: 'row'}}>
+                                                <Text style={[styles.greenText, {fontSize: 16, fontFamily: 'SFUIText-Semibold'}]}>{value.variant}</Text>
+                                                <Text style={{marginLeft: 16, color: '#3E3F42', fontSize: 16, fontFamily: 'SFUIText-Semibold'}}>{value.name}</Text>
+                                            </View>
+                                            <View style={[styles.checkStyle, { borderColor: value.correct == true ? '#1D8EAB' : borderColor }]}>
+                                                <Image source={value.correct == true ? check : answ} style={{ width: 20, height: 20 }} />
+                                            </View>
+                                        </View>
+                                    </View>
                                 )
                             })
                         }

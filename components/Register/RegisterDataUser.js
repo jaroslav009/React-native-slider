@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
+import {StyleSheet, Text, View, TextInput, Button, ScrollView, Dimensions, ActivityIndicator, Alert } from 'react-native';
 import Logo from '../BasicComponents/Logo';
-import DatePicker from 'react-native-datepicker';
 import firebase from 'react-native-firebase';
 
 function validateUser(user) {
@@ -32,18 +31,6 @@ export default class RegisterDataUser extends Component {
     componentDidMount() {
         console.log('RegisterDataUser');
         const { navigation } = this.props;
-        console.log(navigation.getParam('id', 'NO-ID'));
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-              // User is signed in.
-              console.log('user state');
-              console.log(user._user);
-              this.props.navigation.navigate('Dashboard')
-            } else {
-              // User is signed out.
-              // ...
-            }
-        });
     }
     
     _onPressLearnMore() {
@@ -67,11 +54,15 @@ export default class RegisterDataUser extends Component {
                     username: this.state.textUser,
                 }).then(() => {
                     console.log('updarte')
-                    this.setState({ authentication: false });
-                    alert('Confirm your email');
-                    this.props.navigation.navigate('Login', {
-                        id: 'idUser'
-                    });
+                    Alert.alert(
+                        '',
+                        'Verify your email!',
+                        [
+                          {text: 'OK', onPress: () => console.log('OK Pressed')},
+                        ],
+                        {cancelable: false},
+                      );
+                    this.props.navigation.navigate('Login')
                 }).catch((err) => {
                     return console.log(err);
                 })        

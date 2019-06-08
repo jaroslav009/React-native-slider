@@ -1,45 +1,193 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, ScrollView, Dimensions, Picker, TouchableHighlight} from 'react-native';
+import {StyleSheet, Text, View, Image, ScrollView, Dimensions, Picker, TouchableHighlight, ActivityIndicator} from 'react-native';
+import firebase from 'react-native-firebase'
 import Header from '../Header/Header';
 
-import arrowLeft from '../../uploads/img/left-arrow.png'
+import arrowLeft from '../../uploads/img/left-arrow.png';
 import upArrow from '../../uploads/img/up-arrow.png';
 import downArrow from '../../uploads/img/sort-down-triangular-symbol.png';
-import check from '../../uploads/img/check-circular-button.png';
-import cancel from '../../uploads/img/X.png';
+import check from '../../uploads/img/checked.png';
+import cancel from '../../uploads/img/close.png';
 import userFill from '../../uploads/img/user-fill.png';
-import nature1 from '../../uploads/img/bench-carved-stones-cemetery-257360.jpg';
+
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
 
 export default class Profile extends Component {
     constructor(props) {
         super(props);
         this.state = {
             filterAnsw: '',
+            dataUser: {},
+            columnStudents: 0,
+            authentication: true,
+            questions: [],
+            showQues: [],
+            answerQuiz: 0,
+            count: {
+                start: 1,
+                end: 0,
+            },
+            lastItem: 'http://www.youandthemat.com/wp-content/uploads/nature-2-26-17.jpg'
         }
         this._back = this._back.bind(this);
+        this._toQuestProfile = this._toQuestProfile.bind(this);
+        this._addQues = this._addQues.bind(this);
+        this._press = this._press.bind(this);
     }
     _back() {
         this.props.navigation.goBack()
     }
+
+    _toQuestProfile(value) {
+        this.props.navigation.navigate('Quiz', { value });
+    }
+
+    componentDidMount() {
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if(user){
+                firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
+                    console.log(snapshot.key);
+                    firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
+                        console.log('data.toJSON()');
+                        console.log(data);
+                        this.setState({ dataUser: data.toJSON() });
+                        firebase.database().ref("university").orderByChild("name").equalTo(data.toJSON().university).once("child_added", (snapshot) => {
+                            this.setState({ columnStudents: Object.size(snapshot._value) - 3, authentication: false })
+                        });
+                        firebase.database().ref("university/"+data.toJSON().university+"/answer").on("value", (snapshot) => {
+                            console.log('snapshot');
+                            console.log(snapshot._value);
+                            this.setState({ answerQuiz: snapshot._value });
+                        });
+                    })
+                });
+                firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
+                    firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
+                        this.setState({ dataUser: data.toJSON(), snapshot: snapshot.key });
+                        
+                    })
+                });
+            } else {
+                this.props.navigation.navigate('Login');
+            }
+            
+        });
+
+        firebase.database().ref("Cards/Open").limitToLast(200).once("value", (data) => {
+            for(item in data._value) {
+                console.log('item', item);
+                this.setState(state => {
+                    question = state.questions.push(data._value[item]);
+                    return {
+                        question
+                    }
+                })
+            }
+            if(this.state.questions.length < 5) {
+                let i = 1;
+                for(item in data._value) {
+                    if(i > 1) {
+                        console.log('dfewfewfwefewweffew')
+                    }
+                    else {
+                        this.setState(state => {
+                            question = state.showQues.push(data._value[item]);
+                            return {
+                                question
+                            }
+                        })
+                    }
+                    i++;
+                }
+            } else {
+                for(let i = 0; i<=5; i++) {
+                    this.setState(state => {
+                        question = state.showQues.push(data._value[i]);
+                        return {
+                            question
+                        }
+                    })
+                }
+            }
+            console.log('showQues',this.state.showQues, 'length', this.state.questions.length);
+        })
+    }
+
+    _addQues() {
+        console.log('hello', this.state.lastItem);
+
+        // firebase.database().ref("Cards/Open")
+        // .orderByChild("image")
+        // .startAt(this.state.lastItem)
+        // .limitToFirst(2).once("value", (data) => {
+        //     for(item in data._value) {
+        //         this.setState(state => {
+        //             question = state.questions.push(data._value[item]);
+        //             return {
+        //                 question
+        //             }
+        //         })
+        //     }
+        //     this.setState({ lastItem: this.state.questions[this.state.questions.length-1].image })
+        // })
+        
+    }
+
+    _press() {
+        let i = 1;
+        for(items in this.state.questions) {
+            if(i<=5) {
+                this.setState(state => {
+                    let question = state.showQues.push(items)
+                    return {
+                        question
+                    }
+                })
+            }
+            else {
+                break;
+            }
+            i++;
+        }
+    }
+
     render() {
+        if(this.state.authentication == true) {
+            return (
+                <View style={styles.containerActivity}>
+                    <ActivityIndicator size="large" /> 
+                </View>
+            )
+        } 
         return (
-            <ScrollView style={styles.profile}>
+            <ScrollView 
+            style={styles.profile}
+            onScroll={() => { this._addQues() }}
+            onContentSizeChange={ (he, cHe) => console.log('fwfewfewfewfewfew', he, '  ', cHe) }
+            >
                 <Header navigation={this.props.navigation} page="Profile" />
                 <View style={styles.wrapperProfile}>
-                    <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
+                    <TouchableHighlight onPress={() => this._back()} underlayColor="transparent">
                         <Image style={styles.arrowLeft} source={arrowLeft} />
                     </TouchableHighlight>
                     <View style={styles.containerTitleProfile}>
                         <Text style={styles.titleProfie}>
-                            EMORY UNIVERSITY
+                            {this.state.dataUser.university}
                         </Text>
                         <Text style={styles.subTitleProf}>
-                            162 Students logged in
+                            {this.state.columnStudents} Students logged in
                         </Text>
                     </View>
                     <View style={styles.containerAnswer}>
                         <View style={{marginTop: 11}}>
-                            <Text style={styles.answText}>732 Answers</Text>
+                            <Text style={styles.answText}>{this.state.answerQuiz} Answers</Text>
                         </View>
                         <View>
                             <Image source={upArrow} style={styles.upArrow} />
@@ -56,75 +204,85 @@ export default class Profile extends Component {
                             </Picker>
                         </View>
                     </View>
+
+                    {/* Start answer */}
                     <View style={[styles.containerItemsAnswer, {marginTop: 15}]}>
-                        <View style={{elevation: 5, backgroundColor: '#fff', marginTop: 15}}>
-                            <View style={styles.topPartItem}>
-                                <View style={styles.userContainer}>
-                                    <Image source={userFill} style={styles.userFill} />
-                                    <Text>65</Text>
-                                </View>
-                                <View>
-                                    <Text style={styles.greyText}>
-                                        Avg: 17 sec.
-                                    </Text>
-                                </View>
-                                <View>
-                                    <Text style={styles.greyText}>
-                                        Jan, 27, 2019
-                                    </Text>
-                                </View>
-                            </View>
-                            <Image source={nature1} style={styles.styleImageAnsw} />
-                            <View style={styles.bottomPartItem}>
-                                <View style={{display: 'flex', flexDirection: 'row'}}>
-                                    <Text style={styles.textBlue}>
-                                        A
-                                    </Text>    
-                                    <View style={styles.titleItem}>
-                                        <Text style={styles.titleBottomPart}>Everything's alright</Text>
-                                    </View>
-                                </View>
-                                <View style={styles.checkStyle}>
-                                    <Image source={check} />
-                                </View>
 
-                            </View>
-                        </View>
-                        <View style={{elevation: 5, backgroundColor: '#fff', marginTop: 15}}>
-                            <View style={styles.topPartItem}>
-                                <View style={styles.userContainer}>
-                                    <Image source={userFill} style={styles.userFill} />
-                                    <Text>78</Text>
-                                </View>
-                                <View>
-                                    <Text style={styles.greyText}>
-                                        Avg: 17 sec.
-                                    </Text>
-                                </View>
-                                <View>
-                                    <Text style={styles.greyText}>
-                                        Jan, 27, 2019
-                                    </Text>
-                                </View>
-                            </View>
-                            <Image source={nature1} style={styles.styleImageAnsw} />
-                            <View style={styles.bottomPartItem}>
-                                <View style={{display: 'flex', flexDirection: 'row'}}>
-                                    <Text style={styles.textBlue}>
-                                        C
-                                    </Text>
+                        {
+                            this.state.showQues.map((value, key) => {
+                                let sumUser = 0;
+                                let normVariant = 0;
+                                let correctVar = true;
+                                let timeAvenger = 0;
+                                let boofer = 0;
+                                value.answers.map((val) => {
+
+                                    if(val.statisticChoose != undefined) {
+                                        sumUser = val.statisticChoose + sumUser;
+                                    }
                                     
-                                    <View style={styles.titleItem}>
-                                        <Text style={styles.titleBottomPart}>We should ask House</Text>
-                                    </View>
-                                </View>
-                                <View style={[styles.checkStyle, { borderColor: '#FF6464' }]}>
-                                    <Image source={cancel} />
-                                </View>
+                                    if(val.statisticChoose > boofer) {
+                                        normVariant = val.variant;
+                                        correctVar = val.correct;
+                                        boofer = val.statisticChoose;
+                                        if(val.statTime != undefined) {
+                                            timeAvenger = val.statTime;
+                                        } else {
+                                            timeAvenger = 0;
+                                        }
+                                        
+                                    }
+                                    console.log(val.statisticChoose);
+                                });
+                                
+                                return (
+                                    <TouchableHighlight key={key} onPress={() => this._toQuestProfile(value)} underlayColor="transparent">
+                                        <View style={{elevation: 5, backgroundColor: '#fff', marginTop: 15}}>
+                                            
+                                                <View style={styles.topPartItem}>
+                                                    <View style={styles.userContainer}>
+                                                        <Image source={userFill} style={styles.userFill} />
+                                                        <Text>{sumUser}</Text>
+                                                    </View>
+                                                    <View>
+                                                        <Text style={styles.greyText}>
+                                                            Avg: {timeAvenger} sec.
+                                                        </Text>
+                                                    </View>
+                                                    <View>
+                                                        <Text style={styles.greyText}>
+                                                            {value.created}
+                                                        </Text>
+                                                    </View>
+                                                </View>
+                                                <Image source={{uri: value.image}} style={styles.styleImageAnsw} />
+                                                <View style={styles.bottomPartItem}>
+                                                    <View style={{display: 'flex', flexDirection: 'row'}}>
+                                                        <Text style={styles.textBlue}>
+                                                            {normVariant}
+                                                        </Text>    
+                                                        <View style={styles.titleItem}>
+                                                            <Text style={styles.titleBottomPart}>{value.title}</Text>
+                                                        </View>
+                                                    </View>
+                                                    <View style={[styles.checkStyle, { borderColor: correctVar == true ? '#1D8EAB' : '#FF6464'} ]}>
+                                                        <Image source={correctVar == true ? check : cancel} style={{width: 20, height: 20}} />
+                                                    </View>
 
-                            </View>
-                        </View>
+                                                </View>
+                                            
+                                        </View>
+                                    </TouchableHighlight>
+                                )
+                            })
+                        }
+
+                        <TouchableHighlight onPress={this._press}>
+                            <Text>Button</Text>
+                        </TouchableHighlight>
+                        
                     </View>
+                    {/* End answer */}
                 </View>
                 <View style={styles.borderWindowBottom}></View>
             </ScrollView>
@@ -266,5 +424,11 @@ const styles = StyleSheet.create({
         fontFamily: 'SFUIText-Semibold',
         fontSize: 16,
         color: '#3E3F42'
+    },
+    containerActivity: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: Dimensions.get('window').height
     }
 })

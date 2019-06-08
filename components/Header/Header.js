@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {StyleSheet, Text, View, Image, TouchableHighlight, Dimensions, Animated, findNodeHandle } from 'react-native';
 import firebase from 'react-native-firebase';
 
-import Logo from '../BasicComponents/Logo';
 import burger from '../../uploads/img/burger3x.png'
 import addReminder from '../../uploads/img/add-reminder3x.png'
 import logoImg from '../../uploads/img/logo.png'
@@ -43,9 +42,9 @@ export default class Header extends Component {
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
                 console.log('user logged', user);
-                firebase.database().ref("users").orderByChild("email").equalTo(user.email).on("child_added", (snapshot) => { 
+                firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
                     console.log(snapshot.key);
-                    firebase.database().ref("users/"+snapshot.key).on("value", (data) => {
+                    firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                         console.log('data.toJSON()');
                         console.log(data.toJSON());
                         this.setState({ dataUser: data.toJSON() })
@@ -142,11 +141,11 @@ export default class Header extends Component {
                                         }]}>Leadboard</Text>
                                 </TouchableHighlight>
 
-                                <TouchableHighlight onPress={() => this._itemMenu('Slack')} underlayColor="#fff" style={{zIndex: 100000}}>
+                                <TouchableHighlight onPress={() => this._itemMenu('ProfileStudents')} underlayColor="#fff" style={{zIndex: 100000}}>
                                     <Text style={[styles.greyText, {
                                         fontSize: 24, 
                                         marginTop: 20,
-                                        color: this.props.page == 'Perfomance' ? '#333' : '#9EA0A5' 
+                                        color: this.props.page == 'ProfileStudents' ? '#333' : '#9EA0A5' 
                                         }]}>Perfomance</Text>
                                 </TouchableHighlight>
 
@@ -164,14 +163,6 @@ export default class Header extends Component {
                                         marginTop: 20,
                                         color: this.props.page == 'About' ? '#333' : '#9EA0A5' 
                                         }]}>About</Text>
-                                </TouchableHighlight>
-
-                                <TouchableHighlight onPress={() => this._itemMenu('Quiz')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {
-                                        fontSize: 24, 
-                                        marginTop: 20,
-                                        color: this.props.page == 'Quiz' ? '#333' : '#9EA0A5' 
-                                        }]}>Quiz</Text>
                                 </TouchableHighlight>
 
                                 <TouchableHighlight onPress={() => this._itemMenu('Profile')} underlayColor="#fff" style={{zIndex: 100000}}>

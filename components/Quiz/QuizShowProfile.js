@@ -1,14 +1,13 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, ScrollView, TouchableHighlight, findNodeHandle, ActivityIndicator, Dimensions} from 'react-native';
+import {StyleSheet, Text, View, Image, ScrollView, ActivityIndicator, Dimensions} from 'react-native';
 import firebase from 'react-native-firebase';
 
 import nature1 from '../../uploads/img/bench-carved-stones-cemetery-257360.jpg';
 import check from '../../uploads/img/checked.png';
 import cancel from '../../uploads/img/close.png';
 import checkGrey from '../../uploads/img/tick.png';
-import fon from '../../uploads/img/fon.jpg';
 
-export default class QuizItem extends Component {
+export default class QuizShowProfile extends Component {
 
     constructor(props) {
         super(props);
@@ -23,38 +22,23 @@ export default class QuizItem extends Component {
             data: [],
             authentication: false,
             correctVariant: 0,
-            sumAllStat: 0,
             click: false,
             dataUser: {},
             snapshot: '',
             fonImage: '1',
             title: '',
-            answerQuiz: 0,
+            dataUserValue: {},
         }
-        this.touchElement = this.touchElement.bind(this);
     }
 
     componentDidMount() {
-        this.setState({ viewRef: findNodeHandle(fon), authentication: true });
-        let urlFire = '-LgSX6B3EBqa1hn5-CPQ';
-        firebase.auth().onAuthStateChanged((user) => {
-            firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
-                firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
-                    this.setState({ dataUser: data.toJSON(), snapshot: snapshot.key });
-                    firebase.database().ref("university/"+this.state.dataUser.university+"/answer").on("value", (snapshot) => {
-                        console.log('snapshot');
-                        console.log(snapshot._value);
-                        this.setState({ answerQuiz: snapshot._value });
-                    });
-                })
-            });
-        });
-
-        
-
+        const { navigation } = this.props;
+        this.setState({ authentication: true });
+        let urlFire = navigation.getParam('id');
+        this.setState({ dataUserValue: navigation.getParam('value') })
         firebase.database().ref("Cards/Open/" + urlFire).once("value", (data) => {
-            console.log('data.toJSON()');
-            console.log(data.toJSON());
+            console.log('data.toJSON()few');
+            console.log(navigation.getParam('value'));
             this.setState({ data: data.toJSON().answers, fonImage: data.toJSON().image, title: data.toJSON().title });
         }).then(() => {
             console.log('data',this.state.data);
@@ -64,144 +48,33 @@ export default class QuizItem extends Component {
                 if(this.state.data[i].correct == true) {
                     this.setState({ correctVariant: i });
                 }
-
-                if(this.state.data[i].statisticChoose != undefined) {
-                    let sum = this.state.sumAllStat
-                    this.setState({ sumAllStat: sum + this.state.data[i].statisticChoose})
-                }
                 
                 this.setState(state => {
-                    const border = state.data[i].border = -1;
-                    const image = state.data[i].image = checkGrey;
+                    let border = -1;
+                    let image = state.data[i].image = checkGrey;
+
+                    if(navigation.getParam('value').answer == i) {
+                        border = state.data[i].border = 2;
+                        if(navigation.getParam('value').answer == navigation.getParam('value').correctAnswer) {
+                            image = state.data[i].image = check
+                        } else {
+                            image = state.data[i].image = cancel
+                        }
+                        
+                    } else {
+                        border = state.data[i].border = -1;
+                    }
+                    
+                    
                     return {
                         border,
                         image
                     }
                 });
-
             }
-            console.log('sum', this.state.sumAllStat);
-
         })
-        if(this.state.counter >= 0) {
-            let timer = setInterval(this.tick, 1000);
-            // this.setState({timer});
-        } else {
-            this.setState({ counter: 60 })
-        }
     }
 
-    tick =() => {
-        if(this.state.counter > 0) {
-            this.setState({
-                counter: this.state.counter - 1
-            });
-        }
-    }
-
-    touchElement(key, letter) {
-        if(this.state.click == true) {
-            return;
-        }
-        this.setState({ click: true });
-        let urlFire = '-LgSX6B3EBqa1hn5-CPQ';
-
-        this.setState({ stopCounter: this.state.counter, showBlur: '100%' });
-
-        this.setState(state => {
-            const correctShow = state.data[key].correctShow = 'flex';
-            return {
-                correctShow
-            }
-        });
-        let sumStat = this.state.data[key].statisticChoose + 1;
-        console.log('sumStat', sumStat);
-        let statistic;
-        if(this.state.data[key].statisticChoose != undefined) {
-            statistic = Math.round( ( this.state.data[key].statisticChoose * 100 ) / this.state.sumAllStat );
-        } else {
-            statistic = 0;
-        }
-        
-        if(key != this.state.correctVariant) {
-
-            this.setState(state => {
-                const list = state.data[key].border = 2;
-                const image = state.data[key].image = cancel;
-                const listCorrect = state.data[this.state.correctVariant].borderCorrect = 3;
-                const statState = state.data[key].statistic = statistic;
-                return {
-                    list,
-                    listCorrect,
-                    image,
-                    statState
-                }
-            });
-        } else {
-            this.setState(state => {
-                const list = state.data[key].border = 2;
-                const image = state.data[key].image = check;
-                const statState = state.data[key].statistic = statistic;
-                return {
-                    list,
-                    image,
-                    statState
-                }
-            });
-        }
-        console.log('snafewfe', this.state.dataUser.university)
-        let statTime = this.state.counter;
-        let sumTime;
-        let countChoose;
-
-        if(this.state.data[key].sumTime != undefined) {
-            sumTime = this.state.data[key].sumTime;
-        } else {
-            sumTime = 0;
-        }
-
-        if(this.state.data[key].statisticChoose != undefined) {
-            countChoose = this.state.data[key].statisticChoose;
-        } else {
-            countChoose = 0;
-        }
-        
-        let averageTime = Math.round( ( statTime + sumTime ) / ( countChoose + 1 ) );
-        sumTime = statTime + sumTime;
-
-        firebase.database().ref("Cards/Open/" + urlFire + "/answers/" + key).update({
-            statisticChoose: this.state.data[key].statisticChoose == undefined ? 1 : sumStat,
-            statTime: averageTime,
-            sumTime: sumTime,
-        });
-
-        var d = new Date();
-        let months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-        firebase.database().ref("users/"+this.state.snapshot+"/questions/"+urlFire).update({
-            answer: key,
-            correctAnswer: this.state.correctVariant,
-            letter,
-            time: this.state.counter,
-            date: months[d.getMonth()] + ', ' + d.getDay() + ', ' + d.getFullYear(),
-            title: this.state.title,
-            fonImage: this.state.fonImage
-        })
-        firebase.database().ref("university/"+this.state.dataUser.university+"/questions/"+urlFire).update({
-            answer: key,
-            correctAnswer: this.state.correctVariant,
-            letter,
-            time: this.state.counter,
-            date: months[d.getMonth()] + ', ' + d.getDay() + ', ' + d.getFullYear(),
-            title: this.state.title,
-            fonImage: this.state.fonImage
-        });
-        
-        firebase.database().ref("university/"+this.state.dataUser.university).update({
-            answer: this.state.answerQuiz+1,
-        }); 
-        
-    }
     render() {
         if(this.state.authentication == true) {
             return (
@@ -214,7 +87,7 @@ export default class QuizItem extends Component {
             <ScrollView>
 
                 <View style={styles.timerContainer}>
-                    <Text style={{ color: '#FF6464' }}>0:{this.state.stopCounter == 0 ? this.state.counter : this.state.stopCounter}</Text>
+                    <Text>0:{this.state.dataUserValue.time}</Text>
                 </View>
                 <View>
                     <View style={[styles.fonStyle, {width: this.state.showBlur}]}></View>
@@ -226,11 +99,11 @@ export default class QuizItem extends Component {
                     {
                             this.state.data.map((value, key) => {
                                 return (
-                                    <TouchableHighlight key={key} underlayColor="transparent" style={{
+                                    <View key={key} style={{
                                         marginTop: 20,
                                         width: '80%',
                                         zIndex: this.state.data[key].border == 2 || this.state.data[key].borderCorrect == 3 ? 1000 : 10,
-                                        }} onPress={() => this.touchElement(key, value.variant) }>
+                                        }} >
                                         <View style={[styles.itemQuiz, {
                                             borderWidth: this.state.data[key].borderCorrect,
                                             borderColor: '#1D8EAB',
@@ -292,7 +165,7 @@ export default class QuizItem extends Component {
                                                 </View>
                                             </View>
                                         </View>
-                                    </TouchableHighlight>
+                                    </View>
                                 )
                             })
                         } 

@@ -54,25 +54,6 @@ export default class Register extends Component {
         }
         this._onPressLearnMore = this._onPressLearnMore.bind(this);
     }
-
-    componentDidMount() {
-        firebase.database().ref("university").orderByChild("lastPart").equalTo('uams.edu').on("child_added", (snapshot) => {
-            firebase.database().ref('university/'+snapshot.key).on("value", (data) => {
-                console.log('data', data._value.state)
-            })
-        });
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-              // User is signed in.
-              console.log('user state');
-              console.log(user._user);
-              this.props.navigation.navigate('Dashboard')
-            } else {
-              // User is signed out.
-              // ...
-            }
-        });
-    }
     
     _onPressLearnMore() {
         
@@ -95,7 +76,6 @@ export default class Register extends Component {
             .auth()
             .createUserWithEmailAndPassword(this.state.textEmail, this.state.textPassword, this.state.date)
             .then(() => {
-                this.setState({ authentication: false, authErr: false });
                 console.log('auth data user ');
                 let idUser = makeid(10)
                 let dataUserEmail = findEmail(this.state.textEmail.toLowerCase());
@@ -104,7 +84,7 @@ export default class Register extends Component {
                 firebase.database().ref("university").orderByChild("lastPart").equalTo(dataUserEmail.lastPart).on("child_added", (snapshot) => {
                     
                     firebase.database().ref('university/'+snapshot.key).once("value", (data) => {
-                        console.log('data success')
+                        console.log('data success', data._value.name)
                         firebase.database().ref("users/" + idUser).set({
                             email: this.state.textEmail.toLowerCase(),
                             born: this.state.date,
@@ -122,6 +102,7 @@ export default class Register extends Component {
                                 state: data._value.state
                             })
                             .then(() => {
+                                this.setState({ authentication: false, authErr: false });
                                 this.props.navigation.navigate('RegisterDataUser', {
                                     id: idUser,
                                     univerId: snapshot.key,
@@ -129,10 +110,12 @@ export default class Register extends Component {
                             })
                             .catch((err) => {
                                 console.log('failed univer', err);
+                                this.setState({ authentication: false, authErr: false });
                             })
                         })
                         .catch((err) => {
                             console.log('err user', err);
+                            this.setState({ authentication: false, authErr: false });
                         })
                         
                     })
