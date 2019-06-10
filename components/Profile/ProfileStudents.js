@@ -27,9 +27,15 @@ export default class ProfileStudents extends Component {
             authentication: true,
             questions: [],
             idQues: [],
+            showQues: [],
+            countArr: 1,
         }
         this._back = this._back.bind(this);
         this._taskRoute = this._taskRoute.bind(this);
+        this._press = this._press.bind(this);
+        this.correctFilter = this.correctFilter.bind(this);
+        this.wrongFilter = this.wrongFilter.bind(this);
+        this.allFilter = this.allFilter.bind(this);
     }
     _back() {
         this.props.navigation.goBack()
@@ -37,17 +43,15 @@ export default class ProfileStudents extends Component {
 
     componentDidMount() {
         let count = 0;
+        console.log('height', Dimensions.get('window').height)
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
                     console.log(snapshot.key);
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
-                        console.log('data.toJSON()');
-                        console.log(data.toJSON());
                         this.setState({ dataUser: data.toJSON(), authentication: false });
                         if(count == 0) {
                             for (let prop in data.toJSON().questions) {
-                                console.log('props', prop)
                                 this.setState(state => {
                                     questionsItem = state.questions.push(data.toJSON().questions[prop])
                                     questionsId = state.idQues.push(prop)
@@ -57,16 +61,49 @@ export default class ProfileStudents extends Component {
                                     }
                                 })
                             }
+
+                            if(this.state.questions.length < 5) {
+                                let i = 1;
+                                for(item in data.toJSON().questions) {
+                                    console.log('test', data._value[item])
+                                    if(i > 1) {
+                                        // Nothing
+                                    }
+                                    else {
+                                        this.setState(state => {
+                                            question = state.showQues.push(data.toJSON().questions[item]);
+                                            return {
+                                                question,
+                                            }
+                                        })
+                                        console.log('showques 2 ', this.state.showQues)
+                                    }
+                                    i++;
+                                }
+                            } else {
+                                let i = 1;
+                
+                                for(item in data.toJSON().questions) {
+                                    if(i <= 5) {
+                                        this.setState(state => {
+                                            let question = state.showQues.push(data.toJSON().questions[item]);
+                                            let count = state.countArr = 5;
+                                            return {
+                                                question,
+                                                count
+                                            }
+                                        });
+                                    } else {
+                                        break;
+                                    }
+                                    
+                                    i++;
+                                }
+                            }
+
                         }
                         count++;
-                    }).then(() => {
-                        console.log('quiestuins', this.state.questions);
-                       
                     })
-                    .catch((err) => {
-                        console.log('err', err)
-                    })
-                    
                 })
             } else {
                 this.props.navigation.navigate('Login');
@@ -82,6 +119,95 @@ export default class ProfileStudents extends Component {
         navigate('QuizShowProfile', {id, value, key})
     }
 
+    _press() {
+        let count = 5;
+        for(let i = this.state.countArr;i <= 200; i++) {
+            if(count > 1) {
+                if(this.state.questions.length - this.state.countArr < 5) {
+                    count = this.state.questions.length - this.state.countArr;
+                    if(this.state.questions.length - this.state.countArr == 0) {
+                        break;
+                    }
+                }
+                console.log(`count ${count}`)
+
+                this.setState(state => {
+                    let question = state.showQues.push(this.state.questions[i])
+                    let count = state.countArr = i+1;
+                    return {
+                        question,
+                        count
+                    }
+                });
+            }
+            else {
+                break;
+            }
+            count--;
+        }
+    }
+
+    correctFilter() {
+        this.setState(state => {
+            let variant = state.normVariant = [];
+            return {
+                variant
+            }
+        });
+        this.state.showQues.map((value, key) => {
+            this.setState(state => {
+                let variant = state.showQues[key].styleShow = "flex";
+                return {
+                    variant
+                }
+            });
+            if(value.answer != value.correctAnswer) {
+                this.setState(state => {
+                    let variant = state.showQues[key].styleShow = "none";
+                    return {
+                        variant
+                    }
+                })
+            }
+        });
+    }
+
+    wrongFilter() {
+        this.setState(state => {
+            let variant = state.normVariant = [];
+            return {
+                variant
+            }
+        });
+        this.state.showQues.map((value, key) => {
+            this.setState(state => {
+                let variant = state.showQues[key].styleShow = "flex";
+                return {
+                    variant
+                }
+            });
+            if(value.answer == value.correctAnswer) {
+                this.setState(state => {
+                    let variant = state.showQues[key].styleShow = "none";
+                    return {
+                        variant
+                    }
+                })
+            }
+        });
+    }
+
+    allFilter() {
+        this.state.showQues.map((value,key) => {
+            this.setState(state => {
+                let variant = state.showQues[key].styleShow = "flex";
+                return {
+                    variant
+                }
+            })
+        });
+    }
+
     render() {
         
         if(this.state.authentication == true) {
@@ -93,7 +219,7 @@ export default class ProfileStudents extends Component {
         } 
         return (
             <ScrollView style={styles.profile}>
-                <Header navigation={this.props.navigation} page="ProfileStudents" />
+                <Header style={styles.headerStyle} navigation={this.props.navigation} page="ProfileStudents" />
                 <View style={styles.wrapperProfile}>
                     <TouchableHighlight onPress={() => this._back()} underlayColor="transparent">
                         <Image style={styles.arrowLeft} source={arrowLeft} />
@@ -119,9 +245,18 @@ export default class ProfileStudents extends Component {
                             <Picker
                                 selectedValue={this.state.filterAnsw}
                                 style={styles.pickerStyle}
-                                onValueChange={(itemValue, itemIndex) =>
+                                onValueChange={(itemValue, itemIndex) => {
                                     this.setState({filterAnsw: itemValue})
-                                }>
+                                    if(itemValue == 'correct') {
+                                        this.correctFilter();
+                                    } 
+                                    else if(itemValue == 'wrong') {
+                                        this.wrongFilter();
+                                    } 
+                                    else {
+                                        this.allFilter();
+                                    }
+                                }}>
                                 <Picker.Item label="All" value="all" />
                                 <Picker.Item label="Correct" value="correct" />
                                 <Picker.Item label="Wrong" value="wrong" />
@@ -131,9 +266,13 @@ export default class ProfileStudents extends Component {
                     <View style={[styles.containerItemsAnswer, {marginTop: 15}]}>
 
                         {
-                            this.state.questions.map((value, key) => {
+                            this.state.showQues.map((value, key) => {
                                 return(
-                                    <TouchableHighlight key={key} onPress={() => this._taskRoute(key, value)} underlayColor="transparent">
+                                    <TouchableHighlight key={key} 
+                                    onPress={() => this._taskRoute(key, value)} 
+                                    underlayColor="transparent"
+                                    style={{display: this.state.showQues[key].styleShow}}
+                                    >
                                         <View style={{elevation: 5, backgroundColor: '#fff', marginTop: 15}}>
                                             <View style={styles.topPartItem}>
                                                 <View style={styles.userContainer}>
@@ -165,7 +304,19 @@ export default class ProfileStudents extends Component {
                                 )
                             })   
                         }
-
+                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                            <TouchableHighlight underlayColor="#1D8EAB"
+                            style={{marginTop: 50, 
+                                justifyContent: 'center', 
+                                alignItems: 'center',
+                                backgroundColor: '#1D8EAB',
+                                padding: 5,
+                                width: '50%'
+                            }}
+                            onPress={this._press}>
+                                <Text style={{color: '#fff'}}>Upload more</Text>
+                            </TouchableHighlight>
+                        </View>
                     </View>
                 </View>
                 <View style={styles.borderWindowBottom}></View>
@@ -180,6 +331,9 @@ const styles = StyleSheet.create({
         height: Dimensions.get('window').height,
         flex: 1,
     },  
+    headerStyle: {
+        height: Dimensions.get('window').height,
+    },
     arrowLeft: {
         width: 22,
         height: 15
@@ -189,6 +343,7 @@ const styles = StyleSheet.create({
         paddingRight: 25,
         paddingTop: 25,
         paddingBottom: 25,
+        minHeight: Dimensions.get('window').height - 90,
     },
     containerTitleProfile: {
         display: 'flex',

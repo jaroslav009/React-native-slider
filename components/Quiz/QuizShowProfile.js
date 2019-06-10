@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, ScrollView, ActivityIndicator, Dimensions} from 'react-native';
+import {StyleSheet, Text, View, Image, ScrollView, ActivityIndicator, Dimensions, TouchableHighlight} from 'react-native';
 import firebase from 'react-native-firebase';
 
-import nature1 from '../../uploads/img/bench-carved-stones-cemetery-257360.jpg';
 import check from '../../uploads/img/checked.png';
 import cancel from '../../uploads/img/close.png';
 import checkGrey from '../../uploads/img/tick.png';
+import arrowLeft from '../../uploads/img/left-arrow.png'
 
 export default class QuizShowProfile extends Component {
 
@@ -15,7 +15,6 @@ export default class QuizShowProfile extends Component {
             laterKey: null,
             counter: 60,
             stopCounter: 0,
-            viewRef: nature1,
             showBlur: '0%',
             viewRef: null,
             blurType: 'light',
@@ -29,32 +28,30 @@ export default class QuizShowProfile extends Component {
             title: '',
             dataUserValue: {},
         }
+        this._back = this._back.bind(this);
     }
 
     componentDidMount() {
         const { navigation } = this.props;
+        console.log('value navigate ',navigation.getParam('value'));
         this.setState({ authentication: true });
         let urlFire = navigation.getParam('id');
-        this.setState({ dataUserValue: navigation.getParam('value') })
+        this.setState({ dataUserValue: navigation.getParam('value') });
         firebase.database().ref("Cards/Open/" + urlFire).once("value", (data) => {
-            console.log('data.toJSON()few');
-            console.log(navigation.getParam('value'));
             this.setState({ data: data.toJSON().answers, fonImage: data.toJSON().image, title: data.toJSON().title });
         }).then(() => {
-            console.log('data',this.state.data);
             this.setState({ authentication: false });
             for(let i = 0; i < this.state.data.length; i++) {
                 this.state.data[i].border = -1;
                 if(this.state.data[i].correct == true) {
                     this.setState({ correctVariant: i });
                 }
-                
                 this.setState(state => {
                     let border = -1;
                     let image = state.data[i].image = checkGrey;
-
                     if(navigation.getParam('value').answer == i) {
                         border = state.data[i].border = 2;
+                        
                         if(navigation.getParam('value').answer == navigation.getParam('value').correctAnswer) {
                             image = state.data[i].image = check
                         } else {
@@ -64,15 +61,17 @@ export default class QuizShowProfile extends Component {
                     } else {
                         border = state.data[i].border = -1;
                     }
-                    
-                    
                     return {
                         border,
-                        image
+                        image,
                     }
                 });
             }
         })
+    }
+
+    _back() {
+        this.props.navigation.goBack()
     }
 
     render() {
@@ -91,6 +90,9 @@ export default class QuizShowProfile extends Component {
                 </View>
                 <View>
                     <View style={[styles.fonStyle, {width: this.state.showBlur}]}></View>
+                    <TouchableHighlight onPress={() => this._back()} underlayColor="#fff" style={styles.arroweftCont}>
+                        <Image style={{width: 22, height: 15}} source={arrowLeft} />
+                    </TouchableHighlight>
                     <Image 
                         style={styles.backgrImg} 
                         source={{uri: this.state.fonImage}} 

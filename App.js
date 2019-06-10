@@ -42,7 +42,7 @@ const AppNavigator = createStackNavigator({
     QuizShowProfile: {screen : QuizShowProfile}
   },
   {
-    initialRouteName: 'Profile',
+    initialRouteName: 'ProfileStudents',
     headerMode: 'none'
   }
 );

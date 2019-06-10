@@ -33,12 +33,16 @@ export default class Profile extends Component {
                 start: 1,
                 end: 0,
             },
-            lastItem: 'http://www.youandthemat.com/wp-content/uploads/nature-2-26-17.jpg'
+            lastItem: 'http://www.youandthemat.com/wp-content/uploads/nature-2-26-17.jpg',
+            countArr: 1,
+            normVariant: [],
         }
         this._back = this._back.bind(this);
         this._toQuestProfile = this._toQuestProfile.bind(this);
-        this._addQues = this._addQues.bind(this);
         this._press = this._press.bind(this);
+        this.correctFilter = this.correctFilter.bind(this);
+        this.wrongFilter = this.wrongFilter.bind(this);
+        this.allFilter = this.allFilter.bind(this);
     }
     _back() {
         this.props.navigation.goBack()
@@ -53,17 +57,12 @@ export default class Profile extends Component {
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
-                    console.log(snapshot.key);
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
-                        console.log('data.toJSON()');
-                        console.log(data);
                         this.setState({ dataUser: data.toJSON() });
                         firebase.database().ref("university").orderByChild("name").equalTo(data.toJSON().university).once("child_added", (snapshot) => {
                             this.setState({ columnStudents: Object.size(snapshot._value) - 3, authentication: false })
                         });
                         firebase.database().ref("university/"+data.toJSON().university+"/answer").on("value", (snapshot) => {
-                            console.log('snapshot');
-                            console.log(snapshot._value);
                             this.setState({ answerQuiz: snapshot._value });
                         });
                     })
@@ -71,7 +70,6 @@ export default class Profile extends Component {
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                         this.setState({ dataUser: data.toJSON(), snapshot: snapshot.key });
-                        
                     })
                 });
             } else {
@@ -82,8 +80,8 @@ export default class Profile extends Component {
 
         firebase.database().ref("Cards/Open").limitToLast(200).once("value", (data) => {
             for(item in data._value) {
-                console.log('item', item);
                 this.setState(state => {
+                    data._value[item].styleShow = "flex";
                     question = state.questions.push(data._value[item]);
                     return {
                         question
@@ -93,69 +91,236 @@ export default class Profile extends Component {
             if(this.state.questions.length < 5) {
                 let i = 1;
                 for(item in data._value) {
+                    console.log('test', data._value[item])
                     if(i > 1) {
-                        console.log('dfewfewfwefewweffew')
+                        // Nothing
                     }
                     else {
                         this.setState(state => {
                             question = state.showQues.push(data._value[item]);
                             return {
-                                question
+                                question,
                             }
                         })
+                        console.log('showques 2 ', this.state.showQues)
                     }
                     i++;
                 }
             } else {
-                for(let i = 0; i<=5; i++) {
-                    this.setState(state => {
-                        question = state.showQues.push(data._value[i]);
-                        return {
-                            question
-                        }
-                    })
+                let i = 1;
+
+                for(item in data._value) {
+                    if(i <= 5) {
+                        this.setState(state => {
+                            let question = state.showQues.push(data._value[item]);
+                            let count = state.countArr = 5;
+                            return {
+                                question,
+                                count
+                            }
+                        });
+                    }
+                    
+                    i++;
                 }
             }
-            console.log('showQues',this.state.showQues, 'length', this.state.questions.length);
         })
     }
 
-    _addQues() {
-        console.log('hello', this.state.lastItem);
-
-        // firebase.database().ref("Cards/Open")
-        // .orderByChild("image")
-        // .startAt(this.state.lastItem)
-        // .limitToFirst(2).once("value", (data) => {
-        //     for(item in data._value) {
-        //         this.setState(state => {
-        //             question = state.questions.push(data._value[item]);
-        //             return {
-        //                 question
-        //             }
-        //         })
-        //     }
-        //     this.setState({ lastItem: this.state.questions[this.state.questions.length-1].image })
-        // })
-        
-    }
-
     _press() {
-        let i = 1;
-        for(items in this.state.questions) {
-            if(i<=5) {
-                this.setState(state => {
-                    let question = state.showQues.push(items)
-                    return {
-                        question
+        let count = 5;
+        for(let i = this.state.countArr;i < 200; i++) {
+            // if(count < 1) {
+            //     if(i < this.state.questions.length) {
+
+            //         // Audit filter begin
+            //         let sumUser = 0;
+            //         let boofer = 0;
+            //         let keyArr = undefined;
+            //         this.state.questions[i].answers.map((val) => {
+
+            //             if(val.statisticChoose != undefined) {
+            //                 sumUser = val.statisticChoose + sumUser;
+            //             }
+            //             if(val.statisticChoose > boofer) {
+            //                 normVariant = val.variant;
+            //                 correctVar = val.correct;
+            //                 boofer = val.statisticChoose;
+            //                 // Audit on correct
+            //                 if(this.state.filterAnsw == "correct") {
+            //                     if(val.correct != true) {
+            //                         keyArr = 1;
+            //                     } else {
+            //                         keyArr = undefined;
+            //                     }
+            //                 }
+            //                 // Audit on correct
+
+            //                 // Audit on wrong
+            //                 else if(this.state.filterAnsw == "wrong") {
+            //                     if(val.correct != undefined) {
+            //                         keyArr = 1;
+            //                     } else {
+            //                         keyArr = undefined;
+            //                     }
+            //                 }
+            //                 // Audit on wrong
+
+            //                 // Audit on all
+            //                 else {
+            //                     keyArr = undefined;
+            //                 }
+            //                 // Audit on all
+            //             }
+            //         });
+            //         // Audit filter end
+
+            //         // Write data in show questions:
+            //         this.setState(state => {
+            //             let data = this.state.questions[i];
+            //             if(keyArr != undefined) {
+            //                 data.styleShow = "none"
+            //             }
+            //             let question = state.showQues.push(data)
+            //             let count = state.countArr = i+1;
+                        
+            //             return {
+            //                 question,
+            //                 count
+            //             }
+            //         });
+            //     }
+               
+            // }
+            if(count > 1) {
+                if(this.state.questions.length - this.state.countArr < 5) {
+                    count = this.state.questions.length - this.state.countArr;
+                    if(this.state.questions.length - this.state.countArr == 0) {
+                        break;
                     }
-                })
+                }
+                console.log(`count ${count}`)
+
+                this.setState(state => {
+                    let question = state.showQues.push(this.state.questions[i])
+                    let count = state.countArr = i+1;
+                    return {
+                        question,
+                        count
+                    }
+                });
             }
             else {
                 break;
             }
-            i++;
+            count--;
         }
+        
+    }
+
+    correctFilter() {
+        this.setState(state => {
+            let variant = state.normVariant = [];
+            return {
+                variant
+            }
+        });
+        this.state.showQues.map((value, key) => {
+            let sumUser = 0;
+            let boofer = 0;
+            let keyArr = undefined;
+
+            this.setState(state => {
+                let variant = state.showQues[key].styleShow = "flex";
+                return {
+                    variant
+                }
+            });
+            
+            value.answers.map((val) => {
+
+                if(val.statisticChoose != undefined) {
+                    sumUser = val.statisticChoose + sumUser;
+                }
+                if(val.statisticChoose > boofer) {
+                    normVariant = val.variant;
+                    correctVar = val.correct;
+                    boofer = val.statisticChoose;
+                    if(val.correct != true) {
+                        keyArr = 1;
+                    } else {
+                        keyArr = undefined;
+                    }
+                }
+                console.log(val.statisticChoose);
+            });
+            if(keyArr != undefined) {
+                this.setState(state => {
+                    let variant = state.showQues[key].styleShow = "none";
+                    return {
+                        variant
+                    }
+                })
+            }
+        });
+    }
+
+    wrongFilter() {
+        this.setState(state => {
+            let variant = state.normVariant = [];
+            return {
+                variant
+            }
+        });
+        this.state.showQues.map((value, key) => {
+            let sumUser = 0;
+            let boofer = 0;
+            let keyArr = undefined;
+            value.answers.map((val) => {
+
+                this.setState(state => {
+                    let variant = state.showQues[key].styleShow = "flex";
+                    return {
+                        variant
+                    }
+                });
+
+                if(val.statisticChoose != undefined) {
+                    sumUser = val.statisticChoose + sumUser;
+                }
+                if(val.statisticChoose > boofer) {
+                    normVariant = val.variant;
+                    correctVar = val.correct;
+                    boofer = val.statisticChoose;
+                    if(val.correct != undefined) {
+                        keyArr = 1;
+                    } else {
+                        keyArr = undefined;
+                    }
+                }
+            });
+            if(keyArr != undefined) {
+                this.setState(state => {
+                    let variant = state.showQues[key].styleShow = "none";
+                    return {
+                        variant
+                    }
+                })
+            }
+        });
+    }
+
+    allFilter() {
+        this.state.showQues.map((value, key) => {
+            this.setState(state => {
+                let variant = state.showQues[key].styleShow = "flex";
+                return {
+                    variant
+                }
+            })
+            
+            console.log(this.state.showQues.length);
+        });
     }
 
     render() {
@@ -169,8 +334,6 @@ export default class Profile extends Component {
         return (
             <ScrollView 
             style={styles.profile}
-            onScroll={() => { this._addQues() }}
-            onContentSizeChange={ (he, cHe) => console.log('fwfewfewfewfewfew', he, '  ', cHe) }
             >
                 <Header navigation={this.props.navigation} page="Profile" />
                 <View style={styles.wrapperProfile}>
@@ -195,8 +358,18 @@ export default class Profile extends Component {
                             <Picker
                                 selectedValue={this.state.filterAnsw}
                                 style={styles.pickerStyle}
-                                onValueChange={(itemValue, itemIndex) =>
+                                onValueChange={(itemValue, itemIndex) => {
                                     this.setState({filterAnsw: itemValue})
+                                    if(itemValue == 'correct') {
+                                        this.correctFilter();
+                                    } 
+                                    else if(itemValue == 'wrong') {
+                                        this.wrongFilter();
+                                    } 
+                                    else {
+                                        this.allFilter();
+                                    }
+                                }
                                 }>
                                 <Picker.Item label="All" value="all" />
                                 <Picker.Item label="Correct" value="correct" />
@@ -230,13 +403,16 @@ export default class Profile extends Component {
                                         } else {
                                             timeAvenger = 0;
                                         }
-                                        
                                     }
                                     console.log(val.statisticChoose);
                                 });
                                 
                                 return (
-                                    <TouchableHighlight key={key} onPress={() => this._toQuestProfile(value)} underlayColor="transparent">
+                                    <TouchableHighlight key={key} 
+                                        onPress={() => this._toQuestProfile(value)} 
+                                        underlayColor="transparent"
+                                        style={{display: this.state.showQues[key].styleShow}}
+                                        >
                                         <View style={{elevation: 5, backgroundColor: '#fff', marginTop: 15}}>
                                             
                                                 <View style={styles.topPartItem}>
@@ -276,11 +452,19 @@ export default class Profile extends Component {
                                 )
                             })
                         }
-
-                        <TouchableHighlight onPress={this._press}>
-                            <Text>Button</Text>
-                        </TouchableHighlight>
-                        
+                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                            <TouchableHighlight underlayColor="#1D8EAB"
+                            style={{marginTop: 50, 
+                                justifyContent: 'center', 
+                                alignItems: 'center',
+                                backgroundColor: '#1D8EAB',
+                                padding: 5,
+                                width: '50%'
+                            }}
+                            onPress={this._press}>
+                                <Text style={{color: '#fff'}}>Upload more</Text>
+                            </TouchableHighlight>
+                        </View>
                     </View>
                     {/* End answer */}
                 </View>

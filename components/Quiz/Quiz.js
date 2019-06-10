@@ -15,55 +15,13 @@ export default class Quiz extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            dataQuiz: [
-                {
-                    voice: '37 (52%)',
-                    time: 'Avg: 32 sec.',
-                    class: 'A',
-                    title: "Everything's Alright",
-                    cancel: false,
-                    border: new Animated.Value(0)
-                },
-                {
-                    voice: '39 (39%)',
-                    time: 'Avg: 32 sec.',
-                    class: 'B',
-                    title: "Patient is healthy",
-                    cancel: true,
-                    border: new Animated.Value(0)
-                },
-                {
-                    voice: '39 (39%)',
-                    time: 'Avg: 32 sec.',
-                    class: 'C',
-                    title: "Patient is healthy",
-                    cancel: true,
-                    border: new Animated.Value(0)
-                },
-                {
-                    voice: '39 (39%)',
-                    time: 'Avg: 32 sec.',
-                    class: 'D',
-                    title: "Patient is healthy",
-                    cancel: true,
-                    border: new Animated.Value(0)
-                },
-                {
-                    voice: '37 (52%)',
-                    time: 'Avg: 32 sec.',
-                    class: 'E',
-                    title: "Everything's Alright",
-                    cancel: false,
-                    border: new Animated.Value(0)
-                },
-            ],
+            dataQuiz: [],
             laterKey: null,
             data: [],
             answers: [],
             allSum: 0,
             normVar: 0,
         }
-        // this.touchElement = this.touchElement.bind(this);
         this._back = this._back.bind(this);
     }
 

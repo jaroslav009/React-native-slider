@@ -36,7 +36,7 @@ export default class QuizItem extends Component {
 
     componentDidMount() {
         this.setState({ viewRef: findNodeHandle(fon), authentication: true });
-        let urlFire = '-LgSX6B3EBqa1hn5-CPQ';
+        let urlFire = '-LgSX6B3EBqa1hn3-Cda';
         firebase.auth().onAuthStateChanged((user) => {
             firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
                 firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
@@ -104,7 +104,7 @@ export default class QuizItem extends Component {
             return;
         }
         this.setState({ click: true });
-        let urlFire = '-LgSX6B3EBqa1hn5-CPQ';
+        let urlFire = '-LgSX6B3EBqa1hn3-Cda';
 
         this.setState({ stopCounter: this.state.counter, showBlur: '100%' });
 
@@ -115,7 +115,6 @@ export default class QuizItem extends Component {
             }
         });
         let sumStat = this.state.data[key].statisticChoose + 1;
-        console.log('sumStat', sumStat);
         let statistic;
         if(this.state.data[key].statisticChoose != undefined) {
             statistic = Math.round( ( this.state.data[key].statisticChoose * 100 ) / this.state.sumAllStat );
@@ -149,7 +148,6 @@ export default class QuizItem extends Component {
                 }
             });
         }
-        console.log('snafewfe', this.state.dataUser.university)
         let statTime = this.state.counter;
         let sumTime;
         let countChoose;
@@ -271,7 +269,7 @@ export default class QuizItem extends Component {
                                                         marginLeft: 6,
                                                         flexDirection: 'row',
                                                         alignItems: 'flex-start',
-                                                        width: '55%'
+                                                        width: '45%'
                                                         }}>
                                                         <Text style={{
                                                             fontFamily: 'SFUIText-Semibold',
