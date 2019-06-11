@@ -8,6 +8,13 @@ import body from '../../uploads/img/body.png'
 import upArrow from '../../uploads/img/up-arrow.png';
 import downArrow from '../../uploads/img/sort-down-triangular-symbol.png';
 
+function startOfWeek(date)
+{
+  var diff = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
+
+  return new Date(date.setDate(diff));
+
+}
 export default class Dashboard extends Component {
 
     constructor(props) {
@@ -18,34 +25,62 @@ export default class Dashboard extends Component {
             date: today.getHours()+':'+today.getMinutes(),
             dataUser: {},
             authentication: true,
+            quizTake: undefined,
         }
         this._itemMenu = this._itemMenu.bind(this);
+        this._quizRoute = this._quizRoute.bind(this);
     }
 
     componentDidMount() {
         
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
-                // console.log('user logged', user._user.providerData[0]);
-                // this.setState({ dataUser: data.toJSON() })
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
                     console.log(snapshot.key);
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
-                        console.log('data.toJSON()');
+                        console.log('dataJSon');
                         console.log(data.toJSON());
                         this.setState({ dataUser: data.toJSON() })
-                    });
+                        fetch('https://us-central1-radqdweb.cloudfunctions.net/todayCard')
+                        .then(response => response.json())
+                        .then(json => {
+                            console.log(json[0]);
+                            console.log(this.state.dataUser.questions.fewfew);
+                            let audit = false;
+                            Object.keys(data.toJSON().questions).map(function(key) {
+                                console.log('ket', key);
+                                if(key == json[0]) {
+                                    audit = true;
+                                }
+                            });
+                            // this.state.dataUser.questions.map((value) => {
+                            //     console.log('vale', value);
+                            // })
+                            if(audit == false) {
+                                this.setState({ quizTake: json[0] });
+                            }
+                            
+                        })
+                    })
                     this.setState({ authentication: false })
                 });
             } else {
                 this.props.navigation.navigate('Login');
             }
         })
+        
+        
     }
 
     _itemMenu() {
         alert(this.props.navigation.navigate('Settings'))
         this.props.navigation.navigate('Settings')
+    }
+
+    _quizRoute() {
+        this.props.navigation.navigate('QuizItem', {
+            id: this.state.quizTake
+        });
     }
 
     render() {
@@ -58,16 +93,35 @@ export default class Dashboard extends Component {
         } 
         console.log('state')
         console.log(this.state.dataUser.age)
-        const data = [ [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }], [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }] ]
+        const data = [ 
+            [
+                { number: 50, name: 'M' }, 
+                { number: 40, name: 'T' }, 
+                { number: 20, name: 'W' }, 
+                { number: 70, name: 'T'}, 
+                { number: 90, name: 'F' }, 
+                { number: 85, name: 'S' }, 
+                { number: 10, name: 'S' }
+            ],
+            [
+                { number: 50, name: 'M' }, 
+                { number: 40, name: 'T' }, 
+                { number: 20, name: 'W' }, 
+                { number: 70, name: 'T'}, 
+                { number: 90, name: 'F' }, 
+                { number: 85, name: 'S' }, 
+                { number: 10, name: 'S' }
+            ] 
+        ]
         const data2 = [ [{ number: 10, name: 'M' }, { number: 20, name: 'T' }, { number: 24, name: 'W' }, { number: 23, name: 'T'}, { number: 0, name: 'F' }, { number: 25, name: 'S' }, { number: 0, name: 'S' }], [{ number: 0, name: 'M' }, { number: 0, name: 'T' }, { number: 32, name: 'W' }, { number: 22, name: 'T'}, { number: 21, name: 'F' }, { number: 22, name: 'S' }, { number: 21, name: 'S' }] ]
 
         return (
             <View style={{paddingBottom: 10}}>
                 <ScrollView style={styles.wrapperDashboard}>
                    <Header navigation={this.props.navigation} page="Dashboard" />
-                    <View style={styles.wrapperQuiz}>
+                    <TouchableHighlight onPress={() => this._quizRoute()} style={[styles.wrapperQuiz, {display: this.state.quizTake == undefined ? 'none' : 'flex'}]}>
                         <Text style={styles.textQuiz}>Take the quiz</Text>
-                    </View>
+                    </TouchableHighlight>
 
                     {/* Hero section */}
                     <View style={styles.wrapperHero}>

@@ -8,6 +8,10 @@
   },
   "dependencies": {
     "@react-native-community/blur": "^3.3.1",
+    "firebase-admin": "^8.0.0",
+    "firebase-functions": "^2.3.1",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
     "react": "16.8.3",
     "react-native": "^0.59.6",
     "react-native-datepicker": "^1.7.2",

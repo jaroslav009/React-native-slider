@@ -41,12 +41,8 @@ export default class Header extends Component {
     componentDidMount() {
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
-                console.log('user logged', user);
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
-                    console.log(snapshot.key);
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
-                        console.log('data.toJSON()');
-                        console.log(data.toJSON());
                         this.setState({ dataUser: data.toJSON() })
                     });
                 });
@@ -57,7 +53,6 @@ export default class Header extends Component {
     }
 
     _openMenu() {
-        console.log(this.state.showMenu)
         
         Animated.timing(                  // Animate over time
             this.state.fadeAnim,            // The animated value to drive

@@ -30,34 +30,39 @@ export default class QuizItem extends Component {
             fonImage: '1',
             title: '',
             answerQuiz: 0,
+            dataUniversityAnswers: [],
         }
         this.touchElement = this.touchElement.bind(this);
+        this._backMain = this._backMain.bind(this);
     }
 
     componentDidMount() {
         this.setState({ viewRef: findNodeHandle(fon), authentication: true });
-        let urlFire = '-LgSX6B3EBqa1hn3-Cda';
+        const { navigation } = this.props;
+        let urlFire = navigation.getParam('id', 'NO-ID');
         firebase.auth().onAuthStateChanged((user) => {
             firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
                 firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                     this.setState({ dataUser: data.toJSON(), snapshot: snapshot.key });
-                    firebase.database().ref("university/"+this.state.dataUser.university+"/answer").on("value", (snapshot) => {
-                        console.log('snapshot');
-                        console.log(snapshot._value);
-                        this.setState({ answerQuiz: snapshot._value });
+                    firebase.database().ref("university/"+this.state.dataUser.university).on("value", (snapshot) => {
+                        this.setState({
+                            dataUniversity: snapshot._value ,
+                            answerQuiz: snapshot._value.answer,
+                        });
+                        
+                    });
+                    firebase.database().ref("university/"+this.state.dataUser.university+"/answerQuiz").on("value", (snapshot) => {
+                        this.setState({
+                            dataUniversityAnswers: snapshot._value 
+                        });
                     });
                 })
             });
         });
 
-        
-
         firebase.database().ref("Cards/Open/" + urlFire).once("value", (data) => {
-            console.log('data.toJSON()');
-            console.log(data.toJSON());
             this.setState({ data: data.toJSON().answers, fonImage: data.toJSON().image, title: data.toJSON().title });
         }).then(() => {
-            console.log('data',this.state.data);
             this.setState({ authentication: false });
             for(let i = 0; i < this.state.data.length; i++) {
                 this.state.data[i].border = -1;
@@ -80,12 +85,10 @@ export default class QuizItem extends Component {
                 });
 
             }
-            console.log('sum', this.state.sumAllStat);
 
         })
         if(this.state.counter >= 0) {
             let timer = setInterval(this.tick, 1000);
-            // this.setState({timer});
         } else {
             this.setState({ counter: 60 })
         }
@@ -104,7 +107,8 @@ export default class QuizItem extends Component {
             return;
         }
         this.setState({ click: true });
-        let urlFire = '-LgSX6B3EBqa1hn3-Cda';
+        const { navigation } = this.props;
+        let urlFire = navigation.getParam('id', 'NO-ID');
 
         this.setState({ stopCounter: this.state.counter, showBlur: '100%' });
 
@@ -195,11 +199,75 @@ export default class QuizItem extends Component {
             fonImage: this.state.fonImage
         });
         
-        firebase.database().ref("university/"+this.state.dataUser.university).update({
-            answer: this.state.answerQuiz+1,
-        }); 
+        console.log('coorect data answer', this.state.dataUniversity)
+        let correctVar = undefined;
+        let wrongVar = undefined;
+        if(key == this.state.correctVariant) {
+            correctVar = 1;
+        } else {
+            wrongVar = 1;
+        }
+        let body = [];
+        if(this.state.dataUniversityAnswers == undefined) {
+            body = [
+                {
+                    date: new Date(),
+                    correctAnswers: correctVar != undefined ? correctVar : this.state.correctAnswers,
+                    wrongAnswers: wrongVar != undefined ? wrongVar : this.state.wrongAnswers
+                }
+            ]
+            firebase.database().ref("university/"+this.state.dataUser.university).update({
+                answer: this.state.answerQuiz+1,
+                answerQuiz: body
+            });
+        }
+        else {
+            if(this.state.dataUniversityAnswers.length > 0) 
+            {
+                let lenUniver = this.state.dataUniversityAnswers.length;
+                console.log('date audit', this.state.dataUniversityAnswers[lenUniver-1].date, " now: ");
+                console.log(new Date());
+                body = {
+                    date: new Date(),
+                    correctAnswers: correctVar != undefined ? correctVar : this.state.correctAnswers,
+                    wrongAnswers: wrongVar != undefined ? wrongVar : this.state.wrongAnswers
+                }
+                let dateFire = new Date(this.state.dataUniversityAnswers[lenUniver-1].date);
+                let dateNow = new Date(); 
+                let dataFireAnsw = this.state.dataUniversityAnswers;
+                if( dateNow.getDate() == dateFire.getDate() && 
+                    dateNow.getMonth() == dateFire.getMonth() && 
+                    dateNow.getFullYear() == dateFire.getFullYear() ) {
+                        let wrongAnswers = this.state.dataUniversityAnswers[lenUniver-1].wrongAnswers == undefined ? 0 : this.state.dataUniversityAnswers[lenUniver-1].wrongAnswers;
+                        let correctAnswers = this.state.dataUniversityAnswers[lenUniver-1].correctAnswers == undefined ? 0 : this.state.dataUniversityAnswers[lenUniver-1].correctAnswers;
+                        body = {
+                            date: new Date(),
+                            correctAnswers: correctVar != undefined ? 
+                            correctAnswers+correctVar : this.state.dataUniversityAnswers[lenUniver-1].correctAnswers,
+                            wrongAnswers: wrongVar != undefined ? 
+                            wrongAnswers+wrongVar : this.state.dataUniversityAnswers[lenUniver-1].wrongAnswers
+                        }
+                    dataFireAnsw[lenUniver-1] = body;
+                }
+                else {
+                    dataFireAnsw.push(body);
+                }
+                
+                console.log('dataFireasn', dataFireAnsw);
+                firebase.database().ref("university/"+this.state.dataUser.university).update({
+                    answer: this.state.answerQuiz+1,
+                    answerQuiz: dataFireAnsw
+                });
+            }
+            
+        }
         
     }
+
+    _backMain() {
+        this.props.navigation.navigate('Dashboard');
+    }
+    
     render() {
         if(this.state.authentication == true) {
             return (
@@ -214,8 +282,10 @@ export default class QuizItem extends Component {
                 <View style={styles.timerContainer}>
                     <Text style={{ color: '#FF6464' }}>0:{this.state.stopCounter == 0 ? this.state.counter : this.state.stopCounter}</Text>
                 </View>
+                <TouchableHighlight onPress={() => this._backMain()} underlayColor="transparent" 
+                style={[styles.fonStyle, {width: this.state.showBlur}]}><Text></Text></TouchableHighlight>
                 <View>
-                    <View style={[styles.fonStyle, {width: this.state.showBlur}]}></View>
+                    
                     <Image 
                         style={styles.backgrImg} 
                         source={{uri: this.state.fonImage}} 
