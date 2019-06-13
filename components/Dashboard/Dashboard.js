@@ -26,6 +26,7 @@ export default class Dashboard extends Component {
             dataUser: {},
             authentication: true,
             quizTake: undefined,
+            idToken: '',
         }
         this._itemMenu = this._itemMenu.bind(this);
         this._quizRoute = this._quizRoute.bind(this);
@@ -41,26 +42,31 @@ export default class Dashboard extends Component {
                         console.log('dataJSon');
                         console.log(data.toJSON());
                         this.setState({ dataUser: data.toJSON() })
-                        fetch('https://us-central1-radqdweb.cloudfunctions.net/todayCard')
-                        .then(response => response.json())
-                        .then(json => {
-                            console.log(json[0]);
-                            console.log(this.state.dataUser.questions.fewfew);
-                            let audit = false;
-                            Object.keys(data.toJSON().questions).map(function(key) {
-                                console.log('ket', key);
-                                if(key == json[0]) {
-                                    audit = true;
+                        
+                        firebase.auth().currentUser.getIdToken(true).then((idToken) => {
+                            console.log('fewfew',idToken);
+                            this.setState({ idToken });
+                          })
+                          .then(() => {
+                            fetch('https://us-central1-radqdweb.cloudfunctions.net/api/' + this.state.idToken + '/today')
+                            .then(response => response.json())
+                            .then(json => {
+                                let audit = false;
+                                Object.keys(data.toJSON().questions).map(function(key) {
+                                    console.log('ket', key);
+                                    if(key == json.key) {
+                                        audit = true;
+                                    }
+                                });
+                                if(audit == false) {
+                                    this.setState({ quizTake: json.key });
                                 }
-                            });
-                            // this.state.dataUser.questions.map((value) => {
-                            //     console.log('vale', value);
-                            // })
-                            if(audit == false) {
-                                this.setState({ quizTake: json[0] });
-                            }
-                            
-                        })
+                                
+                            })
+                          })
+                          .catch(function(error) {
+                            console.log(`err ${error}`);
+                          });
                     })
                     this.setState({ authentication: false })
                 });

@@ -50,6 +50,7 @@ export default class ProfileStudents extends Component {
                     console.log(snapshot.key);
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                         this.setState({ dataUser: data.toJSON(), authentication: false });
+                        console.log('datauser', data.toJSON())
                         if(count == 0) {
                             for (let prop in data.toJSON().questions) {
                                 this.setState(state => {
