@@ -90,7 +90,7 @@ export default class Register extends Component {
                             email: this.state.textEmail.toLowerCase(),
                             born: this.state.date,
                             state: data._value.state,
-                            university: data._value.name
+                            university: snapshot.key
                         }).then(() => {
                             firebase.auth().currentUser.sendEmailVerification().then(function() {
                                 console.log('send ')

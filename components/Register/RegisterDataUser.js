@@ -69,8 +69,7 @@ export default class RegisterDataUser extends Component {
                     proffesion: this.state.textProffesion,
                     username: this.state.textUser,
                 }).then(() => {
-                    firebase.auth().signOut();
-                    console.log('updarte')
+                    // firebase.auth().signOut();
                     Alert.alert(
                         '',
                         'Verify your email!',

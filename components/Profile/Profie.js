@@ -62,7 +62,7 @@ export default class Profile extends Component {
                         firebase.database().ref("university/"+data.toJSON().university+"/answer").on("value", (snapshot) => {
                             this.setState({ answerQuiz: snapshot._value });
                         });
-                        firebase.database().ref("university/Other").once("value", (data) => {
+                        firebase.database().ref("university/"+data.toJSON().university).once("value", (data) => {
                             this.setState({ loggedUser: data._value.loggedUser });
                         });
                     })

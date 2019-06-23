@@ -54,11 +54,15 @@ export default class QuizItem extends Component {
                 firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                     
                     this.setState({ dataUser: data.toJSON(), snapshot: snapshot.key });
-                    firebase.database().ref("university/"+this.state.dataUser.university).on("value", (snapshot) => {
-                        this.setState({
-                            dataUniversity: snapshot._value,
-                            answerQuiz: snapshot._value.answer,
-                        });
+                    firebase.database().ref("university/"+data.toJSON().university).on("value", (snapshot) => {
+                        console.log('snapshot._value', snapshot.toJSON());
+                        if(snapshot._value != null) {
+                            this.setState({
+                                dataUniversity: snapshot._value,
+                                answerQuiz: snapshot._value.answer,
+                            });
+                        }
+                        
                     });
                     firebase.database().ref("university/"+this.state.dataUser.university+"/answerQuiz").once("value", (snapshot) => {
                         this.setState({

@@ -90,24 +90,24 @@ export default class Dashboard extends Component {
                             }
                             
                             // to do
-                            this.setState({ quizTake: data._value });
-                            let date = new Date();
-                            console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ', date.getSe);
-                            if(date.getHours() == 12) {
-                                if(date.getMinutes() <= 10) {
-                                    this.setState({
-                                        quizTake: '100%',
-                                    });
-                                } else {
-                                    this.setState({
-                                        quizTake: undefined,
-                                    });
-                                }
-                            } else {
-                                this.setState({
-                                    quizTake: undefined,
-                                });            
-                            }
+                            // this.setState({ quizTake: data._value });
+                            // let date = new Date();
+                            // console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ', date.getSe);
+                            // if(date.getHours() == 12) {
+                            //     if(date.getMinutes() <= 10) {
+                            //         this.setState({
+                            //             quizTake: '100%',
+                            //         });
+                            //     } else {
+                            //         this.setState({
+                            //             quizTake: undefined,
+                            //         });
+                            //     }
+                            // } else {
+                            //     this.setState({
+                            //         quizTake: undefined,
+                            //     });            
+                            // }
                             // To do
                         })
                         .then(() => {
@@ -344,13 +344,13 @@ export default class Dashboard extends Component {
     render() {
         const { navigation } = this.props;
         
-        // if(this.state.authentication == true) {
-        //     return (
-        //         <View style={styles.containerActivity}>
-        //             <ActivityIndicator size="large" /> 
-        //         </View>
-        //     )
-        // }
+        if(this.state.authentication == true) {
+            return (
+                <View style={styles.containerActivity}>
+                    <ActivityIndicator size="large" /> 
+                </View>
+            )
+        }
 
         return (
             <View style={{paddingBottom: 10}}>

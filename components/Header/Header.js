@@ -17,6 +17,7 @@ export default class Header extends Component {
             fadeAnim: new Animated.Value(-1000),
             opacBack: new Animated.Value(0),
             dataUser: {},
+            // answeUser: '0'
         }
         this._itemMenu = this._itemMenu.bind(this);
         this._openMenu = this._openMenu.bind(this);
@@ -43,6 +44,14 @@ export default class Header extends Component {
             if(user){
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
+                        if(data.toJSON().questions == undefined) {
+                            this.setState({ answeUser: '0' });
+                        } else {
+                            let answ = Object.keys(data.toJSON().questions);
+                            
+                            this.setState({ answeUser: answ.length })
+                        }
+                        
                         this.setState({ dataUser: data.toJSON() })
                     });
                 });
@@ -115,7 +124,7 @@ export default class Header extends Component {
                                 <Text style={{fontSize: 24, color: '#3E3F42', fontFamily: 'SFUIText-Semibold'}}>
                                 {this.state.dataUser.firstName}
                                 </Text>
-                                <Text style={[styles.greyText, {fontSize: 16}]}>173 Correct Answers</Text>
+                                <Text style={[styles.greyText, {fontSize: 16}]}>{this.state.answeUser} Correct Answers</Text>
                             </View>
                                 <TouchableHighlight onPress={() => this._itemMenu('Dashboard')} underlayColor="#fff" style={{
                                         zIndex: 100000,
@@ -180,7 +189,7 @@ export default class Header extends Component {
                             </View>
                         </View>
                         <TouchableHighlight onPress={() => this._closeMenu()} style={{
-                            width: '100%', 
+                            width: '600%', 
                             height: '100%', 
                             opacity: 0,
                             backgroundColor: '#333',
