@@ -95,7 +95,7 @@ export default class Settings extends Component {
         
         try {
             await firebase.auth().signOut();
-            this.props.navigation.navigate('Login')
+            this.props.navigation.navigate('WrapSlider')
         } catch (e) {
             console.log('err firebae', e);
         }

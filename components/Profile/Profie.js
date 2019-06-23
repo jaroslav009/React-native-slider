@@ -34,7 +34,7 @@ export default class Profile extends Component {
                 end: 0,
             },
             lastItem: 'http://www.youandthemat.com/wp-content/uploads/nature-2-26-17.jpg',
-            countArr: 1,
+            countArr: 5,
             normVariant: [],
         }
         this._back = this._back.bind(this);
@@ -59,12 +59,15 @@ export default class Profile extends Component {
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                         this.setState({ dataUser: data.toJSON() });
-                        firebase.database().ref("university").orderByChild("name").equalTo(data.toJSON().university).once("child_added", (snapshot) => {
-                            this.setState({ columnStudents: Object.size(snapshot._value) - 3, authentication: false })
-                        });
                         firebase.database().ref("university/"+data.toJSON().university+"/answer").on("value", (snapshot) => {
                             this.setState({ answerQuiz: snapshot._value });
                         });
+                        firebase.database().ref("university/Other").once("value", (data) => {
+                            this.setState({ loggedUser: data._value.loggedUser });
+                        });
+                    })
+                    .then(() => {
+                        this.setState({ authentication: false })
                     })
                 });
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
@@ -79,6 +82,8 @@ export default class Profile extends Component {
         });
 
         firebase.database().ref("Cards/Open").limitToLast(200).once("value", (data) => {
+            console.log('data', data._value);
+            
             for(item in data._value) {
                 this.setState(state => {
                     data._value[item].styleShow = "flex";
@@ -128,94 +133,19 @@ export default class Profile extends Component {
     }
 
     _press() {
-        let count = 5;
-        for(let i = this.state.countArr;i < 200; i++) {
-            // if(count < 1) {
-            //     if(i < this.state.questions.length) {
-
-            //         // Audit filter begin
-            //         let sumUser = 0;
-            //         let boofer = 0;
-            //         let keyArr = undefined;
-            //         this.state.questions[i].answers.map((val) => {
-
-            //             if(val.statisticChoose != undefined) {
-            //                 sumUser = val.statisticChoose + sumUser;
-            //             }
-            //             if(val.statisticChoose > boofer) {
-            //                 normVariant = val.variant;
-            //                 correctVar = val.correct;
-            //                 boofer = val.statisticChoose;
-            //                 // Audit on correct
-            //                 if(this.state.filterAnsw == "correct") {
-            //                     if(val.correct != true) {
-            //                         keyArr = 1;
-            //                     } else {
-            //                         keyArr = undefined;
-            //                     }
-            //                 }
-            //                 // Audit on correct
-
-            //                 // Audit on wrong
-            //                 else if(this.state.filterAnsw == "wrong") {
-            //                     if(val.correct != undefined) {
-            //                         keyArr = 1;
-            //                     } else {
-            //                         keyArr = undefined;
-            //                     }
-            //                 }
-            //                 // Audit on wrong
-
-            //                 // Audit on all
-            //                 else {
-            //                     keyArr = undefined;
-            //                 }
-            //                 // Audit on all
-            //             }
-            //         });
-            //         // Audit filter end
-
-            //         // Write data in show questions:
-            //         this.setState(state => {
-            //             let data = this.state.questions[i];
-            //             if(keyArr != undefined) {
-            //                 data.styleShow = "none"
-            //             }
-            //             let question = state.showQues.push(data)
-            //             let count = state.countArr = i+1;
-                        
-            //             return {
-            //                 question,
-            //                 count
-            //             }
-            //         });
-            //     }
-               
-            // }
-            if(count > 1) {
-                if(this.state.questions.length - this.state.countArr < 5) {
-                    count = this.state.questions.length - this.state.countArr;
-                    if(this.state.questions.length - this.state.countArr == 0) {
-                        break;
-                    }
-                }
-                console.log(`count ${count}`)
-
+        for(let i = this.state.countArr; i <= this.state.countArr+1; i++) {
+            console.log('this.state.countArr', this.state.countArr, '   i ', i);
+            if(this.state.questions[i] != undefined) {
                 this.setState(state => {
                     let question = state.showQues.push(this.state.questions[i])
-                    let count = state.countArr = i+1;
+                    
                     return {
                         question,
-                        count
                     }
                 });
             }
-            else {
-                break;
-            }
-            count--;
         }
-        
+        this.setState({ countArr: this.state.countArr+2 });        
     }
 
     correctFilter() {
@@ -345,7 +275,7 @@ export default class Profile extends Component {
                             {this.state.dataUser.university}
                         </Text>
                         <Text style={styles.subTitleProf}>
-                            {this.state.columnStudents} Students logged in
+                            {this.state.loggedUser == undefined ? '1' : this.state.loggedUser} Students logged in
                         </Text>
                     </View>
                     <View style={styles.containerAnswer}>

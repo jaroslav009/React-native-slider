@@ -8,74 +8,239 @@ import body from '../../uploads/img/body.png'
 import upArrow from '../../uploads/img/up-arrow.png';
 import downArrow from '../../uploads/img/sort-down-triangular-symbol.png';
 
-function startOfWeek(date)
-{
-  var diff = date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1);
 
-  return new Date(date.setDate(diff));
-
-}
 export default class Dashboard extends Component {
 
     constructor(props) {
         super(props);
         let today = new Date();
         this.state = {
-            timePickerPersonal: '',
+            timePickerPersonal: 'last7',
+            userPicker: 'last7',
             date: today.getHours()+':'+today.getMinutes(),
             dataUser: {},
             authentication: true,
             quizTake: undefined,
             idToken: '',
+            idQuis: [],
+            statisticUniver: {},
+            statisticUser: {},
+            correctAnswersQuizUser: {},
+            correctAnswersQuizUniversity: {}
         }
         this._itemMenu = this._itemMenu.bind(this);
         this._quizRoute = this._quizRoute.bind(this);
+        this._outputAnswersUnvier = this._outputAnswersUnvier.bind(this);
+        this._outputAnswersUser = this._outputAnswersUser.bind(this);
     }
 
     componentDidMount() {
         
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
-                firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
-                    console.log(snapshot.key);
+                firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => {
+                    this.setState({ snapshot: snapshot.key })
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
-                        console.log('dataJSon');
-                        console.log(data.toJSON());
-                        this.setState({ dataUser: data.toJSON() })
+                        let keysQues;
+                        if(data.toJSON().questions != undefined) {
+                            keysQues = Object.keys(data.toJSON().questions);
+                        } else {
+                            keysQues = undefined;
+                        }
                         
-                        firebase.auth().currentUser.getIdToken(true).then((idToken) => {
-                            console.log('fewfew',idToken);
-                            this.setState({ idToken });
-                          })
-                          .then(() => {
-                            fetch('https://us-central1-radqdweb.cloudfunctions.net/api/' + this.state.idToken + '/today')
-                            .then(response => response.json())
-                            .then(json => {
-                                let audit = false;
-                                Object.keys(data.toJSON().questions).map(function(key) {
-                                    console.log('ket', key);
-                                    if(key == json.key) {
-                                        audit = true;
+                        this.setState({ dataUser: data.toJSON(), idQuis: keysQues })
+                    })
+                    .then(() => {
+                        firebase.database().ref("Cards/Today").once("value", (data) => {
+                            let quisToday = false;
+                            if(this.state.idQuis != undefined) {
+                                this.state.idQuis.forEach((value) => {
+                                    if(value == data._value) {
+                                        quisToday = true;
                                     }
                                 });
-                                if(audit == false) {
-                                    this.setState({ quizTake: json.key });
+                            }
+                            
+                            
+                            if(quisToday == false) {
+                                this.setState({ quizTake: data._value });
+                            }
+                            let keyDataUserQues;
+                            if(this.state.dataUser.questions != undefined) {
+                                keyDataUserQues = Object.keys(this.state.dataUser.questions);
+                            }
+                            let bool = 1;
+                            if(keyDataUserQues != undefined) {
+                                keyDataUserQues.map((value) => {
+                                    console.log('value', value);
+                                    console.log('data._value', data._value);
+                                    if(value == data._value) {
+                                        this.setState({
+                                            quizTake: undefined,
+                                        });
+                                        return bool = 0;
+                                    } else {
+                                        bool = 1
+                                    }
+                                });
+                            }
+                            
+                            if(bool == 1) {
+                                this.setState({ quizTake: data._value });
+                            }
+                            
+                            // to do
+                            this.setState({ quizTake: data._value });
+                            let date = new Date();
+                            console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ', date.getSe);
+                            if(date.getHours() == 12) {
+                                if(date.getMinutes() <= 10) {
+                                    this.setState({
+                                        quizTake: '100%',
+                                    });
+                                } else {
+                                    this.setState({
+                                        quizTake: undefined,
+                                    });
                                 }
-                                
+                            } else {
+                                this.setState({
+                                    quizTake: undefined,
+                                });            
+                            }
+                            // To do
+                        })
+                        .then(() => {
+                            firebase.database().ref("university/"+this.state.dataUser.university+"/answerQuiz").once("value", (data) => {
+                                if(data._value == null) {
+                                    return console.log('null')
+                                }
+                                let dataDay = new Array();
+                                let sumCorrect;
+                                let dataCorrect = new Array();
+                                let dataWrong = new Array();
+                                const arrDay = [null, 'M', 'T', 'W', 'T', 'F', 'S', 'S'];
+                                let objKey;
+
+                                for(let j = 1; j <= 4; j++) {
+                                    if(j == 1) objKey = 'last7';
+                                    if(j == 2) objKey = 'last14';
+                                    if(j == 3) objKey = 'last21';
+                                    if(j == 4) objKey = 'last30';
+                                    dataDay = [];
+                                    dataCorrect = [];
+                                    dataWrong = [];
+                                    sumCorrect=0;
+                                    if(data._value[objKey] == undefined) {
+                                        for(let i = 1; i <= 7; i++) {
+                                            dataCorrect.push({ number: 0, name: arrDay[i] });
+                                            dataWrong.push({ number: 0, name: arrDay[i] });
+                                        }
+                                        
+                                    }
+                                    else {
+                                        for(let i = 1; i <= 7; i++) {
+                                            if(data._value[objKey].data[i.toString(10)] != undefined) {
+                                                dataCorrect.push({ number: data._value[objKey].data[i.toString(10)].correctAnswers, name: arrDay[i] });
+                                                dataWrong.push({ number: data._value[objKey].data[i.toString(10)].wrongAnswers, name: arrDay[i] });
+                                                sumCorrect = sumCorrect+data._value[objKey].data[i.toString(10)].correctAnswers;
+                                            } else {
+                                                dataCorrect.push({ number: 0, name: arrDay[i] });
+                                                dataWrong.push({ number: 0, name: arrDay[i] });
+                                            }
+                                            
+                                        }
+                                    }
+                                    dataDay.push(dataCorrect);
+                                    dataDay.push(dataWrong);
+                                    this.setState(state => {
+                                        const dataUniver = state.statisticUniver[objKey] = dataDay;
+                                        const dataCorrect = state.correctAnswersQuizUniversity[objKey] = sumCorrect;
+                                        return {
+                                            dataUniver,
+                                            dataCorrect
+                                        }
+                                    });
+
+                                }
                             })
-                          })
-                          .catch(function(error) {
-                            console.log(`err ${error}`);
-                          });
+                        })
+                        .then(() => {
+                            firebase.database().ref("users/"+this.state.snapshot+"/answerQuiz/").once("value", (data) => {
+                                let dataDay = new Array();
+                                if(data._value == null) {
+                                    return console.log('null')
+                                }
+                                let dataCorrect = new Array();
+                                let dataWrong = new Array();
+                                const arrDay = [null, 'M', 'T', 'W', 'T', 'F', 'S', 'S'];
+                                let objKey;
+                                let sumCorrect;
+                                for(let j = 1; j <= 4; j++) {
+                                    if(j == 1) objKey = 'last7';
+                                    if(j == 2) objKey = 'last14';
+                                    if(j == 3) objKey = 'last21';
+                                    if(j == 4) objKey = 'last30';
+                                    dataDay = [];
+                                    dataCorrect = [];
+                                    dataWrong = [];
+                                    sumCorrect = 0;
+                                    if(data._value[objKey] == undefined) {
+                                        for(let i = 1; i <= 7; i++) {
+                                            dataCorrect.push({ number: 0, name: arrDay[i] });
+                                            dataWrong.push({ number: 0, name: arrDay[i] });
+                                        }
+                                        
+                                    }
+                                    else {
+                                        for(let i = 1; i <= 7; i++) {
+                                            if(data._value[objKey].data[i.toString(10)] != undefined) {
+                                                dataCorrect.push({ number: data._value[objKey].data[i.toString(10)].correctAnswers, name: arrDay[i] });
+                                                dataWrong.push({ number: data._value[objKey].data[i.toString(10)].wrongAnswers, name: arrDay[i] });
+                                                sumCorrect = sumCorrect+data._value[objKey].data[i.toString(10)].correctAnswers;
+                                            } else {
+                                                dataCorrect.push({ number: 0, name: arrDay[i] });
+                                                dataWrong.push({ number: 0, name: arrDay[i] });
+                                            }
+                                        }
+                                    }
+                                    
+                                    dataDay.push(dataCorrect);
+                                    dataDay.push(dataWrong);
+                                    this.setState(state => {
+                                        const dataUniver = state.statisticUser[objKey] = dataDay;
+                                        const dataCorrect = state.correctAnswersQuizUser[objKey] = sumCorrect;
+                                        return {
+                                            dataUniver,
+                                            dataCorrect
+                                        }
+                                    });
+                                }
+                            })
+                        })
+                        .then(() => {
+                            this.setState({ authentication: false });
+                        })
+                        .catch(err => {
+                            console.log(`err ${err}`);
+                            
+                        })
                     })
-                    this.setState({ authentication: false })
-                });
+                    .catch(err => {
+                        console.log(`err ${err}`);
+                        
+                    })
+                })
+                
+                
             } else {
-                this.props.navigation.navigate('Login');
+                this.props.navigation.navigate('WrapSlider');
             }
         })
-        
-        
+        firebase.database().ref("university/Other").once("value", (data) => {
+            console.log('university/Other',data._value.loggedUser);
+            
+        })
     }
 
     _itemMenu() {
@@ -89,43 +254,109 @@ export default class Dashboard extends Component {
         });
     }
 
+    _outputAnswersUnvier(value) {
+        if(value == 'last7') {
+            if(this.state.correctAnswersQuizUniversity.last7 != undefined) {
+                return(
+                    <Text>{this.state.correctAnswersQuizUniversity.last7}</Text>
+                );
+            } else {
+                return(
+                    <Text>0</Text>
+                );
+            }
+        } else if(value == 'last14') {
+            if(this.state.correctAnswersQuizUniversity.last14 != undefined) {
+                return(
+                    <Text>{this.state.correctAnswersQuizUniversity.last14}</Text>
+                );
+            } else {
+                return(
+                    <Text>0</Text>
+                );
+            }
+        } else if(value == 'last21') {
+            if(this.state.correctAnswersQuizUniversity.last21 != undefined) {
+                return(
+                    <Text>{this.state.correctAnswersQuizUniversity.last21}</Text>
+                );
+            } else {
+                return(
+                    <Text>0</Text>
+                );
+            }
+        } else {
+            if(this.state.correctAnswersQuizUniversity.last30 != undefined) {
+                return(
+                    <Text>{this.state.correctAnswersQuizUniversity.last30}</Text>
+                );
+            } else {
+                return(
+                    <Text>0</Text>
+                );
+            }
+        }
+    }
+    _outputAnswersUser(value) {
+        if(value == 'last7') {
+            if(this.state.correctAnswersQuizUser.last7 != undefined) {
+                return(
+                    <Text>{this.state.correctAnswersQuizUser.last7}</Text>
+                );
+            } else {
+                return(
+                    <Text>0</Text>
+                );
+            }
+        } else if(value == 'last14') {
+            if(this.state.correctAnswersQuizUser.last14 != undefined) {
+                return(
+                    <Text>{this.state.correctAnswersQuizUser.last14}</Text>
+                );
+            } else {
+                return(
+                    <Text>0</Text>
+                );
+            }
+        } else if(value == 'last21') {
+            if(this.state.correctAnswersQuizUser.last21 != undefined) {
+                return(
+                    <Text>{this.state.correctAnswersQuizUser.last21}</Text>
+                );
+            } else {
+                return(
+                    <Text>0</Text>
+                );
+            }
+        } else {
+            if(this.state.correctAnswersQuizUser.last30 != undefined) {
+                return(
+                    <Text>{this.state.correctAnswersQuizUser.last30}</Text>
+                );
+            } else {
+                return(
+                    <Text>0</Text>
+                );
+            }
+        }
+    }
+
     render() {
-        if(this.state.authentication == true) {
-            return (
-                <View style={styles.containerActivity}>
-                    <ActivityIndicator size="large" /> 
-                </View>
-            )
-        } 
-        console.log('state')
-        console.log(this.state.dataUser.age)
-        const data = [ 
-            [
-                { number: 50, name: 'M' }, 
-                { number: 40, name: 'T' }, 
-                { number: 20, name: 'W' }, 
-                { number: 70, name: 'T'}, 
-                { number: 90, name: 'F' }, 
-                { number: 85, name: 'S' }, 
-                { number: 10, name: 'S' }
-            ],
-            [
-                { number: 50, name: 'M' }, 
-                { number: 40, name: 'T' }, 
-                { number: 20, name: 'W' }, 
-                { number: 70, name: 'T'}, 
-                { number: 90, name: 'F' }, 
-                { number: 85, name: 'S' }, 
-                { number: 10, name: 'S' }
-            ] 
-        ]
-        const data2 = [ [{ number: 10, name: 'M' }, { number: 20, name: 'T' }, { number: 24, name: 'W' }, { number: 23, name: 'T'}, { number: 0, name: 'F' }, { number: 25, name: 'S' }, { number: 0, name: 'S' }], [{ number: 0, name: 'M' }, { number: 0, name: 'T' }, { number: 32, name: 'W' }, { number: 22, name: 'T'}, { number: 21, name: 'F' }, { number: 22, name: 'S' }, { number: 21, name: 'S' }] ]
+        const { navigation } = this.props;
+        
+        // if(this.state.authentication == true) {
+        //     return (
+        //         <View style={styles.containerActivity}>
+        //             <ActivityIndicator size="large" /> 
+        //         </View>
+        //     )
+        // }
 
         return (
             <View style={{paddingBottom: 10}}>
                 <ScrollView style={styles.wrapperDashboard}>
                    <Header navigation={this.props.navigation} page="Dashboard" />
-                    <TouchableHighlight onPress={() => this._quizRoute()} style={[styles.wrapperQuiz, {display: this.state.quizTake == undefined ? 'none' : 'flex'}]}>
+                    <TouchableHighlight onPress={() => this._quizRoute()} style={[styles.wrapperQuiz, {display: this.state.quizTake == undefined || navigation.getParam('answer', 'NO-ID') == true ? 'none' : 'flex'}]}>
                         <Text style={styles.textQuiz}>Take the quiz</Text>
                     </TouchableHighlight>
 
@@ -133,10 +364,10 @@ export default class Dashboard extends Component {
                     <View style={styles.wrapperHero}>
                         <Image source={body} style={styles.backgroundImage} />
                         <View style={styles.wrapperHeroText}>
-                            <Text style={[styles.textWelcome]}>Welcom, {this.state.dataUser.firstName}!</Text>
+                            <Text style={[styles.textWelcome]}>Welcom, {this.state.dataUser.username}!</Text>
                             <Text style={styles.textRad}>
-                                <Text style={styles.numberRad}>173 </Text>
-                                rad
+                                <Text style={styles.numberRad}>{this.state.dataUser.firstName} </Text>
+                                {this.state.dataUser.lastName}
                             </Text>
                         </View>
                     </View>
@@ -146,34 +377,6 @@ export default class Dashboard extends Component {
                     <View style={styles.wrapperDiagram}>
                         <View style={styles.containerPerfomanceDiagram}>
                             <View style={styles.wrapperTimePerfomance}>
-                                <Text style={styles.textPerfomance}>PERSONAL PERFORMANCE</Text>
-                                <View style={styles.pickerWrapper}>
-                                    <Image source={upArrow} style={styles.upArrow} />
-                                    <Image source={downArrow} style={styles.downArrow} />
-                                    <Picker
-                                        selectedValue={this.state.timePickerPersonal}
-                                        style={styles.pickerStyle}
-                                        onValueChange={(itemValue, itemIndex) =>
-                                            this.setState({timePickerPersonal: itemValue})
-                                        }>
-                                        <Picker.Item label="Last 7 days" value="lastFirstWeek" />
-                                        <Picker.Item label="Last 14 days" value="lastSecondWeek" />
-                                        <Picker.Item label="Last 21 days" value="lastThirdWeek" />
-                                        <Picker.Item label="Last Month" value="lastMonth" />
-                                    </Picker>
-                                </View>
-                            </View>
-                            <View style={styles.answerDiagram}>
-                                <Text style={styles.textAnswer}>Correct answers</Text>
-                                <Text style={[styles.textAnswer, {fontSize: 20}]}>4</Text>
-                            </View>
-                            <Chart data={data} maxPoint={100} />
-                        </View>
-                    </View>
-
-                    <View style={[styles.wrapperDiagram, {marginTop: 30}]}>
-                        <View style={styles.containerPerfomanceDiagram}>
-                            <View style={styles.wrapperTimePerfomance}>
                                 <Text style={styles.textPerfomance}>INSTITUTION PERFORMANCE</Text>
                                 <View style={styles.pickerWrapper}>
                                     <Image source={upArrow} style={styles.upArrow} />
@@ -181,21 +384,70 @@ export default class Dashboard extends Component {
                                     <Picker
                                         selectedValue={this.state.timePickerPersonal}
                                         style={styles.pickerStyle}
-                                        onValueChange={(itemValue, itemIndex) =>
+                                        onValueChange={(itemValue, itemIndex) => {
                                             this.setState({timePickerPersonal: itemValue})
-                                        }>
-                                        <Picker.Item label="Last 7 days" value="lastFirstWeek" />
-                                        <Picker.Item label="Last 14 days" value="lastSecondWeek" />
-                                        <Picker.Item label="Last 21 days" value="lastThirdWeek" />
-                                        <Picker.Item label="Last Month" value="lastMonth" />
+                                          }
+                                        }
+                                        >
+                                        <Picker.Item label="Last 7 days" value="last7" />
+                                        <Picker.Item label="Last 14 days" value="last14" />
+                                        <Picker.Item label="Last 21 days" value="last21" />
+                                        <Picker.Item label="Last Month" value="last30" />
                                     </Picker>
                                 </View>
                             </View>
                             <View style={styles.answerDiagram}>
                                 <Text style={styles.textAnswer}>Correct answers</Text>
-                                <Text style={[styles.textAnswer, {fontSize: 20}]}>54</Text>
+                                <Text style={[styles.textAnswer, {fontSize: 20}]}>
+                                    { this._outputAnswersUnvier(this.state.timePickerPersonal) }
+                                </Text>
                             </View>
-                            <Chart data={data2} maxPoint={100} />
+                            <Chart data={this.state.statisticUniver.last7} maxPoint={100} 
+                            styleChart={this.state.timePickerPersonal == 'last7' ? 'flex' : 'none'} />
+                            <Chart data={this.state.statisticUniver.last14} maxPoint={100} 
+                            styleChart={this.state.timePickerPersonal == 'last14' ? 'flex' : 'none'} />
+                            <Chart data={this.state.statisticUniver.last21} maxPoint={100} 
+                            styleChart={this.state.timePickerPersonal == 'last21' ? 'flex' : 'none'} />
+                            <Chart data={this.state.statisticUniver.last30} maxPoint={100} 
+                            styleChart={this.state.timePickerPersonal == 'last30' ? 'flex' : 'none'} />
+                        </View>
+                    </View>
+
+                    <View style={[styles.wrapperDiagram, {marginTop: 30}]}>
+                        <View style={styles.containerPerfomanceDiagram}>
+                            <View style={styles.wrapperTimePerfomance}>
+                                <Text style={styles.textPerfomance}>PERSONAL PERFORMANCE</Text>
+                                <View style={styles.pickerWrapper}>
+                                    <Image source={upArrow} style={styles.upArrow} />
+                                    <Image source={downArrow} style={styles.downArrow} />
+                                    <Picker
+                                        selectedValue={this.state.userPicker}
+                                        style={styles.pickerStyle}
+                                        onValueChange={(itemValue, itemIndex) => {
+                                            this.setState({userPicker: itemValue})
+                                          }
+                                        }>
+                                        <Picker.Item label="Last 7 days" value="last7" />
+                                        <Picker.Item label="Last 14 days" value="last14" />
+                                        <Picker.Item label="Last 21 days" value="last21" />
+                                        <Picker.Item label="Last Month" value="last30" />
+                                    </Picker>
+                                </View>
+                            </View>
+                            <View style={styles.answerDiagram}>
+                                <Text style={styles.textAnswer}>Correct answers</Text>
+                                <Text style={[styles.textAnswer, {fontSize: 20}]}>
+                                { this._outputAnswersUser(this.state.userPicker) }
+                                </Text>
+                            </View>
+                            <Chart data={this.state.statisticUser.last7} maxPoint={100} 
+                            styleChart={this.state.userPicker == 'last7' ? 'flex' : 'none'} />
+                            <Chart data={this.state.statisticUser.last14} maxPoint={100} 
+                            styleChart={this.state.userPicker == 'last14' ? 'flex' : 'none'} />
+                            <Chart data={this.state.statisticUser.last21} maxPoint={100} 
+                            styleChart={this.state.userPicker == 'last21' ? 'flex' : 'none'} />
+                            <Chart data={this.state.statisticUser.last30} maxPoint={100} 
+                            styleChart={this.state.userPicker == 'last30' ? 'flex' : 'none'} />
                         </View>
                     </View>
                     {/* Diagrams */}

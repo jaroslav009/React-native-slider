@@ -7,7 +7,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@react-native-community/blur": "^3.3.1",
     "firebase-admin": "^8.0.0",
     "firebase-functions": "^2.3.1",
     "fs": "0.0.1-security",

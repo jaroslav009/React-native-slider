@@ -79,6 +79,7 @@ export default class Register extends Component {
                 console.log('auth data user ');
                 let idUser = makeid(10)
                 let dataUserEmail = findEmail(this.state.textEmail.toLowerCase());
+                console.log('idUswer', idUser);
                 
                 console.log('success');
                 firebase.database().ref("university").orderByChild("lastPart").equalTo(dataUserEmail.lastPart).on("child_added", (snapshot) => {

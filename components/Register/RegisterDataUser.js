@@ -45,7 +45,23 @@ export default class RegisterDataUser extends Component {
                 firstName: this.state.textFName,
                 lastName: this.state.textLName,
                 proffesion: this.state.textProffesion
-            }).then(() => {
+            })
+            .then(() => {
+                firebase.database().ref("university/" + navigation.getParam('univerId')).once("value", (data) => {
+                    console.log('data.loggedUser', data.loggedUser, 'data', data);
+                    if(data._value.loggedUser == undefined) {
+                        this.setState({ loggedUser: 1 });
+                    } else {
+                        this.setState({ loggedUser: parseInt(data._value.loggedUser)+1 });
+                    }
+                })
+                .then(() => {
+                    firebase.database().ref("university/" + navigation.getParam('univerId')).update({
+                        loggedUser: this.state.loggedUser,
+                    });
+                })
+            })
+            .then(() => {
                 console.log('success this.state.textUser' , this.state.textUser);        
                 firebase.database().ref("university/" + navigation.getParam('univerId') + "/" + navigation.getParam('id', 'NO-ID')).update({
                     firstName: this.state.textFName,
@@ -53,6 +69,7 @@ export default class RegisterDataUser extends Component {
                     proffesion: this.state.textProffesion,
                     username: this.state.textUser,
                 }).then(() => {
+                    firebase.auth().signOut();
                     console.log('updarte')
                     Alert.alert(
                         '',

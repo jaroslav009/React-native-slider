@@ -29,6 +29,7 @@ export default class ProfileStudents extends Component {
             idQues: [],
             showQues: [],
             countArr: 1,
+            showButtonUpload: 'flex',
         }
         this._back = this._back.bind(this);
         this._taskRoute = this._taskRoute.bind(this);
@@ -43,7 +44,6 @@ export default class ProfileStudents extends Component {
 
     componentDidMount() {
         let count = 0;
-        console.log('height', Dimensions.get('window').height)
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => { 
@@ -62,46 +62,48 @@ export default class ProfileStudents extends Component {
                                     }
                                 })
                             }
-
-                            if(this.state.questions.length < 5) {
-                                let i = 1;
-                                for(item in data.toJSON().questions) {
-                                    console.log('test', data._value[item])
-                                    if(i > 1) {
-                                        // Nothing
-                                    }
-                                    else {
-                                        this.setState(state => {
-                                            question = state.showQues.push(data.toJSON().questions[item]);
-                                            return {
-                                                question,
-                                            }
-                                        })
-                                        console.log('showques 2 ', this.state.showQues)
-                                    }
-                                    i++;
-                                }
+                            if(data.toJSON().questions == undefined) {
+                                this.setState({ showButtonUpload: 'none' })
                             } else {
-                                let i = 1;
-                
-                                for(item in data.toJSON().questions) {
-                                    if(i <= 5) {
-                                        this.setState(state => {
-                                            let question = state.showQues.push(data.toJSON().questions[item]);
-                                            let count = state.countArr = 5;
-                                            return {
-                                                question,
-                                                count
-                                            }
-                                        });
-                                    } else {
-                                        break;
+                                if(this.state.questions.length < 5) {
+                                    let i = 1;
+                                    for(item in data.toJSON().questions) {
+                                        console.log('test', data._value[item])
+                                        if(i > 1) {
+                                            // Nothing
+                                        }
+                                        else {
+                                            this.setState(state => {
+                                                question = state.showQues.push(data.toJSON().questions[item]);
+                                                return {
+                                                    question,
+                                                }
+                                            })
+                                            console.log('showques 2 ', this.state.showQues)
+                                        }
+                                        i++;
                                     }
-                                    
-                                    i++;
+                                } else {
+                                    let i = 1;
+                    
+                                    for(item in data.toJSON().questions) {
+                                        if(i <= 5) {
+                                            this.setState(state => {
+                                                let question = state.showQues.push(data.toJSON().questions[item]);
+                                                let count = state.countArr = 5;
+                                                return {
+                                                    question,
+                                                    count
+                                                }
+                                            });
+                                        } else {
+                                            break;
+                                        }
+                                        
+                                        i++;
+                                    }
                                 }
                             }
-
                         }
                         count++;
                     })
@@ -113,8 +115,6 @@ export default class ProfileStudents extends Component {
     }
 
     _taskRoute(key, value) {
-        console.log('hello', key);
-        console.log(value);
         const {navigate} = this.props.navigation;
         let id = this.state.idQues[key];
         navigate('QuizShowProfile', {id, value, key})
@@ -305,7 +305,7 @@ export default class ProfileStudents extends Component {
                                 )
                             })   
                         }
-                        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                        <View style={{justifyContent: 'center', alignItems: 'center', display: this.state.showButtonUpload}}>
                             <TouchableHighlight underlayColor="#1D8EAB"
                             style={{marginTop: 50, 
                                 justifyContent: 'center', 

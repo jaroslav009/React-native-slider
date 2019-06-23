@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, Animated, ScrollView, Dimensions, Picker, TextInput, TouchableHighlight} from 'react-native';
+import {StyleSheet, Text, View, Image, Animated, ScrollView, Dimensions, Picker, TextInput, TouchableHighlight, ActivityIndicator} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import firebase from 'react-native-firebase';
 
 import Header from '../Header/Header';
 import Chart from '../Chart/Chart';
@@ -17,73 +18,34 @@ export default class Leaderboard extends Component {
         this.state = {
             score: '',
             fadeAnim: new Animated.Value(0),
-            itemsLeader: [
-                {
-                    title: 'Emory University',
-                    score: 54,
-                    data: [
-                        [{ number: 10, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }], [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }]
-                    ],
-                    styeShowGraph: new Animated.Value(0),
-                    displayGraph: 'none',
-                    opacNum: 0
-                },
-                {
-                    title: 'Stanford University',
-                    score: 24,
-                    data: [
-                        [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }], [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }]
-                    ],
-                    styeShowGraph: new Animated.Value(0),
-                    displayGraph: 'none',
-                    opacNum: 0
-                },
-                {
-                    title: 'San Francisco Childrens Hospital',
-                    score: 84,
-                    data: [
-                        [{ number: 90, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }], [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }]
-                    ],
-                    styeShowGraph: new Animated.Value(0),
-                    displayGraph: 'none',
-                    opacNum: 0
-                },
-                {
-                    title: 'San Francisco Childrens Hospital',
-                    score: 14,
-                    data: [
-                        [{ number: 220, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }], [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }]
-                    ],
-                    styeShowGraph: new Animated.Value(0),
-                    displayGraph: 'none',
-                    opacNum: 0
-                },
-                {
-                    title: 'Emory University',
-                    score: 44,
-                    data: [
-                        [{ number: 30, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }], [{ number: 50, name: 'M' }, { number: 40, name: 'T' }, { number: 20, name: 'W' }, { number: 70, name: 'T'}, { number: 90, name: 'F' }, { number: 85, name: 'S' }, { number: 10, name: 'S' }]
-                    ],
-                    styeShowGraph: new Animated.Value(0),
-                    displayGraph: 'none',
-                    opacNum: 0
-                },
-            ]
+            correctAnswersQuizUniversity: {},
+            statisticUniver: {},
+            itemsUniver: [],
+            authentication: true,
+            instituteSelect: {},
+            countArr: 5,
+            searchText: '',
+            booferUniverSearch: [],
         }
         this._graphShow = this._graphShow.bind(this);
         this._back = this._back.bind(this);
+        this._outputUnivers = this._outputUnivers.bind(this);
+        this._uploadMore = this._uploadMore.bind(this);
+        this._filterScore = this._filterScore.bind(this);
+        this._filterTitle = this._filterTitle.bind(this);
+        this._searchTitle = this._searchTitle.bind(this);
     }
 
-    _graphShow(arg) {
-        if(this.state.itemsLeader[arg].opacNum == 0) {
+    _graphShow(arg) {        
+        if(this.state.arrUniver[arg].opacNum == 0) {
             this.setState(state => {
-                const list = state.itemsLeader[arg].opacNum = 1;
+                const list = state.arrUniver[arg].opacNum = 1;
                 return {
                     list,
                 };
             });
             Animated.timing(
-                this.state.itemsLeader[arg].styeShowGraph,
+                this.state.arrUniver[arg].styeShowGraph,
                 {
                   toValue: 1,
                   duration: 1000,
@@ -91,13 +53,13 @@ export default class Leaderboard extends Component {
             ).start();
         } else {
             this.setState(state => {
-                const list = state.itemsLeader[arg].opacNum = 0;
+                const list = state.arrUniver[arg].opacNum = 0;
                 return {
                     list,
                 };
             });
             Animated.timing(
-                this.state.itemsLeader[arg].styeShowGraph,            
+                this.state.arrUniver[arg].styeShowGraph,            
                 {
                   toValue: 0,
                   duration: 1000,
@@ -111,7 +73,200 @@ export default class Leaderboard extends Component {
         this.props.navigation.goBack()
     }
 
+    componentDidMount() {
+        firebase.database().ref("university/").limitToLast(100).once("value", (data) => {
+            
+            this.setState({ dataAllUnivers: data._value });
+            const itemUniver = [];
+            let arrUniver = new Array();
+            let objUniver = {};
+            for(prop in data._value) {
+                this.setState({ [prop]: 'last7' })
+                let dataDay = new Array();
+                let sumCorrect;
+                let correctAnswers = 0;
+                let dataCorrect = new Array();
+                let dataWrong = new Array();
+                const arrDay = [null, 'M', 'T', 'W', 'T', 'F', 'S', 'S'];
+                let objKey;
+                let dataUniver = {};
+                
+                
+                if(data._value[prop].answerQuiz != undefined ) {
+                    
+                    if(data._value[prop].answerQuiz == null) {
+                        console.log('null')
+                    }
+                    else {
+                        
+                        for(let j = 1; j <= 4; j++) {
+                            if(j == 1) objKey = 'last7';
+                            if(j == 2) objKey = 'last14';
+                            if(j == 3) objKey = 'last21';
+                            if(j == 4) objKey = 'last30';
+                            dataDay = [];
+                            dataCorrect = [];
+                            dataWrong = [];
+                            sumCorrect=0;
+                            if(data._value[prop].answerQuiz[objKey] == undefined) {
+                                for(let i = 1; i <= 7; i++) {
+                                    dataCorrect.push({ number: 0, name: arrDay[i] });
+                                    dataWrong.push({ number: 0, name: arrDay[i] });
+                                }
+                            }
+                            else {
+                                for(let i = 1; i <= 7; i++) {
+                                    if(data._value[prop].answerQuiz[objKey].data[i] == undefined) {
+                                        dataCorrect.push({ number: 0, name: arrDay[i] });
+                                        dataWrong.push({ number: 0, name: arrDay[i] });
+                                    } else {
+                                        dataCorrect.push({ number: data._value[prop].answerQuiz[objKey].data[i.toString(10)].correctAnswers, name: arrDay[i] });
+                                        dataWrong.push({ number: data._value[prop].answerQuiz[objKey].data[i.toString(10)].wrongAnswers, name: arrDay[i] });
+                                        sumCorrect = sumCorrect+data._value[prop].answerQuiz[objKey].data[i.toString(10)].correctAnswers;
+                                    }
+                                }
+                            }
+                            
+                            // if(data._value[objKey] == undefined) {
+                            //     for(let i = 1; i <= 7; i++) {
+                            //         dataCorrect.push({ number: 0, name: arrDay[i] });
+                            //         dataWrong.push({ number: 0, name: arrDay[i] });
+                            //     }
+                                
+                            // }
+                            // else {
+                            //     for(let i = 1; i <= 7; i++) {
+                            //         if(data._value[objKey].data[i.toString(10)] != undefined) {
+                            //             dataCorrect.push({ number: data._value[objKey].data[i.toString(10)].correctAnswers, name: arrDay[i] });
+                            //             dataWrong.push({ number: data._value[objKey].data[i.toString(10)].wrongAnswers, name: arrDay[i] });
+                            //             sumCorrect = sumCorrect+data._value[objKey].data[i.toString(10)].correctAnswers;
+                            //         } else {
+                            //             dataCorrect.push({ number: 0, name: arrDay[i] });
+                            //             dataWrong.push({ number: 0, name: arrDay[i] });
+                            //         }
+                                    
+                            //     }
+                            // }
+                            dataDay.push(dataCorrect);
+                            dataDay.push(dataWrong);
+                            correctAnswers = correctAnswers+sumCorrect
+                            dataUniver[objKey] = dataDay;
+                        }
+                    }
+                }
+                this.setState({ [data._value[prop].name]: 'last7' });
+                objUniver = {
+                    title: data._value[prop].name,
+                    score: correctAnswers,
+                    data: {
+                        last7: dataUniver.last7,
+                        last14: dataUniver.last14,
+                        last21: dataUniver.last21,
+                        last30: dataUniver.last30,
+                    },
+                    opacNum: 0,
+                    displayGraph: 'none',
+                    styeShowGraph: new Animated.Value(0),
+                }
+                arrUniver.push(objUniver);
+            }
+            let arrUniverOut = [];
+            for(let i = 0; i <= 5; i++) {
+                arrUniverOut.push(arrUniver[i]);
+            }
+            this.setState({ itemsUniver: itemUniver, arrUniver, arrUniverOut });
+            console.log(arrUniver[3]);
+            
+
+        })
+        .then(() => {
+            this.setState({ authentication: false });
+        })
+        .catch(err => {
+            console.log(`err ${err}`);
+        })
+    }
+
+    _outputUnivers() {
+        
+    }
+
+    _uploadMore() {
+        for(let i = this.state.countArr; i <= this.state.countArr+5; i++) {
+            if(this.state.arrUniver[i] != undefined) {
+                this.setState(state => {
+                    
+                    let arr = state.arrUniverOut.push(this.state.arrUniver[i]);
+                    return {
+                        arr
+                    }
+                })
+            }
+        }
+        this.setState({ countArr: this.state.countArr+5 });
+    }
+
+    _filterScore() {
+
+        let arrBoofer = this.state.arrUniverOut;
+        
+        let n = arrBoofer.length;
+        for (let i = 0; i < n-1; i++)
+        { 
+            for (let j = 0; j < n-1-i; j++)
+            { 
+                if (arrBoofer[j+1].score < arrBoofer[j].score)
+                { 
+                    let t = arrBoofer[j+1]; 
+                    arrBoofer[j+1] = arrBoofer[j]; 
+                    arrBoofer[j] = t; 
+                }
+            }
+        } 
+        this.setState({ arrUniverOut: arrBoofer.reverse() });
+    }
+
+    _filterTitle() {
+        let arrBoofer = this.state.arrUniverOut;
+        
+        let n = arrBoofer.length;
+        for (let i = 0; i < n-1; i++)
+        { 
+            for (let j = 0; j < n-1-i; j++)
+            { 
+                if (arrBoofer[j+1].title < arrBoofer[j].title)
+                { 
+                    let t = arrBoofer[j+1]; 
+                    arrBoofer[j+1] = arrBoofer[j]; 
+                    arrBoofer[j] = t; 
+                }
+            }
+        } 
+        this.setState({ arrUniverOut: arrBoofer });
+    }
+
+    _searchTitle() {
+        let searchText;
+        let arrBoofer = [];
+        this.state.arrUniver.map((value, key) => {
+            if(value.title != undefined) {
+                searchText = value.title.indexOf(this.state.searchText);
+                if(searchText != -1) {
+                    arrBoofer.push(value);
+                }
+            }
+        });
+        this.setState({ arrUniverOut: arrBoofer });
+    }
+
     render() {
+        if(this.state.authentication == true) {
+            return (
+                <View style={styles.containerActivity}>
+                    <ActivityIndicator size="large" /> 
+                </View>
+            )
+        }
         return (
             <ScrollView style={styles.leader}>
                 <Header navigation={this.props.navigation} page="Leadboard" />
@@ -129,71 +284,94 @@ export default class Leaderboard extends Component {
                             <Picker
                                 selectedValue={this.state.score}
                                 style={styles.pickerStyle}
-                                onValueChange={(itemValue) =>
+                                onValueChange={(itemValue) => {
                                     this.setState({score: itemValue})
+                                    if(itemValue == 'score') this._filterScore();
+                                    else this._filterTitle();
+                                }
                                 }>
-                                <Picker.Item style={styles.itemPickerLead} label="Score" value="score1" />
-                                <Picker.Item style={styles.itemPickerLead} label="Score" value="score2" />
-                                <Picker.Item style={styles.itemPickerLead} label="Title" value="title1" />
-                                <Picker.Item style={styles.itemPickerLead} label="Title" value="title2" />
+                                <Picker.Item style={styles.itemPickerLead} label="Score" value="score" />
+                                <Picker.Item style={styles.itemPickerLead} label="Title" value="title" />
                             </Picker>
                         </View>
                     </View>
                     <View style={styles.searchContainer}>
                         <TextInput
                             style={styles.inputForm}
+                            onChangeText={(title) => { this.setState({ searchText: title }) }} 
                         />
-                        <Image source={magnifySearch} style={styles.searchImage} />
+                        <TouchableHighlight underlayColor="#1D8EAB" onPress={this._searchTitle} style={styles.searchImage}>
+                            <Image source={magnifySearch} style={{ width: 20, height: 20 }} />
+                        </TouchableHighlight>
                     </View>
                     <View style={styles.containerLeader}></View>
-                        {
-                            this.state.itemsLeader.map((value, key) => {
-                                return (
-                                    <View key={key}>
-                                        <TouchableHighlight onPress={() => this._graphShow(key)} underlayColor="white">
-                                            <LinearGradient colors={['#2FA4C2', '#1D8EAB']} style={styles.itemLeader}>
-                                                <Text style={styles.textItemLeader}>{value.title}</Text>
-                                                <Text style={styles.textItemLeader}>{value.score}</Text>
-                                            </LinearGradient>
-                                        </TouchableHighlight>
-                                        <Animated.View                 // Special animatable View
-                                            style={{
-                                                opacity: this.state.itemsLeader[key].styeShowGraph,
-                                                display: this.state.itemsLeader[key].opacNum == 0 ? 'none' : 'flex'
-                                            }}
-                                        >
-                                            <View style={[styles.wrapperDiagram, {marginTop: 30}]}>
-                                                <View style={styles.containerPerfomanceDiagram}>
-                                                    <View style={styles.wrapperTimePerfomance}>
-                                                        <Text style={styles.textPerfomance}>INSTITUTION PERFORMANCE</Text>
-                                                        <View style={styles.pickerWrapper}>
-                                                            <Image source={upArrow} style={styles.upArrow2} />
-                                                            <Image source={downArrow} style={styles.downArrow2} />
-                                                            <Picker
-                                                                selectedValue={this.state.timePickerPersonal}
-                                                                style={styles.pickerStyle2}
-                                                                onValueChange={(itemValue, itemIndex) =>
-                                                                    this.setState({timePickerPersonal: itemValue})
-                                                                }>
-                                                                <Picker.Item label="Last 7 days" value="lastFirstWeek" />
-                                                                <Picker.Item label="Last 14 days" value="lastSecondWeek" />
-                                                                <Picker.Item label="Last 21 days" value="lastThirdWeek" />
-                                                                <Picker.Item label="Last Month" value="lastMonth" />
-                                                            </Picker>
-                                                        </View>
+                    {this._outputUnivers()}
+                    {
+                        this.state.arrUniverOut.map((value, key) => {
+                            return(
+                                <View key={key}>
+                                    <TouchableHighlight onPress={() => this._graphShow(key)} underlayColor="white">
+                                        <LinearGradient colors={['#2FA4C2', '#1D8EAB']} style={styles.itemLeader}>
+                                            <Text style={styles.textItemLeader}>{value.title}</Text>
+                                            <Text style={styles.textItemLeader}>{value.score}</Text>
+                                        </LinearGradient>
+                                    </TouchableHighlight>
+                                    <Animated.View                 // Special animatable View
+                                        style={{
+                                            opacity: this.state.arrUniver[key].styeShowGraph,
+                                            display: this.state.arrUniver[key].opacNum == 0 ? 'none' : 'flex'
+                                        }}
+                                    >
+                                        <View style={[styles.wrapperDiagram, {marginTop: 30}]}>
+                                            <View style={styles.containerPerfomanceDiagram}>
+                                                <View style={styles.wrapperTimePerfomance}>
+                                                    <Text style={styles.textPerfomance}>INSTITUTION PERFORMANCE</Text>
+                                                    <View style={styles.pickerWrapper}>
+                                                        <Image source={upArrow} style={styles.upArrow2} />
+                                                        <Image source={downArrow} style={styles.downArrow2} />
+                                                        <Picker
+                                                            selectedValue={this.state[value.title]}
+                                                            style={styles.pickerStyle2}
+                                                            onValueChange={(itemValue, itemIndex) => {
+                                                                this.setState({[value.title]: itemValue})
+                                                                console.log(this.state[value.title], '             ', itemValue);
+                                                            }}
+                                                            >
+                                                            <Picker.Item key={'unselectable'} label="Last 7 days" value="last7" />
+                                                            <Picker.Item label="Last 14 days" value="last14" />
+                                                            <Picker.Item label="Last 21 days" value="last21" />
+                                                            <Picker.Item label="Last Month" value="last30" />
+                                                        </Picker>
                                                     </View>
-                                                    <View style={styles.answerDiagram}>
-                                                        <Text style={styles.textAnswer}>Correct answers</Text>
-                                                        <Text style={styles.textAnswer}>54</Text>
-                                                    </View>
-                                                    <Chart data={value.data} maxPoint={100} />
                                                 </View>
+                                                <View style={styles.answerDiagram}>
+                                                    <Text style={styles.textAnswer}>Correct answers</Text>
+                                                    <Text style={styles.textAnswer}>{value.score}</Text>
+                                                </View>
+                                                <Chart data={value.data.last7} maxPoint={100} styleChart={this.state[value.title] == 'last7' ? 'flex' : 'none'} />
+                                                <Chart data={value.data.last14} maxPoint={100} styleChart={this.state[value.title] == 'last14' ? 'flex' : 'none'} />
+                                                <Chart data={value.data.last21} maxPoint={100} styleChart={this.state[value.title] == 'last21' ? 'flex' : 'none'} />
+                                                <Chart data={value.data.last30} maxPoint={100} styleChart={this.state[value.title] == 'last30' ? 'flex' : 'none'} />
                                             </View>
-                                        </Animated.View>
-                                    </View>
-                                )
-                            })
-                        }
+                                        </View>
+                                    </Animated.View>
+                                </View>
+                            )
+                        })
+                    }
+                    <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                            <TouchableHighlight underlayColor="#1D8EAB"
+                            style={{marginTop: 50, 
+                                justifyContent: 'center', 
+                                alignItems: 'center',
+                                backgroundColor: '#1D8EAB',
+                                padding: 5,
+                                width: '50%'
+                            }}
+                            onPress={this._uploadMore}>
+                                <Text style={{color: '#fff'}}>Upload more</Text>
+                            </TouchableHighlight>
+                        </View>
                     </View>
 
                 <View style={styles.borderWindowBottom}></View>
@@ -370,5 +548,11 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginTop: 20,
         alignItems: 'center'
+    },
+    containerActivity: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: Dimensions.get('window').height
     }
 })

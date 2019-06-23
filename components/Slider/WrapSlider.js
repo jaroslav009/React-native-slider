@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, Animated} from 'react-native';
+import {StyleSheet, Text, View, Image, Animated, Button} from 'react-native';
+import firebase from 'react-native-firebase';
 
 import slideImg1 from '../../uploads/img/Welcome.png';
 import slideImg2 from '../../uploads/img/everyday.png';
@@ -41,6 +42,7 @@ export default class WrapSlider extends Component {
             fadeValue: new Animated.Value(0),
         }
         this.dotNav = this.dotNav.bind(this);
+        this._toRegister = this._toRegister.bind(this);
     }
 
     dotNav = (id) => {
@@ -72,6 +74,18 @@ export default class WrapSlider extends Component {
             toValue: 1,
             duration: 1200,
         }).start();
+    }
+
+    _toRegister() {
+      this.props.navigation.navigate('Register')
+    }
+
+    componentDidMount() {
+      firebase.auth().onAuthStateChanged((user) => {
+        if(user){
+          this.props.navigation.navigate('Dashboard');
+        }
+      });
     }
 
     render() {
@@ -114,12 +128,22 @@ export default class WrapSlider extends Component {
                     })
                 }
                 </View>
-                <View style={styles.wrapperArrow}>
-                
-                <Text onPress={this.prev.bind(this)} style={styles.navArrow}>
-                    Prev
-                </Text>
-                <Text onPress={this.next.bind(this)} style={styles.navArrow}>Next</Text>
+                <View style={[styles.wrapperArrow, {display: this.state.current == 2 ? 'none' : 'flex'}]}>
+                  <Text onPress={this.prev.bind(this)} style={styles.navArrow}>
+                      Prev
+                  </Text>
+                  <Text onPress={this.next.bind(this)} style={styles.navArrow}>Next</Text>
+                </View>
+                <View style={{
+                  display: this.state.current == 2 ? 'flex' : 'none',
+                  paddingLeft: 32,
+                  paddingRight: 32,
+              }}>
+                  <Button
+                    onPress={this._toRegister}
+                    title="Get started"
+                    color="#1D8EAB"
+                  />
                 </View>
             </View>
         )
@@ -149,7 +173,7 @@ const styles = StyleSheet.create({
       justifyContent: 'flex-end',
       display: 'flex',
       flexDirection: 'row',
-      marginTop: 50,
+      marginTop: 30,
       flex: 1
     },
     navDotsItem: {
@@ -218,7 +242,7 @@ const styles = StyleSheet.create({
     wrapperDescriptionStyle: {
         paddingLeft: 50,
         paddingRight: 50,
-        marginTop: 50,
+        marginTop: 30,
         color: '#3E3F42',
         fontSize: 14
     },

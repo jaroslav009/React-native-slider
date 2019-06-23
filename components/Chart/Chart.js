@@ -10,16 +10,30 @@ export default class Chart extends Component {
     }
 
     componentDidMount() {
-        for (var prop in this.props.data[0]) {
+        if(this.props.data == undefined) {
+            return console.log('no data');
+        }
+        console.log('all ok');
+        
+        for (var prop in this.props.data[1]) {
             if(this.state.maxPoint < this.props.data[0][prop].number) {
                 this.setState({ maxPoint: this.props.data[0][prop].number });
             }
         }
     }
+
     render() {
         let heightTopGraphic;
+        
+        if(this.props.data == undefined) {
+            return (
+                <View>
+                    <Text></Text>
+                </View>
+            )
+        }
         return( 
-            <View style={styles.wrapperChart}>
+            <View style={[styles.wrapperChart, {display: this.props.styleChart}]}>
                 <View style={[styles.wrapperChartTop]}>
                     {
                         this.props.data[0].map((value, key) => {
