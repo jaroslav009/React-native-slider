@@ -405,7 +405,7 @@ export default class QuizItem extends Component {
     }
 
     _backMain() {
-        this.props.navigation.navigate('Dashboard', { answer: this.state.click });
+        this.props.navigation.navigate('Slack', { answer: this.state.click });
     }
     
     render() {
