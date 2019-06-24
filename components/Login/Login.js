@@ -98,7 +98,6 @@ export default class Login extends Component {
     }
 
     _toRegister() {
-        console.log('hello')
         this.props.navigation.navigate('Register');
         
     }
@@ -238,7 +237,7 @@ const styles = StyleSheet.create({
         fontSize: 14
     },
     wrapperJoin: {
-        marginTop: Dimensions.get('window').height > 600 ? '100%' : '3%',
+        marginTop: Dimensions.get('window').height > 600 ? '50%' : '3%',
         display: 'flex',
         flexDirection: 'column'
     },
