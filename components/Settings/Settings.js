@@ -222,7 +222,7 @@ export default class Settings extends Component {
             )
         } 
         return (
-            <ScrollView>
+            <ScrollView style={{ paddingBottom: 30 }}>
                 <Header navigation={this.props.navigation} page="Account" />
                 <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
                     <View>  
@@ -303,7 +303,6 @@ export default class Settings extends Component {
                         </View>
                     </View>
                     
-                    <View style={styles.borderWindowBottom}></View>
                 </View>
                 
             </ScrollView>
@@ -359,15 +358,7 @@ const styles = StyleSheet.create({
         color: '#FF6464',
         fontSize: 14,
     },
-    borderWindowBottom: {
-        textAlign: 'center',
-        borderBottomColor: '#E4E4E4',
-        borderBottomWidth: 4,
-        width: '50%',
-        bottom: 20,
-        left: '30%',
-        marginTop: '30%'
-    },
+
     imageSelect: {
         width: 17, 
         height: 12,

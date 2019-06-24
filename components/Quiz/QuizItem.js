@@ -509,8 +509,6 @@ export default class QuizItem extends Component {
                        
                     </View>
                 </View>
-                
-                <View style={styles.borderWindowBottom}></View>
             </ScrollView>
         )
     }
@@ -576,14 +574,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 26,
         paddingBottom: 16
-    },
-    borderWindowBottom: {
-        textAlign: 'center',
-        borderBottomColor: '#E4E4E4',
-        borderBottomWidth: 4,
-        width: '50%',
-        left: '30%',
-        bottom: 10
     },
     blurView: {
         position: 'absolute',

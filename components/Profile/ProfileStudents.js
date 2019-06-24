@@ -315,7 +315,6 @@ export default class ProfileStudents extends Component {
                         </View>
                     </View>
                 </View>
-                <View style={styles.borderWindowBottom}></View>
             </ScrollView>
         )
     }
@@ -448,15 +447,6 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: '#1D8EAB',
         padding: 5
-    },
-    borderWindowBottom: {
-        textAlign: 'center',
-        borderBottomColor: '#E4E4E4',
-        borderBottomWidth: 4,
-        width: '50%',
-        bottom: -0,
-        left: '30%',
-        marginTop: 30
     },
     titleBottomPart: {
         fontFamily: 'SFUIText-Semibold',

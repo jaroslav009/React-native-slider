@@ -426,7 +426,7 @@ export default class Dashboard extends Component {
         }
 
         return (
-            <View style={{paddingBottom: 10}}>
+            <View style={{paddingBottom: 30}}>
                 <ScrollView style={styles.wrapperDashboard}>
                    <Header navigation={this.props.navigation} page="Dashboard" />
                     <TouchableHighlight onPress={() => this._quizRoute()} style={[styles.wrapperQuiz, {display: this.state.quizTake == undefined || navigation.getParam('answer', 'NO-ID') == true ? 'none' : 'flex'}]}>
@@ -524,8 +524,6 @@ export default class Dashboard extends Component {
                         </View>
                     </View>
                     {/* Diagrams */}
-
-                    <View style={styles.borderWindowBottom}></View>
                 </ScrollView>
             </View>
         )
@@ -648,15 +646,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#3E3F42',
         fontFamily: 'SFUIText-Medium'
-    },
-    borderWindowBottom: {
-        textAlign: 'center',
-        borderBottomColor: '#E4E4E4',
-        borderBottomWidth: 4,
-        width: '50%',
-        bottom: -0,
-        left: '30%',
-        marginTop: 30
     },
     wrapperQuiz: {
         backgroundColor: '#1D8EAB',

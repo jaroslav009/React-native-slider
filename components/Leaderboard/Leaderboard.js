@@ -371,8 +371,6 @@ export default class Leaderboard extends Component {
                             </TouchableHighlight>
                         </View>
                     </View>
-
-                <View style={styles.borderWindowBottom}></View>
             </ScrollView>
         )
     }
@@ -489,15 +487,6 @@ const styles = StyleSheet.create({
     },
     textItemLeader: {
         color: '#fff'
-    },
-    borderWindowBottom: {
-        textAlign: 'center',
-        borderBottomColor: '#E4E4E4',
-        borderBottomWidth: 4,
-        width: '50%',
-        bottom: -0,
-        left: '30%',
-        marginTop: 30
     },
     bgFirst: {
         backgroundColor: '#2FA4C2',

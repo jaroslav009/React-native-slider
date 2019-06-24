@@ -35,9 +35,6 @@ export default class Slack extends Component {
                     <Image style={{marginTop: 30}} source={slack} />
 
                 </View>
-                <View style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                    <View style={styles.borderWindowBottom}></View>
-                </View>
                 
             </ScrollView>
         )
@@ -55,12 +52,5 @@ const styles = StyleSheet.create({
         fontFamily: 'SFUIText-Regular',
         lineHeight: 26
     },
-    borderWindowBottom: {
-        textAlign: 'center',
-        borderBottomColor: '#E4E4E4',
-        borderBottomWidth: 4,
-        width: '50%',
-        marginTop: '50%',
-        bottom: 10,
-    },
+
 })

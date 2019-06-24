@@ -31,11 +31,7 @@ export default class About extends Component {
                         - Replicable the resistance collaborative consumption empower communities thought leader framework problem-solvers. Relief targeted, strategize ecosystem white paper, mass incarceration move the needle catalyze strategize.                    
                     </Text>
                 </View>
-                    
-                <View style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                    <View style={styles.borderWindowBottom}></View>
-                </View>
-                
+                                
             </ScrollView>
         )
     }
@@ -51,13 +47,5 @@ const styles = StyleSheet.create({
         marginTop: 30,
         fontFamily: 'SFUIText-Regular',
         lineHeight: 26
-    },
-    borderWindowBottom: {
-        textAlign: 'center',
-        borderBottomColor: '#E4E4E4',
-        borderBottomWidth: 4,
-        width: '50%',
-        marginTop: '20%',
-        bottom: 10,
     },
 })
