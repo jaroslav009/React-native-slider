@@ -98,7 +98,6 @@ export default class Leaderboard extends Component {
                         console.log('null')
                     }
                     else {
-                        
                         for(let j = 1; j <= 4; j++) {
                             if(j == 1) objKey = 'last7';
                             if(j == 2) objKey = 'last14';
@@ -126,32 +125,30 @@ export default class Leaderboard extends Component {
                                     }
                                 }
                             }
-                            
-                            // if(data._value[objKey] == undefined) {
-                            //     for(let i = 1; i <= 7; i++) {
-                            //         dataCorrect.push({ number: 0, name: arrDay[i] });
-                            //         dataWrong.push({ number: 0, name: arrDay[i] });
-                            //     }
-                                
-                            // }
-                            // else {
-                            //     for(let i = 1; i <= 7; i++) {
-                            //         if(data._value[objKey].data[i.toString(10)] != undefined) {
-                            //             dataCorrect.push({ number: data._value[objKey].data[i.toString(10)].correctAnswers, name: arrDay[i] });
-                            //             dataWrong.push({ number: data._value[objKey].data[i.toString(10)].wrongAnswers, name: arrDay[i] });
-                            //             sumCorrect = sumCorrect+data._value[objKey].data[i.toString(10)].correctAnswers;
-                            //         } else {
-                            //             dataCorrect.push({ number: 0, name: arrDay[i] });
-                            //             dataWrong.push({ number: 0, name: arrDay[i] });
-                            //         }
-                                    
-                            //     }
-                            // }
                             dataDay.push(dataCorrect);
                             dataDay.push(dataWrong);
                             correctAnswers = correctAnswers+sumCorrect
                             dataUniver[objKey] = dataDay;
                         }
+                    }
+                } else {
+                    for(let j = 1; j <= 4; j++) {
+                        if(j == 1) objKey = 'last7';
+                        if(j == 2) objKey = 'last14';
+                        if(j == 3) objKey = 'last21';
+                        if(j == 4) objKey = 'last30';
+                        dataDay = [];
+                        dataCorrect = [];
+                        dataWrong = [];
+                        sumCorrect=0;
+                        for(let i = 1; i <= 7; i++) {
+                            dataCorrect.push({ number: 0, name: arrDay[i] });
+                            dataWrong.push({ number: 0, name: arrDay[i] });
+                        }
+                        dataDay.push(dataCorrect);
+                        dataDay.push(dataWrong);
+                        correctAnswers = correctAnswers+sumCorrect
+                        dataUniver[objKey] = dataDay;
                     }
                 }
                 this.setState({ [data._value[prop].name]: 'last7' });

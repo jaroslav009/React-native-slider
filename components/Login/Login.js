@@ -183,7 +183,8 @@ const styles = StyleSheet.create({
         paddingLeft: 40,
         paddingRight: 40,
         paddingTop: Dimensions.get('window').height > 600 ? 50 : 10,
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        height: Dimensions.get('window').height,
     },
     greyText: {
         color: '#C9C9C9',
@@ -233,11 +234,10 @@ const styles = StyleSheet.create({
     join: {
         color: '#1D8EAB',
         textTransform: 'uppercase',
-        fontFamily: 'SFUIText-Bold',
-        fontSize: 14
+        fontWeight: '400'
     },
     wrapperJoin: {
-        marginTop: Dimensions.get('window').height > 600 ? '50%' : '3%',
+        marginTop: Dimensions.get('window').height > 600 ? '40%' : '3%',
         display: 'flex',
         flexDirection: 'column'
     },

@@ -39,7 +39,9 @@ export default class Dashboard extends Component {
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => {
+                    
                     this.setState({ snapshot: snapshot.key })
+
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                         let keysQues;
                         if(data.toJSON().questions != undefined) {
@@ -48,9 +50,10 @@ export default class Dashboard extends Component {
                             keysQues = undefined;
                         }
                         
-                        this.setState({ dataUser: data.toJSON(), idQuis: keysQues })
+                        this.setState({ dataUser: data.toJSON(), idQuis: keysQues });                        
                     })
                     .then(() => {
+                        
                         firebase.database().ref("Cards/Today").once("value", (data) => {
                             let quisToday = false;
                             if(this.state.idQuis != undefined) {
@@ -90,37 +93,63 @@ export default class Dashboard extends Component {
                             }
                             
                             // to do
-                            // this.setState({ quizTake: data._value });
-                            // let date = new Date();
-                            // console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ', date.getSe);
-                            // if(date.getHours() == 12) {
-                            //     if(date.getMinutes() <= 10) {
-                            //         this.setState({
-                            //             quizTake: '100%',
-                            //         });
-                            //     } else {
-                            //         this.setState({
-                            //             quizTake: undefined,
-                            //         });
-                            //     }
-                            // } else {
-                            //     this.setState({
-                            //         quizTake: undefined,
-                            //     });            
-                            // }
+                            this.setState({ quizTake: data._value });
+                            let date = new Date();
+                            console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ', date.getSe);
+                            if(date.getHours() == 12) {
+                                if(date.getMinutes() <= 10) {
+                                    this.setState({
+                                        quizTake: '100%',
+                                    });
+                                } else {
+                                    this.setState({
+                                        quizTake: undefined,
+                                    });
+                                }
+                            } else {
+                                this.setState({
+                                    quizTake: undefined,
+                                });            
+                            }
                             // To do
                         })
                         .then(() => {
                             firebase.database().ref("university/"+this.state.dataUser.university+"/answerQuiz").once("value", (data) => {
-                                if(data._value == null) {
-                                    return console.log('null')
-                                }
                                 let dataDay = new Array();
                                 let sumCorrect;
                                 let dataCorrect = new Array();
                                 let dataWrong = new Array();
                                 const arrDay = [null, 'M', 'T', 'W', 'T', 'F', 'S', 'S'];
                                 let objKey;
+
+                                if(data._value == null) {
+                                    for(let j = 1; j <= 4; j++) {
+                                        if(j == 1) objKey = 'last7';
+                                        if(j == 2) objKey = 'last14';
+                                        if(j == 3) objKey = 'last21';
+                                        if(j == 4) objKey = 'last30';
+                                        dataDay = [];
+                                        dataCorrect = [];
+                                        dataWrong = [];
+                                        sumCorrect=0;
+                                        for(let i = 1; i <= 7; i++) {
+                                            dataCorrect.push({ number: 0, name: arrDay[i] });
+                                            dataWrong.push({ number: 0, name: arrDay[i] });
+                                        }
+                                        dataDay.push(dataCorrect);
+                                        dataDay.push(dataWrong);
+                                        this.setState(state => {
+                                            const dataUniver = state.statisticUniver[objKey] = dataDay;
+                                            const dataCorrect = state.correctAnswersQuizUniversity[objKey] = sumCorrect;
+                                            return {
+                                                dataUniver,
+                                                dataCorrect
+                                            }
+                                        });
+    
+                                    }
+                                    return console.log('null')
+                                }
 
                                 for(let j = 1; j <= 4; j++) {
                                     if(j == 1) objKey = 'last7';
@@ -168,14 +197,52 @@ export default class Dashboard extends Component {
                         .then(() => {
                             firebase.database().ref("users/"+this.state.snapshot+"/answerQuiz/").once("value", (data) => {
                                 let dataDay = new Array();
-                                if(data._value == null) {
-                                    return console.log('null')
-                                }
                                 let dataCorrect = new Array();
                                 let dataWrong = new Array();
                                 const arrDay = [null, 'M', 'T', 'W', 'T', 'F', 'S', 'S'];
                                 let objKey;
                                 let sumCorrect;
+                                if(data._value == null) {
+                                    for(let j = 1; j <= 4; j++) {
+                                        if(j == 1) objKey = 'last7';
+                                        if(j == 2) objKey = 'last14';
+                                        if(j == 3) objKey = 'last21';
+                                        if(j == 4) objKey = 'last30';
+                                        dataDay = [];
+                                        dataCorrect = [];
+                                        dataWrong = [];
+                                        sumCorrect = 0;
+                                        for(let i = 1; i <= 7; i++) {                                            
+                                            dataCorrect.push({ number: 0, name: arrDay[i] });
+                                            dataWrong.push({ number: 0, name: arrDay[i] });
+                                        }
+                                        
+                                        dataDay.push(dataCorrect);
+                                        dataDay.push(dataWrong);
+                                        this.setState(state => {
+                                            const dataUniver = state.statisticUser[objKey] = dataDay;
+                                            const dataCorrect = state.correctAnswersQuizUser[objKey] = sumCorrect;
+                                            return {
+                                                dataUniver,
+                                                dataCorrect
+                                            }
+                                        });
+                                    }
+
+                                    dataDay.push(dataCorrect);
+                                    dataDay.push(dataWrong);
+
+                                    this.setState(state => {
+                                        const dataUniver = state.statisticUser[objKey] = dataDay;
+                                        const dataCorrect = state.correctAnswersQuizUser[objKey] = sumCorrect;
+                                        return {
+                                            dataUniver,
+                                            dataCorrect
+                                        }
+                                    });
+                                    return console.log('null')
+                                }
+                                
                                 for(let j = 1; j <= 4; j++) {
                                     if(j == 1) objKey = 'last7';
                                     if(j == 2) objKey = 'last14';
@@ -186,13 +253,15 @@ export default class Dashboard extends Component {
                                     dataWrong = [];
                                     sumCorrect = 0;
                                     if(data._value[objKey] == undefined) {
-                                        for(let i = 1; i <= 7; i++) {
+                                        console.log('undefined', objKey);
+                                        
+                                        for(let i = 1; i <= 7; i++) {                                            
                                             dataCorrect.push({ number: 0, name: arrDay[i] });
                                             dataWrong.push({ number: 0, name: arrDay[i] });
                                         }
-                                        
                                     }
                                     else {
+                                        console.log('defined', objKey);
                                         for(let i = 1; i <= 7; i++) {
                                             if(data._value[objKey].data[i.toString(10)] != undefined) {
                                                 dataCorrect.push({ number: data._value[objKey].data[i.toString(10)].correctAnswers, name: arrDay[i] });

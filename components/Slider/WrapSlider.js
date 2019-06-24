@@ -84,6 +84,9 @@ export default class WrapSlider extends Component {
       firebase.auth().onAuthStateChanged((user) => {
         if(user){
           this.props.navigation.navigate('Dashboard');
+        } else {
+          console.log('here');
+          
         }
       });
     }

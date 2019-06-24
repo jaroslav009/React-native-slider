@@ -31,6 +31,7 @@ export default class RegisterDataUser extends Component {
     componentDidMount() {
         console.log('RegisterDataUser');
         const { navigation } = this.props;
+        this.setState({ authentication: false })
     }
     
     _onPressLearnMore() {
@@ -91,13 +92,13 @@ export default class RegisterDataUser extends Component {
     }
 
     render() {
-        if(this.state.authentication == true) {
-            return (
-                <View style={styles.containerActivity}>
-                    <ActivityIndicator size="large" /> 
-                </View>
-            )
-        } 
+        // if(this.state.authentication == true) {
+        //     return (
+        //         <View style={styles.containerActivity}>
+        //             <ActivityIndicator size="large" /> 
+        //         </View>
+        //     )
+        // } 
         return (
             <ScrollView>
                 <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
