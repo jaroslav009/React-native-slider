@@ -50,7 +50,14 @@ export default class ProfileStudents extends Component {
                     console.log(snapshot.key);
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                         this.setState({ dataUser: data.toJSON(), authentication: false });
-                        console.log('datauser', data.toJSON())
+                        console.log('datauser', data.toJSON());
+                        this.setState({ dataUser: data.toJSON() });
+                        firebase.database().ref("university/"+data.toJSON().university+"/answer").on("value", (snapshot) => {
+                            this.setState({ answerQuiz: snapshot._value });
+                        });
+                        firebase.database().ref("university/"+data.toJSON().university).once("value", (data) => {
+                            this.setState({ nameUniver: data._value.name });
+                        });
                         if(count == 0) {
                             for (let prop in data.toJSON().questions) {
                                 this.setState(state => {
@@ -121,31 +128,19 @@ export default class ProfileStudents extends Component {
     }
 
     _press() {
-        let count = 5;
-        for(let i = this.state.countArr;i <= 200; i++) {
-            if(count > 1) {
-                if(this.state.questions.length - this.state.countArr < 5) {
-                    count = this.state.questions.length - this.state.countArr;
-                    if(this.state.questions.length - this.state.countArr == 0) {
-                        break;
-                    }
-                }
-                console.log(`count ${count}`)
-
+        for(let i = this.state.countArr; i <= this.state.countArr+1; i++) {
+            console.log('this.state.countArr', this.state.countArr, '   i ', i);
+            if(this.state.questions[i] != undefined) {
                 this.setState(state => {
                     let question = state.showQues.push(this.state.questions[i])
-                    let count = state.countArr = i+1;
+                    
                     return {
                         question,
-                        count
                     }
                 });
             }
-            else {
-                break;
-            }
-            count--;
         }
+        this.setState({ countArr: this.state.countArr+2 }); 
     }
 
     correctFilter() {
@@ -230,7 +225,7 @@ export default class ProfileStudents extends Component {
                             {this.state.dataUser.firstName}
                         </Text>
                         <Text style={[styles.subTitleProf, {fontSize: 16}]}>
-                            {this.state.dataUser.university}
+                            {this.state.nameUniver}
                         </Text>
                         <Text style={[styles.greyText, {fontSize: 16}]}>
                             {this.state.dataUser.proffesion}
@@ -362,7 +357,8 @@ const styles = StyleSheet.create({
         color: '#3E3F42',
         fontSize: 16,
         marginTop: 5,
-        fontFamily: 'SFUIText-Semibold'
+        fontFamily: 'SFUIText-Semibold',
+        textAlign: 'center'
     },
      pickerStyle: {
         width: Dimensions.get('window').width > 600 ? 110 : 120, 

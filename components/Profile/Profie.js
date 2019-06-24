@@ -64,6 +64,7 @@ export default class Profile extends Component {
                         });
                         firebase.database().ref("university/"+data.toJSON().university).once("value", (data) => {
                             this.setState({ loggedUser: data._value.loggedUser });
+                            this.setState({ nameUniver: data._value.name });
                         });
                     })
                     .then(() => {
@@ -272,7 +273,7 @@ export default class Profile extends Component {
                     </TouchableHighlight>
                     <View style={styles.containerTitleProfile}>
                         <Text style={styles.titleProfie}>
-                            {this.state.dataUser.university}
+                            {this.state.nameUniver}
                         </Text>
                         <Text style={styles.subTitleProf}>
                             {this.state.loggedUser == undefined ? '1' : this.state.loggedUser} Students logged in
@@ -429,7 +430,8 @@ const styles = StyleSheet.create({
     titleProfie: {
         color: '#3E3F42',
         fontSize: 24,
-        fontFamily: 'SFUIText-Semibold'
+        fontFamily: 'SFUIText-Semibold',
+        textAlign: 'center'
     },
     subTitleProf: {
         color: '#3E3F42',

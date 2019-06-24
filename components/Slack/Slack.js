@@ -14,7 +14,8 @@ export default class Slack extends Component {
     }
 
     _back() {
-        this.props.navigation.navigate('Dashboard');
+        const { navigation } = this.props;
+        this.props.navigation.navigate('Dashboard', { answer: navigation.getParam('answer', 'NO-ID') });
     }
 
     render() {
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
         borderBottomColor: '#E4E4E4',
         borderBottomWidth: 4,
         width: '50%',
-        marginTop: '90%',
+        marginTop: '50%',
         bottom: 10,
     },
 })

@@ -73,8 +73,10 @@ export default class Settings extends Component {
                 console.log(snapshot.key);
                 keyUser = snapshot.key;
                 firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
-                    console.log('data.toJSON()');
-                    console.log(data.toJSON());
+                    firebase.database().ref("university/"+data.toJSON().university).once("value", (data) => {
+                        this.setState({ nameUniver: data._value.name });
+                        console.log('univer name', this.state.nameUniver);
+                    });
                     this.setState({ 
                         dataUser: data.toJSON(), 
                         authentication: false,
@@ -229,7 +231,7 @@ export default class Settings extends Component {
                     </TouchableHighlight>
                         <View style={styles.titleWrapper}>
                             <Text style={{color: '#3E3F42', fontSize: 24, fontFamily: 'SFUIText-Semibold'}}> {this.state.dataUser.firstName} {this.state.dataUser.lastName} </Text>
-                            <Text style={{color: '#3E3F42', fontSize: 16, fontFamily: 'SFUIText-Semibold'}}>{this.state.dataUser.university}</Text>
+                            <Text style={{color: '#3E3F42', fontSize: 16, fontFamily: 'SFUIText-Semibold', textAlign: 'center'}}>{this.state.nameUniver}</Text>
                             <Text style={{color: '#9EA0A5', fontSize: 16}}>{this.state.dataUser.proffesion}</Text>
                         </View>
                         <View style={styles.wrapperFormLogin}>
@@ -364,7 +366,7 @@ const styles = StyleSheet.create({
         width: '50%',
         bottom: 20,
         left: '30%',
-        marginTop: '60%'
+        marginTop: '30%'
     },
     imageSelect: {
         width: 17, 

@@ -55,7 +55,6 @@ export default class QuizItem extends Component {
                     
                     this.setState({ dataUser: data.toJSON(), snapshot: snapshot.key });
                     firebase.database().ref("university/"+data.toJSON().university).on("value", (snapshot) => {
-                        console.log('snapshot._value', snapshot.toJSON());
                         if(snapshot._value != null) {
                             this.setState({
                                 dataUniversity: snapshot._value,
@@ -117,6 +116,8 @@ export default class QuizItem extends Component {
             this.setState({
                 counter: this.state.counter - 1
             });
+        } else {
+            this.setState({showBlur: '100%'});
         }
     }
 
@@ -268,7 +269,7 @@ export default class QuizItem extends Component {
                 if(lenUniverAnswer == -1) {
                     break;
                 }
-                let date1 = new Date(this.state.dataUniversityAnswers[keyAnswerDay].data[keysAnswerDay[value]].date);
+                let date1 = new Date(this.state.dataUniversityAnswers[keyAnswerDay].data[keyAnswer].date);
                 console.log('dat31', date1, '     ', date1.getMonth() == date2.getMonth(), '    ', date1.getFullYear() == date2.getFullYear(),   '    ', date1.getDay() == date2.getDay());
                 if( date1.getDay() == date2.getDay() && 
                     date1.getMonth() == date2.getMonth() && 
@@ -276,11 +277,11 @@ export default class QuizItem extends Component {
                     this.state.dataUniversityAnswers[keyAnswerDay].data == undefined ) {
                         console.log('qwdqw123');
                         if(key == this.state.correctVariant) {
-                            correctAnswerCurrent = parseInt(this.state.dataUniversityAnswers[keyAnswerDay].data[keysAnswerDay[value]].correctAnswers)+1;
-                            wrongAnswersCurrent = this.state.dataUniversityAnswers[keyAnswerDay].data[keysAnswerDay[value]].wrongAnswers;
+                            correctAnswerCurrent = parseInt(this.state.dataUniversityAnswers[keyAnswerDay].data[keyAnswer].correctAnswers)+1;
+                            wrongAnswersCurrent = this.state.dataUniversityAnswers[keyAnswerDay].data[keyAnswer].wrongAnswers;
                         } else {
-                            correctAnswerCurrent = this.state.dataUniversityAnswers[keyAnswerDay].data[keysAnswerDay[value]].correctAnswers;
-                            wrongAnswersCurrent = parseInt(this.state.dataUniversityAnswers[keyAnswerDay].data[keysAnswerDay[value]].wrongAnswers)+1;
+                            correctAnswerCurrent = this.state.dataUniversityAnswers[keyAnswerDay].data[keyAnswer].correctAnswers;
+                            wrongAnswersCurrent = parseInt(this.state.dataUniversityAnswers[keyAnswerDay].data[keyAnswer].wrongAnswers)+1;
                         }
                         break;
 
@@ -354,18 +355,18 @@ export default class QuizItem extends Component {
                 if(lenUniverAnswer == -1) {
                     break;
                 }
-                let date1 = new Date(this.state.dataUserAnswers[keyAnswerDay].data[keysAnswerDay[value]].date);
+                let date1 = new Date(this.state.dataUserAnswers[keyAnswerDay].data[dateBase].date);
                 if( date1.getDay() == date2.getDay() && 
                     date1.getMonth() == date2.getMonth() && 
                     date1.getFullYear() == date2.getFullYear() || 
                     this.state.dataUserAnswers[keyAnswerDay].data == undefined ) {
                         console.log('qwdqw123');
                         if(key == this.state.correctVariant) {
-                            correctAnswerCurrent = parseInt(this.state.dataUserAnswers[keyAnswerDay].data[keysAnswerDay[value]].correctAnswers)+1;
-                            wrongAnswersCurrent = this.state.dataUserAnswers[keyAnswerDay].data[keysAnswerDay[value]].wrongAnswers;
+                            correctAnswerCurrent = parseInt(this.state.dataUserAnswers[keyAnswerDay].data[dateBase].correctAnswers)+1;
+                            wrongAnswersCurrent = this.state.dataUserAnswers[keyAnswerDay].data[dateBase].wrongAnswers;
                         } else {
-                            correctAnswerCurrent = this.state.dataUserAnswers[keyAnswerDay].data[keysAnswerDay[value]].correctAnswers;
-                            wrongAnswersCurrent = parseInt(this.state.dataUserAnswers[keyAnswerDay].data[keysAnswerDay[value]].wrongAnswers)+1;
+                            correctAnswerCurrent = this.state.dataUserAnswers[keyAnswerDay].data[dateBase].correctAnswers;
+                            wrongAnswersCurrent = parseInt(this.state.dataUserAnswers[keyAnswerDay].data[dateBase].wrongAnswers)+1;
                         }
                         break;
 
@@ -409,10 +410,6 @@ export default class QuizItem extends Component {
     }
     
     render() {
-
-        // if(this.state.stopCounter == 0) {
-        //     this.setState({showBlur: '100%'});
-        // }
 
         if(this.state.authentication == true) {
             return (

@@ -93,20 +93,18 @@ export default class Dashboard extends Component {
 
                             console.log('bool real', bool);
                             
-                            
                             if(bool == 1) {
                                 this.setState({ quizTake: data._value });
+                            } else {
+                                this.setState({ quizTake: undefined });
                             }
                             
                             // to do
-                            this.setState({ quizTake: data._value });
                             let date = new Date();
                             console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ', date.getSe);
                             if(date.getHours() == 12) {
                                 if(date.getMinutes() <= 10) {
-                                    this.setState({
-                                        quizTake: '100%',
-                                    });
+                                    // Nothing
                                 } else {
                                     this.setState({
                                         quizTake: undefined,
@@ -201,7 +199,7 @@ export default class Dashboard extends Component {
                             })
                         })
                         .then(() => {
-                            firebase.database().ref("users/"+this.state.snapshot+"/answerQuiz/").once("value", (data) => {
+                            firebase.database().ref("users/"+this.state.snapshot+"/answerQuiz/").on("value", (data) => {
                                 let dataDay = new Array();
                                 let dataCorrect = new Array();
                                 let dataWrong = new Array();

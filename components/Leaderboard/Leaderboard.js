@@ -74,7 +74,7 @@ export default class Leaderboard extends Component {
     }
 
     componentDidMount() {
-        firebase.database().ref("university/").limitToLast(100).once("value", (data) => {
+        firebase.database().ref("university/").limitToLast(200).once("value", (data) => {
             
             this.setState({ dataAllUnivers: data._value });
             const itemUniver = [];
@@ -247,7 +247,8 @@ export default class Leaderboard extends Component {
         let arrBoofer = [];
         this.state.arrUniver.map((value, key) => {
             if(value.title != undefined) {
-                searchText = value.title.indexOf(this.state.searchText);
+                searchText = value.title.toLowerCase();
+                searchText = searchText.indexOf(this.state.searchText.toLowerCase());
                 if(searchText != -1) {
                     arrBoofer.push(value);
                 }
