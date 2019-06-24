@@ -14,7 +14,7 @@ export default class Slack extends Component {
     }
 
     _back() {
-        this.props.navigation.goBack()
+        this.props.navigation.navigate('Dashboard');
     }
 
     render() {

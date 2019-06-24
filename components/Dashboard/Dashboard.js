@@ -73,20 +73,26 @@ export default class Dashboard extends Component {
                                 keyDataUserQues = Object.keys(this.state.dataUser.questions);
                             }
                             let bool = 1;
+                            console.log('keyDataUserQues', keyDataUserQues);
+                            
                             if(keyDataUserQues != undefined) {
                                 keyDataUserQues.map((value) => {
                                     console.log('value', value);
                                     console.log('data._value', data._value);
+                                    console.log('data._value bool', value == data._value);
                                     if(value == data._value) {
                                         this.setState({
                                             quizTake: undefined,
                                         });
+                                        console.log('bool ', 0);
+                                        
                                         return bool = 0;
-                                    } else {
-                                        bool = 1
                                     }
                                 });
                             }
+
+                            console.log('bool real', bool);
+                            
                             
                             if(bool == 1) {
                                 this.setState({ quizTake: data._value });
