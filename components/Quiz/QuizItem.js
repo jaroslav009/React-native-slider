@@ -425,7 +425,9 @@ export default class QuizItem extends Component {
                     <Text style={{ color: '#FF6464' }}>0:{this.state.stopCounter == 0 ? this.state.counter : this.state.stopCounter}</Text>
                 </View>
                 <TouchableHighlight onPress={() => this._backMain()} underlayColor="transparent" 
-                style={[styles.fonStyle, {width: this.state.showBlur}]}><Text></Text></TouchableHighlight>
+                style={[styles.fonStyle, {width: this.state.showBlur}]}>
+                    <Text></Text>
+                    </TouchableHighlight>
                 <View>
                     
                     <Image 

@@ -226,7 +226,7 @@ export default class Register extends Component {
                         </Text>
                         
                     </TouchableHighlight>
-=                </View>
+                </View>
                 
             </ScrollView>
         )   

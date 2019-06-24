@@ -100,21 +100,21 @@ export default class Dashboard extends Component {
                             }
                             
                             // to do
-                            let date = new Date();
-                            console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ', date.getSe);
-                            if(date.getHours() == 12) {
-                                if(date.getMinutes() <= 10) {
-                                    // Nothing
-                                } else {
-                                    this.setState({
-                                        quizTake: undefined,
-                                    });
-                                }
-                            } else {
-                                this.setState({
-                                    quizTake: undefined,
-                                });            
-                            }
+                            // let date = new Date();
+                            // console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ', date.getSe);
+                            // if(date.getHours() == 12) {
+                            //     if(date.getMinutes() <= 10) {
+                            //         // Nothing
+                            //     } else {
+                            //         this.setState({
+                            //             quizTake: undefined,
+                            //         });
+                            //     }
+                            // } else {
+                            //     this.setState({
+                            //         quizTake: undefined,
+                            //     });            
+                            // }
                             // To do
                         })
                         .then(() => {
@@ -437,7 +437,7 @@ export default class Dashboard extends Component {
                     <View style={styles.wrapperHero}>
                         <Image source={body} style={styles.backgroundImage} />
                         <View style={styles.wrapperHeroText}>
-                            <Text style={[styles.textWelcome]}>Welcom, {this.state.dataUser.username}!</Text>
+                            <Text style={[styles.textWelcome]}>Welcome, {this.state.dataUser.username}!</Text>
                             <Text style={styles.textRad}>
                                 <Text style={styles.numberRad}>{this.state.dataUser.firstName} </Text>
                                 {this.state.dataUser.lastName}

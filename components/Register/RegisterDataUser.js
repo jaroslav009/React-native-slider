@@ -175,7 +175,7 @@ export default class RegisterDataUser extends Component {
                         </Text>
                         
                     </View>
-=                </View>
+                </View>
                 
             </ScrollView>
         )   
