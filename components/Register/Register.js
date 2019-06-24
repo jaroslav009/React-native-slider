@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
+import {StyleSheet, Text, View, TextInput, Image, Button, ScrollView, Dimensions, ActivityIndicator, TouchableHighlight } from 'react-native';
 import Logo from '../BasicComponents/Logo';
 import DatePicker from 'react-native-datepicker';
 import firebase from 'react-native-firebase';
@@ -53,6 +53,7 @@ export default class Register extends Component {
             authErr: false,
         }
         this._onPressLearnMore = this._onPressLearnMore.bind(this);
+        this._toLogin = this._toLogin.bind(this);
     }
     
     _onPressLearnMore() {
@@ -131,6 +132,10 @@ export default class Register extends Component {
         
     }
 
+    _toLogin() {
+        this.props.navigation.navigate('Login');
+    }
+
     render() {
         if(this.state.authentication == true) {
             return (
@@ -146,7 +151,7 @@ export default class Register extends Component {
                         <View style={styles.wrapperHeaderLogin}>
                             <Logo />
                             <Text style={styles.greyText}>
-                                Sign in below
+                                Sign up below
                             </Text>
                         </View>
                         <View style={styles.wrapperFormLogin}>
@@ -213,14 +218,14 @@ export default class Register extends Component {
                             />
                         </View>
                     </View>
-                    <View style={styles.wrapperJoin}>
+                    <TouchableHighlight style={styles.wrapperJoin} onPress={() => this._toLogin()} underlayColor="#fff">
 
                         <Text style={styles.greyText}>
-                            No account yet?
-                            <Text style={styles.join}> join now</Text>
+                            Have account?
+                            <Text style={styles.join}> LOG IN NOW </Text>
                         </Text>
                         
-                    </View>
+                    </TouchableHighlight>
                     <View style={styles.borderWindowBottom}></View>
                 </View>
                 
