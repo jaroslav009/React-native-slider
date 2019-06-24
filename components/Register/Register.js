@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
         fontWeight: '400'
     },
     wrapperJoin: {
-        marginTop: Dimensions.get('window').height > 600 ? '70%' : '3%',
+        marginTop: Dimensions.get('window').height > 600 ? '30%' : '3%',
     },
     errText: {
         color: '#FF6464',
