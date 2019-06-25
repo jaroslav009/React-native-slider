@@ -38,10 +38,12 @@ export default class Dashboard extends Component {
         
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
+                console.log('users', user);
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => {
                     
                     this.setState({ snapshot: snapshot.key })
-
+                    
+                    
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                         let keysQues;
                         if(data.toJSON().questions != undefined) {
@@ -100,21 +102,21 @@ export default class Dashboard extends Component {
                             }
                             
                             // to do
-                            // let date = new Date();
-                            // console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ', date.getSe);
-                            // if(date.getHours() == 12) {
-                            //     if(date.getMinutes() <= 10) {
-                            //         // Nothing
-                            //     } else {
-                            //         this.setState({
-                            //             quizTake: undefined,
-                            //         });
-                            //     }
-                            // } else {
-                            //     this.setState({
-                            //         quizTake: undefined,
-                            //     });            
-                            // }
+                            let date = new Date();
+                            console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ', date.getSe);
+                            if(date.getHours() == 12) {
+                                if(date.getMinutes() <= 10) {
+                                    // Nothing
+                                } else {
+                                    this.setState({
+                                        quizTake: undefined,
+                                    });
+                                }
+                            } else {
+                                this.setState({
+                                    quizTake: undefined,
+                                });            
+                            }
                             // To do
                         })
                         .then(() => {
@@ -304,7 +306,10 @@ export default class Dashboard extends Component {
                         
                     })
                 })
-                
+                .catch((err) => {
+                    console.log(`err ${err}`);
+                    
+                })
                 
             } else {
                 this.props.navigation.navigate('WrapSlider');
@@ -426,7 +431,7 @@ export default class Dashboard extends Component {
         }
 
         return (
-            <View style={{paddingBottom: 30}}>
+            <View>
                 <ScrollView style={styles.wrapperDashboard}>
                    <Header navigation={this.props.navigation} page="Dashboard" />
                     <TouchableHighlight onPress={() => this._quizRoute()} style={[styles.wrapperQuiz, {display: this.state.quizTake == undefined || navigation.getParam('answer', 'NO-ID') == true ? 'none' : 'flex'}]}>

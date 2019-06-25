@@ -222,7 +222,7 @@ export default class Settings extends Component {
             )
         } 
         return (
-            <ScrollView style={{ paddingBottom: 30 }}>
+            <ScrollView style={{ paddingBottom: 0 }}>
                 <Header navigation={this.props.navigation} page="Account" />
                 <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
                     <View>  

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View, Image, TouchableHighlight, Dimensions, Animated, findNodeHandle } from 'react-native';
 import firebase from 'react-native-firebase';
+import GestureRecognizer from 'react-native-swipe-gestures';
 
 import burger from '../../uploads/img/burger3x.png'
 import addReminder from '../../uploads/img/add-reminder3x.png'
@@ -23,6 +24,7 @@ export default class Header extends Component {
         this._openMenu = this._openMenu.bind(this);
         this._logOut = this._logOut.bind(this);
         this._closeMenu = this._closeMenu.bind(this);
+        this.onSwipeLeft = this.onSwipeLeft.bind(this);
     }
 
     _itemMenu(item) {
@@ -63,20 +65,20 @@ export default class Header extends Component {
 
     _openMenu() {
         
-        Animated.timing(                  // Animate over time
-            this.state.fadeAnim,            // The animated value to drive
+        Animated.timing(
+            this.state.fadeAnim,
             {
-              toValue: 0,
+              toValue: 5,
               duration: 400
             }
         ).start();
-        Animated.timing(                  // Animate over time
-            this.state.opacBack,            // The animated value to drive
-            {
-              toValue: 1,
-              duration: 400
-            }
-        ).start();
+        // Animated.timing(
+        //     this.state.opacBack,
+        //     {
+        //       toValue: -10000,
+        //       duration: 400
+        //     }
+        // ).start();
         this.setState({ open: true })        
     }
 
@@ -89,125 +91,139 @@ export default class Header extends Component {
               duration: 400
             }
         ).start(); 
-        Animated.timing(                  // Animate over time
-            this.state.opacBack,            // The animated value to drive
-            {
-              toValue: 0,
-              duration: 400
-            }
-        ).start();
+        // Animated.timing(                  // Animate over time
+        //     this.state.opacBack,            // The animated value to drive
+        //     {
+        //       toValue: 0,
+        //       duration: 400
+        //     }
+        // ).start();
+    }
+    onSwipeLeft(stateMenu) {
+        this._closeMenu();
     }
 
     render() {
+        const config = {
+            velocityThreshold: 0.3,
+            directionalOffsetThreshold: 80
+          };
         return (
             <View>
                 <Animated.View style={[styles.menuContainer, { 
-                        display: this.state.open == false ? 'none' : 'flex',
-                        height: this.state.open == false ? '0%' : '100%',
-                        height:  Dimensions.get('window').height+200,
+                        display: 'flex',
+                        height:  Dimensions.get('window').height,
                         position: 'absolute',
                         elevation: 5,
                         backgroundColor: 'rgba(52, 52, 52, 0.6)',
                         transform: [
                             { translateX: this.state.fadeAnim },
-                        ]
+                        ],
+                        width: '110%'
                     }]}>
-                        <View style={{
-                            width: '80%', 
-                            backgroundColor: '#fff', 
-                            zIndex: 100000, 
-                            paddingLeft: 40,
-                            }}>
+                                <GestureRecognizer
+                                    onSwipeLeft={(state) => this.onSwipeLeft(state)}
+                                    config={config}
+                                    style={{
+                                        width: '70%', 
+                                        backgroundColor: '#fff', 
+                                        zIndex: 100000, 
+                                        paddingLeft: 40,
+                                    }}
+                                >
                             
-                            <View style={styles.containerMenu}>
-                            <View style={{paddingTop: 50, paddingBottom: 50}}>
-                                <Text style={{fontSize: 24, color: '#3E3F42', fontFamily: 'SFUIText-Semibold'}}>
-                                {this.state.dataUser.firstName}
-                                </Text>
-                                <Text style={[styles.greyText, {fontSize: 16}]}>{this.state.answeUser} Correct Answers</Text>
-                            </View>
-                                <TouchableHighlight onPress={() => this._itemMenu('Dashboard')} underlayColor="#fff" style={{
-                                        zIndex: 100000,
-                                    }}>
-                                    <Text style={[styles.greyText, 
-                                        {
-                                            fontSize: 24,
-                                            marginTop: 15,
-                                            color: this.props.page == 'Dashboard' ? '#333' : '#9EA0A5' 
-                                        }]}>Dashboard</Text>
-                                </TouchableHighlight>
+                                    <View style={styles.containerMenu}>
+                                    <View style={{paddingTop: 50, paddingBottom: 50}}>
+                                        <Text style={{fontSize: 24, color: '#3E3F42', fontFamily: 'SFUIText-Semibold'}}>
+                                        {this.state.dataUser.firstName}
+                                        </Text>
+                                        <Text style={[styles.greyText, {fontSize: 16}]}>{this.state.answeUser} Correct Answers</Text>
+                                    </View>
+                                        <TouchableHighlight onPress={() => this._itemMenu('Dashboard')} underlayColor="#fff" style={{
+                                                zIndex: 100000,
+                                            }}>
+                                            <Text style={[styles.greyText, 
+                                                {
+                                                    fontSize: 24,
+                                                    marginTop: 15,
+                                                    color: this.props.page == 'Dashboard' ? '#333' : '#9EA0A5' 
+                                                }]}>Dashboard</Text>
+                                        </TouchableHighlight>
 
-                                <TouchableHighlight onPress={() => this._itemMenu('Leaderboard')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {
-                                        fontSize: 24,
-                                        marginTop: 20,
-                                        color: this.props.page == 'Leadboard' ? '#333' : '#9EA0A5' 
-                                        }]}>Leadboard</Text>
-                                </TouchableHighlight>
+                                        <TouchableHighlight onPress={() => this._itemMenu('Leaderboard')} underlayColor="#fff" style={{zIndex: 100000}}>
+                                            <Text style={[styles.greyText, {
+                                                fontSize: 24,
+                                                marginTop: 20,
+                                                color: this.props.page == 'Leadboard' ? '#333' : '#9EA0A5' 
+                                                }]}>Leadboard</Text>
+                                        </TouchableHighlight>
 
-                                <TouchableHighlight onPress={() => this._itemMenu('ProfileStudents')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {
-                                        fontSize: 24, 
-                                        marginTop: 20,
-                                        color: this.props.page == 'ProfileStudents' ? '#333' : '#9EA0A5' 
-                                        }]}>Perfomance</Text>
-                                </TouchableHighlight>
+                                        <TouchableHighlight onPress={() => this._itemMenu('ProfileStudents')} underlayColor="#fff" style={{zIndex: 100000}}>
+                                            <Text style={[styles.greyText, {
+                                                fontSize: 24, 
+                                                marginTop: 20,
+                                                color: this.props.page == 'ProfileStudents' ? '#333' : '#9EA0A5' 
+                                                }]}>Perfomance</Text>
+                                        </TouchableHighlight>
 
-                                <TouchableHighlight onPress={() => this._itemMenu('Settings')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {
-                                        fontSize: 24, 
-                                        marginTop: 20,
-                                        color: this.props.page == 'Account' ? '#333' : '#9EA0A5' 
-                                        }]}>Account</Text>
-                                </TouchableHighlight>
-                                
-                                <TouchableHighlight onPress={() => this._itemMenu('About')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {
-                                        fontSize: 24, 
-                                        marginTop: 20,
-                                        color: this.props.page == 'About' ? '#333' : '#9EA0A5' 
-                                        }]}>About</Text>
-                                </TouchableHighlight>
+                                        <TouchableHighlight onPress={() => this._itemMenu('Settings')} underlayColor="#fff" style={{zIndex: 100000}}>
+                                            <Text style={[styles.greyText, {
+                                                fontSize: 24, 
+                                                marginTop: 20,
+                                                color: this.props.page == 'Account' ? '#333' : '#9EA0A5' 
+                                                }]}>Account</Text>
+                                        </TouchableHighlight>
+                                        
+                                        <TouchableHighlight onPress={() => this._itemMenu('About')} underlayColor="#fff" style={{zIndex: 100000}}>
+                                            <Text style={[styles.greyText, {
+                                                fontSize: 24, 
+                                                marginTop: 20,
+                                                color: this.props.page == 'About' ? '#333' : '#9EA0A5' 
+                                                }]}>About</Text>
+                                        </TouchableHighlight>
 
-                                <TouchableHighlight onPress={() => this._itemMenu('Profile')} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[styles.greyText, {
-                                        fontSize: 24, 
-                                        marginTop: 20,
-                                        color: this.props.page == 'Profile' ? '#333' : '#9EA0A5' 
-                                        }]}>Profile</Text>
-                                </TouchableHighlight>
-                                
-                                <TouchableHighlight onPress={() => this._logOut()} underlayColor="#fff" style={{zIndex: 100000}}>
-                                    <Text style={[{
-                                        fontSize: 24, 
-                                        marginTop: 20, 
-                                        color: '#FF6464'}]}>Log out</Text>
-                                </TouchableHighlight>
-                            </View>
-                            <View style={styles.versionApp}>
-                                <Text style={[styles.greyText, {fontSize: 16}]}>radQD v1.1</Text>
-                            </View>
-                        </View>
-                        <TouchableHighlight onPress={() => this._closeMenu()} style={{
-                            width: '600%', 
-                            height: '100%', 
-                            opacity: 0,
-                            backgroundColor: '#333',
-                            position: 'absolute',
-                            }}
+                                        <TouchableHighlight onPress={() => this._itemMenu('Profile')} underlayColor="#fff" style={{zIndex: 100000}}>
+                                            <Text style={[styles.greyText, {
+                                                fontSize: 24, 
+                                                marginTop: 20,
+                                                color: this.props.page == 'Profile' ? '#333' : '#9EA0A5' 
+                                                }]}>Profile</Text>
+                                        </TouchableHighlight>
+                                        
+                                        <TouchableHighlight onPress={() => this._logOut()} underlayColor="#fff" style={{zIndex: 100000}}>
+                                            <Text style={[{
+                                                fontSize: 24, 
+                                                marginTop: 20, 
+                                                color: '#FF6464'}]}>Log out</Text>
+                                        </TouchableHighlight>
+                                    </View>
+                                    <View style={styles.versionApp}>
+                                        <Text style={[styles.greyText, {fontSize: 16}]}>radQD v1.1</Text>
+                                    </View>
+                                </GestureRecognizer>
+                        <GestureRecognizer
+                                    onSwipeLeft={(state) => this.onSwipeLeft(state)}
+                                    config={config}
+                                    style={{
+                                    position: 'absolute',
+                                    width: '100%',
+                                    height: '100%'
+                                    }}
                         >
-                            <View></View>
-                        </TouchableHighlight>
+                            <TouchableHighlight onPress={() => this._closeMenu()} style={{
+                                width: '600%', 
+                                height: '100%', 
+                                opacity: 0,
+                                backgroundColor: '#333',
+                                position: 'relative',
+                                }}
+                            >
+                                <View></View>
+                            </TouchableHighlight>
+                        </GestureRecognizer>
                         
                 </Animated.View>
                 <View style={styles.header}>
-                {/* <BlurView
-                                style={styles.absolute}
-                                viewRef={this.state.viewRef}
-                                blurType="extraDark"
-                                blurAmount={2}
-                            /> */}
-
                 
                     <TouchableHighlight style={styles.openMenu} onPress={() => this._openMenu() } underlayColor="#fff">
                         <Image source={burger} style={styles.burger} />
@@ -290,7 +306,7 @@ const styles = StyleSheet.create({
     },
     versionApp: {
         position: 'absolute',
-        top: Dimensions.get('window').height - 40,
+        top: Dimensions.get('window').height - 60,
         left: 40,
         zIndex: 10000000000000000000
     },
