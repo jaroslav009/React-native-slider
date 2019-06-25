@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View, Image, Animated, Button} from 'react-native';
 import firebase from 'react-native-firebase';
+import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
 
 import slideImg1 from '../../uploads/img/Welcome.png';
 import slideImg2 from '../../uploads/img/everyday.png';
@@ -41,32 +42,16 @@ export default class WrapSlider extends Component {
               // Animation
             fadeValue: new Animated.Value(0),
         }
+
         this.dotNav = this.dotNav.bind(this);
         this._toRegister = this._toRegister.bind(this);
+        this.onSwipeRight = this.onSwipeRight.bind(this);
+        this.onSwipeLeft = this.onSwipeLeft.bind(this);
+        this.onSwipe = this.onSwipe.bind(this);
     }
 
     dotNav = (id) => {
         this.setState({current: id});
-    }
-
-    prev() {
-        if(this.state.current == 0) return;
-        let prev = this.state.current - 1;
-        this.setState({ current: prev });
-        Animated.timing(this.state.fadeValue, {
-          toValue: 1,
-          duration: 1200,
-        }).start();
-    }
-
-    next() {
-        if(this.state.current == this.state.slides.length-1) return;
-        let next = parseInt(this.state.current) + 1;
-        this.setState({ current: next });
-        Animated.timing(this.state.fadeValue, {
-          toValue: 1,
-          duration: 1200,
-        }).start();
     }
 
     _fadeAnimation() {
@@ -80,50 +65,147 @@ export default class WrapSlider extends Component {
       this.props.navigation.navigate('Register')
     }
 
+    onSwipeRight(stateRecognize) {
+      console.log('Right', stateRecognize);
+      this.prev();
+    }
+
+    onSwipeLeft(stateRecognize) {
+      console.log('Left', stateRecognize);
+      this.next();
+    }
+
+    onSwipe(direction, stateRecognize) {
+      console.log('Swipe', direction, '   ', stateRecognize);
+    }
+
+    prev() {
+      if(this.state.current == 0) return;
+      let prev = this.state.current - 1;
+      
+
+      Animated.timing(this.state[this.state.current], {
+        toValue: 0,
+        duration: 1200,
+      }).start();
+      this.setState({ ['pos'+this.state.current]: 'absolute' });
+      Animated.timing(this.state[prev], {
+        toValue: 1,
+        duration: 1200,
+      }).start();
+      this.setState({ ['pos'+prev]: 'relative' });
+
+      this.setState({ current: prev });
+
+      Animated.timing(this.state.fadeValue, {
+        toValue: 1,
+        duration: 1200,
+      }).start();
+    }
+
+    next() {
+        if(this.state.current == this.state.slides.length-1) return;
+        let next = parseInt(this.state.current) + 1;
+
+        Animated.timing(this.state[this.state.current], {
+          toValue: 0,
+          duration: 1200,
+        }).start();
+        this.setState({ ['pos'+this.state.current]: 'absolute' });
+        Animated.timing(this.state[next], {
+          toValue: 1,
+          duration: 1200,
+        }).start();
+        this.setState({ ['pos'+next]: 'relative' });
+        this.setState({ current: next });
+        
+        Animated.timing(this.state.fadeValue, {
+          toValue: 1,
+          duration: 1200,
+        }).start();
+    }
+
     componentDidMount() {
       firebase.auth().onAuthStateChanged((user) => {
         if(user){
           this.props.navigation.navigate('Dashboard');
         } else {
           console.log('here');
-          
         }
+        
       });
+      let pos;
+      this.state.slides.map( (item, i) => {        
+        
+        if(i == 0) {
+          pos = 'pos'+i;
+          this.setState({ [ i ]: new Animated.Value(1) });
+          this.setState({ [ pos ]: 'relative' });
+        } else {
+          pos = 'pos'+i;
+          this.setState({ [ i ]: new Animated.Value(0) });
+          this.setState({ [ pos ]: 'absolute' });
+        }
+      });      
     }
 
     render() {
-        const colorArrow = this.state.fadeValue.interpolate({
-            inputRange: [0, 150],
-            outputRange: ['#677495', '#fff']
-        })
+        const config = {
+          velocityThreshold: 0.3,
+          directionalOffsetThreshold: 80
+        };
+        
+        console.log('this.state.1', this.state['0']);
         return (
 
             <View style={styles.navigationWrapper}>
-            
-                <View style={styles.wrapper}>
-                {
-                    this.state.slides.map( (item, i) => {
-                        return (
-                        <View key={i} id={i} style={ this.state.current == i ? styles.activeSlide : styles.sliderComponentStyle }>
-                            <View style={styles.container}>
-                                <Text style={styles.subtitleStyle}>
-                                    {item.subTitle}
-                                </Text>
-                                <Text style={styles.titleStyle}>
-                                    {item.title}
-                                </Text>
-                                <Image source={item.image} style={styles.imageStyle} />
-                                <View style={styles.wrapperDescriptionStyle}>
-                                    <Text style={styles.descriptionStyle}>
-                                        {item.description}
+                
+                  <View style={styles.wrapper}>
+                  <GestureRecognizer
+                    onSwipeLeft={(state) => this.onSwipeLeft(state)}
+                    onSwipeRight={(state) => this.onSwipeRight(state)}
+                    config={config}
+                    style={{
+                      position: 'absolute',
+                      backgroundColor: this.state.backgroundColor,
+                      width: '100%',
+                      height: '100%'
+                    }}
+                  >
+                  {
+                      this.state.slides.map( (item, i) => {
+                          return (
+                            <Animated.View                 // Special animatable View
+                            key={i}
+                            style={{
+                              opacity: this.state[ i ],
+                              position: this.state['pos'+i]
+                            }}
+                          >
+                            {/* <View id={i} style={ this.state.current == i ? styles.activeSlide : styles.sliderComponentStyle }> */}
+                            <View id={i} >
+                                <View style={styles.container}>
+                                    <Text style={styles.subtitleStyle}>
+                                        {item.subTitle}
                                     </Text>
+                                    <Text style={styles.titleStyle}>
+                                        {item.title}
+                                    </Text>
+                                    <Image source={item.image} style={styles.imageStyle} />
+                                    <View style={styles.wrapperDescriptionStyle}>
+                                        <Text style={styles.descriptionStyle}>
+                                            {item.description}
+                                        </Text>
+                                    </View>
                                 </View>
                             </View>
-                        </View>
-                        )
-                    } )
-                }
-                </View>
+                          </Animated.View>
+                          )
+                      } )
+                  }
+                  </GestureRecognizer>
+                  </View>
+                
                 <View style={styles.navDots}>
                 {
                     this.state.slides.map( (item, i) => {
