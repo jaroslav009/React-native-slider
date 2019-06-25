@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View, Image, Animated, Button} from 'react-native';
 import firebase from 'react-native-firebase';
-import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
+import GestureRecognizer from 'react-native-swipe-gestures';
 
 import slideImg1 from '../../uploads/img/Welcome.png';
 import slideImg2 from '../../uploads/img/everyday.png';
@@ -43,15 +43,9 @@ export default class WrapSlider extends Component {
             fadeValue: new Animated.Value(0),
         }
 
-        this.dotNav = this.dotNav.bind(this);
         this._toRegister = this._toRegister.bind(this);
         this.onSwipeRight = this.onSwipeRight.bind(this);
         this.onSwipeLeft = this.onSwipeLeft.bind(this);
-        this.onSwipe = this.onSwipe.bind(this);
-    }
-
-    dotNav = (id) => {
-        this.setState({current: id});
     }
 
     _fadeAnimation() {
@@ -73,10 +67,6 @@ export default class WrapSlider extends Component {
     onSwipeLeft(stateRecognize) {
       console.log('Left', stateRecognize);
       this.next();
-    }
-
-    onSwipe(direction, stateRecognize) {
-      console.log('Swipe', direction, '   ', stateRecognize);
     }
 
     prev() {
@@ -209,7 +199,7 @@ export default class WrapSlider extends Component {
                 <View style={styles.navDots}>
                 {
                     this.state.slides.map( (item, i) => {
-                    return <Text key={i} style={ this.state.current == i ? styles.navDotsItemActive : styles.navDotsItem} id={i} onPress={this.dotNav.bind(this,i)}></Text>
+                    return <Text key={i} style={ this.state.current == i ? styles.navDotsItemActive : styles.navDotsItem} id={i}></Text>
                     })
                 }
                 </View>
