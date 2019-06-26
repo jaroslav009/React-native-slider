@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, ScrollView, Dimensions, Picker, TouchableHighlight, ActivityIndicator} from 'react-native';
+import {StyleSheet, Text, View, Image, ScrollView, Dimensions, Picker, TouchableHighlight, ActivityIndicator, Modal} from 'react-native';
 import firebase from 'react-native-firebase'
 import Header from '../Header/Header';
 
@@ -36,6 +36,8 @@ export default class Profile extends Component {
             lastItem: 'http://www.youandthemat.com/wp-content/uploads/nature-2-26-17.jpg',
             countArr: 5,
             normVariant: [],
+            showPicker: 'none',
+            textPicker1: 'All'
         }
         this._back = this._back.bind(this);
         this._toQuestProfile = this._toQuestProfile.bind(this);
@@ -284,28 +286,89 @@ export default class Profile extends Component {
                             <Text style={styles.answText}>{this.state.answerQuiz} Answers</Text>
                         </View>
                         <View>
-                            <Image source={upArrow} style={styles.upArrow} />
-                            <Image source={downArrow} style={styles.downArrow} />
-                            <Picker
-                                selectedValue={this.state.filterAnsw}
-                                style={styles.pickerStyle}
-                                onValueChange={(itemValue, itemIndex) => {
-                                    this.setState({filterAnsw: itemValue})
-                                    if(itemValue == 'correct') {
-                                        this.correctFilter();
-                                    } 
-                                    else if(itemValue == 'wrong') {
-                                        this.wrongFilter();
-                                    } 
-                                    else {
-                                        this.allFilter();
-                                    }
-                                }
-                                }>
-                                <Picker.Item label="All" value="all" />
-                                <Picker.Item label="Correct" value="correct" />
-                                <Picker.Item label="Wrong" value="wrong" />
-                            </Picker>
+                            {/* Picker */}
+                            <TouchableHighlight onPress={ () => {
+                                if(this.state.showPicker == 'none') this.setState({ showPicker: 'flex' /* must have */ });
+                                else this.setState({ showPicker: 'none' /* must have */ });
+
+                            } } 
+                                key="Picker" 
+                                underlayColor="transparent" 
+                                style={{ 
+                                    backgroundColor: '#fff',
+                                    display: 'flex',
+                                }}
+                            >
+                                <View style={{
+                                    position: 'relative', 
+                                    zIndex: 10000000000000000,
+                                }}>
+                                        <Image source={upArrow} style={[styles.upArrow, { display: this.state.showPicker == 'none' ? 'flex' : 'none', position: this.state.showPicker == 'none' ? 'absolute' : 'relative' }]} />
+                                        <Image source={downArrow} style={[styles.downArrow, { display: this.state.showPicker == 'none' ? 'flex' : 'none', position: this.state.showPicker == 'none' ? 'absolute' : 'relative' }]} />
+                                    <Text style={{
+                                        fontSize: 14,
+                                        fontFamily: 'SFUIText-Regular',
+                                        marginRight: 30,
+                                        display: this.state.showPicker == 'none' ? 'flex' : 'none' 
+                                    }}> {this.state.textPicker1} </Text>
+                                    <View 
+                                    style={{
+                                        display: this.state.showPicker,
+                                        marginTop: 20
+                                    }}>
+                                        <Modal 
+                                        animationType="fade"
+                                        transparent={false}
+                                        visible={this.state.showPicker == 'none' ? false : true}
+                                        style={{ display: 'flex',
+                                                 justifyContent: 'center',
+                                                 alignItems: 'center',
+                                                 paddingTop: 20 }}
+                                        >
+                                            <TouchableHighlight style={[styles.pickerItem]}
+                                            underlayColor="transparent"
+                                            onPress={() => {
+                                                this.setState({
+                                                    filterAnsw: 'all', 
+                                                    textPicker1: 'All', 
+                                                    showPicker: 'none', 
+                                                });
+                                                this.allFilter();
+                                            }
+                                            }>
+                                                <Text>All</Text>
+                                            </TouchableHighlight>
+                                            <TouchableHighlight style={[styles.pickerItem]}
+                                            underlayColor="transparent"
+                                            onPress={() => {
+                                                this.setState({
+                                                    filterAnsw: 'correct', 
+                                                    textPicker1: 'Correct',
+                                                    showPicker: 'none'
+                                                });
+                                                this.correctFilter();
+                                            }
+                                            }>
+                                                <Text>Correct</Text>
+                                            </TouchableHighlight>
+                                            <TouchableHighlight style={[styles.pickerItem]}
+                                            underlayColor="transparent"
+                                            onPress={() => {
+                                                this.setState({
+                                                    filterAnsw: 'wrong', 
+                                                    textPicker1: 'Wrong',
+                                                    showPicker: 'none'
+                                                });
+                                                this.wrongFilter();
+                                            }
+                                            }>
+                                                <Text>Wrong</Text>
+                                            </TouchableHighlight>
+                                        </Modal>
+                                    </View>
+                                </View>
+                            </TouchableHighlight>
+                            {/* Picker */}
                         </View>
                     </View>
 
@@ -451,7 +514,7 @@ const styles = StyleSheet.create({
         height: 8,
         position: 'absolute',
         right: 18,
-        top: 14,
+        top: 1,
         zIndex: 1000
     },
     downArrow: {
@@ -459,7 +522,7 @@ const styles = StyleSheet.create({
         height: 8,
         position: 'absolute',
         right: 18,
-        top: 25,
+        top: 13,
         zIndex: 101111100
     },
     containerAnswer: {
@@ -536,5 +599,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         height: Dimensions.get('window').height
+    },
+    pickerItem: {
+        padding: 6,
+        zIndex: 100000,
+        elevation: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })

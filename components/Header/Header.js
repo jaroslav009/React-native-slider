@@ -129,6 +129,7 @@ export default class Header extends Component {
                                         backgroundColor: '#fff', 
                                         zIndex: 100000, 
                                         paddingLeft: 40,
+                                        opacity: 0.9
                                     }}
                                 >
                             
@@ -207,7 +208,7 @@ export default class Header extends Component {
                                     style={{
                                     position: 'absolute',
                                     width: '100%',
-                                    height: '100%'
+                                    height: '100%',
                                     }}
                         >
                             <TouchableHighlight onPress={() => this._closeMenu()} style={{
@@ -302,7 +303,8 @@ const styles = StyleSheet.create({
         // left: -20,
         paddingLeft: 40,
         zIndex: 1000000000000000000,
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
+        opacity: 0.9
     },
     versionApp: {
         position: 'absolute',

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, Animated, ScrollView, Dimensions, Picker, TextInput, TouchableHighlight, ActivityIndicator} from 'react-native';
+import {StyleSheet, Text, View, Image, Animated, ScrollView, Dimensions, Picker, TextInput, TouchableHighlight, ActivityIndicator, Modal} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import firebase from 'react-native-firebase';
 
@@ -26,6 +26,9 @@ export default class Leaderboard extends Component {
             countArr: 5,
             searchText: '',
             booferUniverSearch: [],
+            textPicker: 'Last 7',
+            showPicker: 'none',
+            textPicker1: 'Title'
         }
         this._graphShow = this._graphShow.bind(this);
         this._back = this._back.bind(this);
@@ -266,7 +269,7 @@ export default class Leaderboard extends Component {
             )
         }
         return (
-            <ScrollView style={styles.leader}>
+            <ScrollView style={styles.leader} stickyHeaderIndices={[0]}>
                 <Header navigation={this.props.navigation} page="Leadboard" />
                 <View style={styles.wrapperLeader}>
                     <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
@@ -277,20 +280,77 @@ export default class Leaderboard extends Component {
                             <Text style={styles.filterTitle}>Leaderboard</Text>
                         </View>
                         <View>
-                            <Image source={upArrow} style={styles.upArrow} />
-                            <Image source={downArrow} style={styles.downArrow} />
-                            <Picker
-                                selectedValue={this.state.score}
-                                style={styles.pickerStyle}
-                                onValueChange={(itemValue) => {
-                                    this.setState({score: itemValue})
-                                    if(itemValue == 'score') this._filterScore();
-                                    else this._filterTitle();
-                                }
-                                }>
-                                <Picker.Item style={styles.itemPickerLead} label="Score" value="score" />
-                                <Picker.Item style={styles.itemPickerLead} label="Title" value="title" />
-                            </Picker>
+                            {/* Picker */}
+                            <TouchableHighlight onPress={ () => {
+                                if(this.state.showPicker == 'none') this.setState({ showPicker: 'flex' /* must have */ });
+                                else this.setState({ showPicker: 'none' /* must have */ });
+
+                            } } 
+                                key="Picker" 
+                                underlayColor="transparent" 
+                                style={{ 
+                                    backgroundColor: '#fff',
+                                    display: 'flex',
+                                }}
+                            >
+                                <View style={{
+                                    position: 'relative', 
+                                    zIndex: 10000000000000000,
+                                }}>
+                                        <Image source={upArrow} style={[styles.upArrow, { display: this.state.showPicker == 'none' ? 'flex' : 'none', position: this.state.showPicker == 'none' ? 'absolute' : 'relative' }]} />
+                                        <Image source={downArrow} style={[styles.downArrow, { display: this.state.showPicker == 'none' ? 'flex' : 'none', position: this.state.showPicker == 'none' ? 'absolute' : 'relative' }]} />
+                                    <Text style={{
+                                        fontSize: 14,
+                                        fontFamily: 'SFUIText-Regular',
+                                        marginRight: 30,
+                                        display: this.state.showPicker == 'none' ? 'flex' : 'none' 
+                                    }}> {this.state.textPicker1} </Text>
+                                    <View 
+                                    style={{
+                                        display: this.state.showPicker,
+                                        marginTop: 20
+                                    }}>
+                                        <Modal 
+                                        animationType="fade"
+                                        transparent={false}
+                                        visible={this.state.showPicker == 'none' ? false : true}
+                                        style={{ display: 'flex',
+                                                 justifyContent: 'center',
+                                                 alignItems: 'center',
+                                                 paddingTop: 20 }}
+                                        >
+                                            <TouchableHighlight  style={[styles.pickerItem]}
+                                            underlayColor="transparent"
+                                            onPress={() => {
+                                                this.setState({
+                                                    timePickerPersonal: 'title', // must have
+                                                    textPicker1: 'Title', // must have
+                                                    showPicker: 'none'
+                                                });
+                                                this._filterTitle()
+                                            }
+                                            }>
+                                                <Text>Title</Text>
+                                            </TouchableHighlight>
+                                            <TouchableHighlight style={[styles.pickerItem]}
+                                            underlayColor="transparent"
+                                            onPress={() => {
+                                                this.setState({
+                                                    timePickerPersonal: 'score', 
+                                                    textPicker1: 'Score', 
+                                                    showPicker: 'none', 
+                                                });
+                                                this._filterScore();
+                                            }
+                                            }
+                                            >
+                                                <Text>Score</Text>
+                                            </TouchableHighlight>
+                                        </Modal>
+                                    </View>
+                                </View>
+                            </TouchableHighlight>
+                            {/* Picker */}
                         </View>
                     </View>
                     <View style={styles.searchContainer}>
@@ -325,21 +385,89 @@ export default class Leaderboard extends Component {
                                                 <View style={styles.wrapperTimePerfomance}>
                                                     <Text style={styles.textPerfomance}>INSTITUTION PERFORMANCE</Text>
                                                     <View style={styles.pickerWrapper}>
-                                                        <Image source={upArrow} style={styles.upArrow2} />
-                                                        <Image source={downArrow} style={styles.downArrow2} />
-                                                        <Picker
-                                                            selectedValue={this.state[value.title]}
-                                                            style={styles.pickerStyle2}
-                                                            onValueChange={(itemValue, itemIndex) => {
-                                                                this.setState({[value.title]: itemValue})
-                                                                console.log(this.state[value.title], '             ', itemValue);
+                                                        {/* todo */}
+                                                        {/* Picker */}
+                                                        <TouchableHighlight onPress={ () => {
+                                                            if(this.state.showPicker[value.title] == 'none') this.setState({ showPicker: {[value.title]: 'flex'} /* must have */ });
+                                                            else this.setState({ showPicker: {[value.title]: 'none'} /* must have */ });
+
+                                                        } } 
+                                                            key="Picker" 
+                                                            underlayColor="transparent" 
+                                                            style={{ 
+                                                                backgroundColor: '#fff',
+                                                                display: 'flex',
                                                             }}
-                                                            >
-                                                            <Picker.Item key={'unselectable'} label="Last 7 days" value="last7" />
-                                                            <Picker.Item label="Last 14 days" value="last14" />
-                                                            <Picker.Item label="Last 21 days" value="last21" />
-                                                            <Picker.Item label="Last Month" value="last30" />
-                                                        </Picker>
+                                                        >
+                                                            <View style={{
+                                                                position: 'relative', 
+                                                                zIndex: 10000000000000000,
+                                                            }}>
+                                                                    {/* <Image source={upArrow} style={[styles.upArrow, {display: this.state.showPicker[value.title] == 'none' || this.state.showPicker[value.title] == undefined ? 'flex' : 'none', }]} />
+                                                                    <Image source={downArrow} style={[styles.downArrow, {display: this.state.showPicker[value.title] == 'none' || this.state.showPicker[value.title] == undefined ? 'flex' : 'none',}]} /> */}
+                                                                <Text style={{
+                                                                    fontSize: 14,
+                                                                    fontFamily: 'SFUIText-Regular',
+                                                                    marginRight: 30,
+                                                                    display: this.state.showPicker[value.title] == 'none' || this.state.showPicker[value.title] == undefined ? 'flex' : 'none' 
+                                                                }}> {this.state.textPicker[value.title] == undefined ? 'Last 7' : this.state.textPicker[value.title]} </Text>
+                                                                <View 
+                                                                style={{
+                                                                    display: this.state.showPicker[value.title] == undefined || this.state.showPicker[value.title] == 'none' ? 'none' : 'flex',
+                                                                    marginTop: 20
+                                                                }}>
+                                                                    {/* <Modal 
+                                                                    animationType="slide"
+                                                                    transparent={false}
+                                                                    visible={false}
+                                                                    style={{
+                                                                            justifyContent: 'center',
+                                                                            alignItems: 'center',
+                                                                            paddingTop: 20 }}
+                                                                    >
+                                                                        <TouchableHighlight  style={[styles.pickerItem]}
+                                                                        underlayColor="transparent"
+                                                                        onPress={() => this.setState({
+                                                                            [value.title]: 'last7', // must have
+                                                                            textPicker: {[value.title]:'Last 7'}, // must have
+                                                                            showPicker: {[value.title]: 'none'}
+                                                                        })}>
+                                                                            <Text>Last 7</Text>
+                                                                        </TouchableHighlight>
+                                                                        <TouchableHighlight style={[styles.pickerItem]}
+                                                                        underlayColor="transparent"
+                                                                        onPress={() => this.setState({
+                                                                            [value.title]: 'last14', 
+                                                                            textPicker: {[value.title]: 'Last 14'}, 
+                                                                            showPicker: {[value.title]: 'none'}, 
+                                                                            
+                                                                        })}>
+                                                                            <Text>Last 14</Text>
+                                                                        </TouchableHighlight>
+                                                                        <TouchableHighlight style={[styles.pickerItem]}
+                                                                        underlayColor="transparent"
+                                                                        onPress={() => this.setState({
+                                                                            [value.title]: 'last21', 
+                                                                            textPicker: {[value.title]: 'Last 21'},
+                                                                            showPicker: {[value.title]: 'none'}
+                                                                        })}>
+                                                                            <Text>Last 21</Text>
+                                                                        </TouchableHighlight>
+                                                                        <TouchableHighlight style={[styles.pickerItem]}
+                                                                        underlayColor="transparent"
+                                                                        onPress={() => this.setState({
+                                                                            [value.title]: 'last30', 
+                                                                            textPicker: {[value.title]: 'Last Month'},
+                                                                            showPicker: {[value.title]: 'none'}
+                                                                        })}>
+                                                                            <Text>Last Month</Text>
+                                                                        </TouchableHighlight>
+                                                                    </Modal> */}
+                                                                </View>
+                                                            </View>
+                                                        </TouchableHighlight>
+                                                        {/* Picker */}
+                                                        {/* todo */}
                                                     </View>
                                                 </View>
                                                 <View style={styles.answerDiagram}>
@@ -408,7 +536,7 @@ const styles = StyleSheet.create({
         height: 8,
         position: 'absolute',
         right: 18,
-        top: 14,
+        top: 0,
         zIndex: 1000
     },
     downArrow: {
@@ -416,7 +544,7 @@ const styles = StyleSheet.create({
         height: 8,
         position: 'absolute',
         right: 18,
-        top: 25,
+        top: 10,
         zIndex: 101111100
     },
     upArrow2: {
@@ -541,5 +669,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         height: Dimensions.get('window').height
+    },
+    pickerItem: {
+        padding: 6,
+        zIndex: 100000,
+        elevation: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, Image, ActivityIndicator, ScrollView, Dimensions, Picker, TouchableHighlight } from 'react-native';
+import {StyleSheet, Text, View, Image, ActivityIndicator, ScrollView, Dimensions, Picker, TouchableHighlight, Modal } from 'react-native';
 import firebase from 'react-native-firebase';
 
 import Header from '../Header/Header';
@@ -7,7 +7,7 @@ import Chart from '../Chart/Chart';
 import body from '../../uploads/img/body.png'
 import upArrow from '../../uploads/img/up-arrow.png';
 import downArrow from '../../uploads/img/sort-down-triangular-symbol.png';
-
+import ribs from '../../uploads/img/ribs.png';
 
 export default class Dashboard extends Component {
 
@@ -26,7 +26,11 @@ export default class Dashboard extends Component {
             statisticUniver: {},
             statisticUser: {},
             correctAnswersQuizUser: {},
-            correctAnswersQuizUniversity: {}
+            correctAnswersQuizUniversity: {},
+            textPicker1: 'Last 7',
+            showPicker: 'none',
+            textPicker2: 'Last 7',
+            showPicker2: 'none',
         }
         this._itemMenu = this._itemMenu.bind(this);
         this._quizRoute = this._quizRoute.bind(this);
@@ -431,7 +435,7 @@ export default class Dashboard extends Component {
         }
 
         return (
-            <View>
+            <View style={{ position: 'relative', zIndex: -1 }}>
                 <ScrollView style={styles.wrapperDashboard}>
                    <Header navigation={this.props.navigation} page="Dashboard" />
                     <TouchableHighlight onPress={() => this._quizRoute()} style={[styles.wrapperQuiz, {display: this.state.quizTake == undefined || navigation.getParam('answer', 'NO-ID') == true ? 'none' : 'flex'}]}>
@@ -441,6 +445,7 @@ export default class Dashboard extends Component {
                     {/* Hero section */}
                     <View style={styles.wrapperHero}>
                         <Image source={body} style={styles.backgroundImage} />
+                        <Image source={ribs} style={{ alignSelf: 'center', position: 'absolute', top: 280, width: 120, height: 120 }} />
                         <View style={styles.wrapperHeroText}>
                             <Text style={[styles.textWelcome]}>Welcome, {this.state.dataUser.username}!</Text>
                             <Text style={styles.textRad}>
@@ -457,21 +462,88 @@ export default class Dashboard extends Component {
                             <View style={styles.wrapperTimePerfomance}>
                                 <Text style={styles.textPerfomance}>INSTITUTION PERFORMANCE</Text>
                                 <View style={styles.pickerWrapper}>
-                                    <Image source={upArrow} style={styles.upArrow} />
-                                    <Image source={downArrow} style={styles.downArrow} />
-                                    <Picker
-                                        selectedValue={this.state.timePickerPersonal}
-                                        style={styles.pickerStyle}
-                                        onValueChange={(itemValue, itemIndex) => {
-                                            this.setState({timePickerPersonal: itemValue})
-                                          }
-                                        }
-                                        >
-                                        <Picker.Item label="Last 7 days" value="last7" />
-                                        <Picker.Item label="Last 14 days" value="last14" />
-                                        <Picker.Item label="Last 21 days" value="last21" />
-                                        <Picker.Item label="Last Month" value="last30" />
-                                    </Picker>
+                                    
+                                    {/* Picker */}
+                                    <TouchableHighlight onPress={ () => {
+                                        if(this.state.showPicker == 'none') this.setState({ showPicker: 'flex' /* must have */ });
+                                        else this.setState({ showPicker: 'none' /* must have */ });
+
+                                    } } 
+                                        key="Picker" 
+                                        underlayColor="transparent" 
+                                        style={{ 
+                                            backgroundColor: '#fff',
+                                            display: 'flex',
+                                        }}
+                                    >
+                                        <View style={{
+                                            position: 'relative', 
+                                            zIndex: 10000000000000000,
+                                        }}>
+                                                <Image source={upArrow} style={[styles.upArrow, { display: this.state.showPicker == 'none' ? 'flex' : 'none', position: this.state.showPicker == 'none' ? 'absolute' : 'relative' }]} />
+                                                <Image source={downArrow} style={[styles.downArrow, { display: this.state.showPicker == 'none' ? 'flex' : 'none', position: this.state.showPicker == 'none' ? 'absolute' : 'relative' }]} />
+                                            <Text style={{
+                                                fontSize: 14,
+                                                fontFamily: 'SFUIText-Regular',
+                                                marginRight: 30,
+                                                display: this.state.showPicker == 'none' ? 'flex' : 'none' 
+                                            }}> {this.state.textPicker1} </Text>
+                                            <View 
+                                            style={{
+                                                display: this.state.showPicker,
+                                                marginTop: 20
+                                            }}>
+                                                <Modal 
+                                                animationType="fade"
+                                                transparent={false}
+                                                visible={this.state.showPicker == 'none' ? false : true}
+                                                style={{ display: 'flex',
+                                                         justifyContent: 'center',
+                                                         alignItems: 'center',
+                                                         paddingTop: 20 }}
+                                                >
+                                                    <TouchableHighlight  style={[styles.pickerItem]}
+                                                    underlayColor="transparent"
+                                                    onPress={() => this.setState({
+                                                        timePickerPersonal: 'last7', // must have
+                                                        textPicker1: 'Last 7', // must have
+                                                        showPicker: 'none'
+                                                    })}>
+                                                        <Text>Last 7</Text>
+                                                    </TouchableHighlight>
+                                                    <TouchableHighlight style={[styles.pickerItem]}
+                                                    underlayColor="transparent"
+                                                    onPress={() => this.setState({
+                                                        timePickerPersonal: 'last14', 
+                                                        textPicker1: 'Last 14', 
+                                                        showPicker: 'none', 
+                                                        
+                                                    })}>
+                                                        <Text>Last 14</Text>
+                                                    </TouchableHighlight>
+                                                    <TouchableHighlight style={[styles.pickerItem]}
+                                                    underlayColor="transparent"
+                                                    onPress={() => this.setState({
+                                                        timePickerPersonal: 'last21', 
+                                                        textPicker1: 'Last 21',
+                                                        showPicker: 'none'
+                                                    })}>
+                                                        <Text>Last 21</Text>
+                                                    </TouchableHighlight>
+                                                    <TouchableHighlight style={[styles.pickerItem]}
+                                                    underlayColor="transparent"
+                                                    onPress={() => this.setState({
+                                                        timePickerPersonal: 'last30', 
+                                                        textPicker1: 'Last Month',
+                                                        showPicker: 'none'
+                                                    })}>
+                                                        <Text>Last Month</Text>
+                                                    </TouchableHighlight>
+                                                </Modal>
+                                            </View>
+                                        </View>
+                                    </TouchableHighlight>
+                                    {/* Picker */}
                                 </View>
                             </View>
                             <View style={styles.answerDiagram}>
@@ -498,18 +570,87 @@ export default class Dashboard extends Component {
                                 <View style={styles.pickerWrapper}>
                                     <Image source={upArrow} style={styles.upArrow} />
                                     <Image source={downArrow} style={styles.downArrow} />
-                                    <Picker
-                                        selectedValue={this.state.userPicker}
-                                        style={styles.pickerStyle}
-                                        onValueChange={(itemValue, itemIndex) => {
-                                            this.setState({userPicker: itemValue})
-                                          }
-                                        }>
-                                        <Picker.Item label="Last 7 days" value="last7" />
-                                        <Picker.Item label="Last 14 days" value="last14" />
-                                        <Picker.Item label="Last 21 days" value="last21" />
-                                        <Picker.Item label="Last Month" value="last30" />
-                                    </Picker>
+                                    {/* Picker */}
+                                    <TouchableHighlight onPress={ () => {
+                                        if(this.state.showPicker2 == 'none') this.setState({ showPicker2: 'flex' /* must have */ });
+                                        else this.setState({ showPicker: 'none' /* must have */ });
+
+                                    } } 
+                                        key="Picker" 
+                                        underlayColor="transparent" 
+                                        style={{ 
+                                            backgroundColor: '#fff',
+                                            display: 'flex',
+                                        }}
+                                    >
+                                        <View style={{
+                                            position: 'relative', 
+                                            zIndex: 10000000000000000,
+                                        }}>
+                                                <Image source={upArrow} style={[styles.upArrow, {display: this.state.showPicker2 == 'none' ? 'flex' : 'none', position: this.state.showPicker2 == 'none' ? 'absolute' : 'relative' }]} />
+                                                <Image source={downArrow} style={[styles.downArrow, {display: this.state.showPicker2 == 'none' ? 'flex' : 'none', position: this.state.showPicker2 == 'none' ? 'absolute' : 'relative' }]} />
+                                            <Text style={{
+                                                fontSize: 14,
+                                                fontFamily: 'SFUIText-Regular',
+                                                marginRight: 30,
+                                                display: this.state.showPicker2 == 'none' ? 'flex' : 'none' 
+                                            }}> {this.state.textPicker2} </Text>
+                                            <View 
+                                            style={{
+                                                display: this.state.showPicker2,
+                                                marginTop: 20
+                                            }}>
+                                                <Modal 
+                                                animationType="fade"
+                                                transparent={false}
+                                                visible={this.state.showPicker2 == 'none' ? false : true}
+                                                style={{ display: 'flex',
+                                                         justifyContent: 'center',
+                                                         alignItems: 'center',
+                                                         paddingTop: 20 }}
+                                                >
+                                                    <TouchableHighlight  style={[styles.pickerItem]}
+                                                    underlayColor="transparent"
+                                                    onPress={() => this.setState({
+                                                        userPicker: 'last7', // must have
+                                                        textPicker2: 'Last 7', // must have
+                                                        showPicker2: 'none'
+                                                    })}>
+                                                        <Text>Last 7</Text>
+                                                    </TouchableHighlight>
+                                                    <TouchableHighlight style={[styles.pickerItem]}
+                                                    underlayColor="transparent"
+                                                    onPress={() => this.setState({
+                                                        userPicker: 'last14', 
+                                                        textPicker2: 'Last 14', 
+                                                        showPicker2: 'none', 
+                                                        
+                                                    })}>
+                                                        <Text>Last 14</Text>
+                                                    </TouchableHighlight>
+                                                    <TouchableHighlight style={[styles.pickerItem]}
+                                                    underlayColor="transparent"
+                                                    onPress={() => this.setState({
+                                                        userPicker: 'last21', 
+                                                        textPicker2: 'Last 21',
+                                                        showPicker2: 'none'
+                                                    })}>
+                                                        <Text>Last 21</Text>
+                                                    </TouchableHighlight>
+                                                    <TouchableHighlight style={[styles.pickerItem]}
+                                                    underlayColor="transparent"
+                                                    onPress={() => this.setState({
+                                                        userPicker: 'last30', 
+                                                        textPicker2: 'Last Month',
+                                                        showPicker2: 'none'
+                                                    })}>
+                                                        <Text>Last Month</Text>
+                                                    </TouchableHighlight>
+                                                </Modal>
+                                            </View>
+                                        </View>
+                                    </TouchableHighlight>
+                                    {/* Picker */}
                                 </View>
                             </View>
                             <View style={styles.answerDiagram}>
@@ -540,7 +681,7 @@ const styles = StyleSheet.create({
         marginTop: 50,
         position: 'absolute',
         top: 50,
-        left: Dimensions.get('window').height > 600 ? '8%' : '30%'
+        alignSelf: 'center'
     },
     wrapperDashboard: {
         height: '100%',
@@ -554,22 +695,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         paddingBottom: 50,
         paddingTop: 50,
-        elevation: 5,
+        elevation: 6,
     },
     wrapperHero: {
         paddingBottom: 50,
         paddingTop: Dimensions.get('window').height > 600 ? 230 : 100,
         paddingLeft: 25,
         paddingRight: 25,
-        borderWidth: 1,
-        borderRadius: 2,
-        borderColor: '#ddd',
-        borderBottomWidth: 0,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.8,
-        shadowRadius: 2,
-        
+        opacity: 0.9,        
     },
     textWelcome: {
         fontSize: 30,
@@ -595,7 +728,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     pickerWrapper: {
-        position: 'relative',
+        position: 'absolute',
+        right: 15,
+        zIndex: 100000000000000
     },
     textPerfomance: {
         color: '#9EA0A5',
@@ -606,22 +741,22 @@ const styles = StyleSheet.create({
         width: 8,
         height: 8,
         position: 'absolute',
-        right: 18,
-        top: 14,
+        right: 0,
+        top: 0,
         zIndex: 1000
     },
     downArrow: {
         width: 8,
         height: 8,
         position: 'absolute',
-        right: 18,
-        top: 25,
+        right: 0,
+        top: 10,
         zIndex: 1000
     },
     wrapperDiagram: {
         paddingLeft: 30,
         paddingRight: 30,
-        
+        position: 'relative',
     },
     containerPerfomanceDiagram: {
         backgroundColor: '#fff',
@@ -629,15 +764,11 @@ const styles = StyleSheet.create({
         paddingLeft: 16,
         paddingRight: 16,
         paddingBottom: 25,
-        elevation: 5,
     },
     pickerStyle: {
-        height: 50, 
         width: Dimensions.get('window').width > 600 ? 150 : 120, 
         color: '#9EA0A5', 
         backgroundColor: '#fff',
-        borderBottomColor: 'red',
-        borderBottomWidth: 2,
         fontSize: 14,
         fontFamily: 'SFUIText-Regular'
     },
@@ -645,7 +776,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 20
+        marginTop: 20,
     },
     textAnswer: {
         fontSize: 14,
@@ -672,5 +803,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         height: Dimensions.get('window').height
+    },
+    pickerItem: {
+        padding: 6,
+        zIndex: 100000,
+        elevation: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })
