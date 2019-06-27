@@ -46,6 +46,7 @@ export default class Settings extends Component {
             authentication: true,
             idUser: '',
             university: '',
+            clickHeader: false,
         }
         this._resetPass = this._resetPass.bind(this);
         this._logOut = this._logOut.bind(this);
@@ -54,6 +55,7 @@ export default class Settings extends Component {
         this._emailFunc = this._emailFunc.bind(this);
         this._passwordFunc = this._passwordFunc.bind(this);
         this._changeData = this._changeData.bind(this);
+        this.handleClickHeader = this.handleClickHeader.bind(this);
     }
 
     componentDidMount() {
@@ -213,6 +215,12 @@ export default class Settings extends Component {
         })
     }
 
+    handleClickHeader = (value) => {
+        console.log('wdqdqdqw', value);
+        
+        this.setState({clickHeader: value});
+    }
+
     render() {
         if(this.state.authentication == true) {
             return (
@@ -222,89 +230,90 @@ export default class Settings extends Component {
             )
         } 
         return (
-            <ScrollView style={{ paddingBottom: 0 }}>
-                <Header navigation={this.props.navigation} page="Account" />
-                <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
-                    <View>  
-                    <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
-                        <Image style={styles.arrowLeft} source={arrowLeft} />
-                    </TouchableHighlight>
-                        <View style={styles.titleWrapper}>
-                            <Text style={{color: '#3E3F42', fontSize: 24, fontFamily: 'SFUIText-Semibold'}}> {this.state.dataUser.firstName} {this.state.dataUser.lastName} </Text>
-                            <Text style={{color: '#3E3F42', fontSize: 16, fontFamily: 'SFUIText-Semibold', textAlign: 'center'}}>{this.state.nameUniver}</Text>
-                            <Text style={{color: '#9EA0A5', fontSize: 16}}>{this.state.dataUser.proffesion}</Text>
-                        </View>
-                        <View style={styles.wrapperFormLogin}>
-                            <View style={styles.itemInputForm}>
-                                <Text style={styles.labelInput}>Name</Text>
-                                <TextInput
-                                    style={styles.inputForm}
-                                    onChangeText={(text) => this._nameFunc(text) } 
-                                    placeholder="Name"
-                                    placeholderTextColor="#3E3F42" 
-                                    value={this.state.changeName}
-                                    defaultValue={this.state.defaultName}
-                                />
-                                <Image source={edit} style={{position: 'absolute', right: 10, top: '30%'}} />
+            <ScrollView style={{ paddingBottom: 0 }} stickyHeaderIndices={[0]}>
+                <View>
+                    <Header navigation={this.props.navigation} page="Account" click={this.handleClickHeader} style={{ width: '100%', height: this.state.clickHeader == false ? 50 : '100%', position: 'absolute', zIndex: -1 }} />
+                    <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
+                        <View>  
+                        <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
+                            <Image style={styles.arrowLeft} source={arrowLeft} />
+                        </TouchableHighlight>
+                            <View style={styles.titleWrapper}>
+                                <Text style={{color: '#3E3F42', fontSize: 24, fontFamily: 'SFUIText-Semibold'}}> {this.state.dataUser.firstName} {this.state.dataUser.lastName} </Text>
+                                <Text style={{color: '#3E3F42', fontSize: 16, fontFamily: 'SFUIText-Semibold', textAlign: 'center'}}>{this.state.nameUniver}</Text>
+                                <Text style={{color: '#9EA0A5', fontSize: 16}}>{this.state.dataUser.proffesion}</Text>
                             </View>
+                            <View style={styles.wrapperFormLogin}>
+                                <View style={styles.itemInputForm}>
+                                    <Text style={styles.labelInput}>Name</Text>
+                                    <TextInput
+                                        style={styles.inputForm}
+                                        onChangeText={(text) => this._nameFunc(text) } 
+                                        placeholder="Name"
+                                        placeholderTextColor="#3E3F42" 
+                                        value={this.state.changeName}
+                                        defaultValue={this.state.defaultName}
+                                    />
+                                    <Image source={edit} style={{position: 'absolute', right: 10, top: '30%'}} />
+                                </View>
 
-                            <View style={{marginTop: 20}}>
-                                <Text style={styles.labelInput}>Email</Text>
-                                <TextInput
-                                    style={styles.inputForm}
-                                    onChangeText={(text) => this._emailFunc(text) } 
-                                    placeholder="Email"
-                                    placeholderTextColor="#3E3F42"
-                                    value={this.state.changeEmail}
-                                    defaultValue={this.state.defaultEmail}
-                                />
-                                <Image source={edit} style={{position: 'absolute', right: 10, top: '30%'}} />
-                                <Text style={[styles.errText, {opacity: this.state.errorEmail == false ? 1 : 0}]}>Enter correct email address</Text>
+                                <View style={{marginTop: 20}}>
+                                    <Text style={styles.labelInput}>Email</Text>
+                                    <TextInput
+                                        style={styles.inputForm}
+                                        onChangeText={(text) => this._emailFunc(text) } 
+                                        placeholder="Email"
+                                        placeholderTextColor="#3E3F42"
+                                        value={this.state.changeEmail}
+                                        defaultValue={this.state.defaultEmail}
+                                    />
+                                    <Image source={edit} style={{position: 'absolute', right: 10, top: '30%'}} />
+                                    <Text style={[styles.errText, {opacity: this.state.errorEmail == false ? 1 : 0}]}>Enter correct email address</Text>
+                                </View>
+                            
+                                <View style={styles.itemInputForm}>
+                                    <Text style={styles.labelInput}>Password</Text>
+                                    <TextInput
+                                        style={styles.inputForm}
+                                        onChangeText={(text) => this._passwordFunc(text) }
+                                        placeholder="Password"
+                                        placeholderTextColor="#3E3F42" 
+                                        secureTextEntry={true}
+                                        value={this.state.changePassword}
+                                        defaultValue={this.state.defaultPassword}
+                                    />
+                                    <TouchableHighlight onPress={this._resetPass} underlayColor="#fff" style={styles.resetBtn}>
+                                        <Text style={{color: '#9EA0A5'}}>Reset</Text>
+                                    </TouchableHighlight>
+                                    <Text style={[styles.errText, {opacity: this.state.errorPassword == false ? 1 : 0}]}>Enter the password</Text>
+                                </View>
+                                <View style={styles.itemInputForm}>
+                                    <Text style={styles.labelInput}>New Password</Text>
+                                    <TextInput
+                                        style={styles.inputForm}
+                                        onChangeText={(text) => this.setState({ newPassword: text }) }
+                                        placeholder="New password"
+                                        placeholderTextColor="#3E3F42" 
+                                        secureTextEntry={true}
+                                        value={this.state.newPassword}
+                                    />
+                                    <Text style={[styles.errText, {opacity: this.state.errorNewPassword == false ? 1 : 0}]}>Not correct current password or new password</Text>                                
+                                </View>
                             </View>
-                           
-                            <View style={styles.itemInputForm}>
-                                <Text style={styles.labelInput}>Password</Text>
-                                <TextInput
-                                    style={styles.inputForm}
-                                    onChangeText={(text) => this._passwordFunc(text) }
-                                    placeholder="Password"
-                                    placeholderTextColor="#3E3F42" 
-                                    secureTextEntry={true}
-                                    value={this.state.changePassword}
-                                    defaultValue={this.state.defaultPassword}
-                                />
-                                <TouchableHighlight onPress={this._resetPass} underlayColor="#fff" style={styles.resetBtn}>
-                                    <Text style={{color: '#9EA0A5'}}>Reset</Text>
+                            <View>
+                                <TouchableHighlight onPress={this._logOut} underlayColor="#fff" style={[styles.buttonLog, {marginTop: 20}]}>
+                                    <Text style={{color: '#FF6464', fontSize: 16}}>Log Out</Text>
                                 </TouchableHighlight>
-                                <Text style={[styles.errText, {opacity: this.state.errorPassword == false ? 1 : 0}]}>Enter the password</Text>
                             </View>
-                            <View style={styles.itemInputForm}>
-                                <Text style={styles.labelInput}>New Password</Text>
-                                <TextInput
-                                    style={styles.inputForm}
-                                    onChangeText={(text) => this.setState({ newPassword: text }) }
-                                    placeholder="New password"
-                                    placeholderTextColor="#3E3F42" 
-                                    secureTextEntry={true}
-                                    value={this.state.newPassword}
-                                />
-                                <Text style={[styles.errText, {opacity: this.state.errorNewPassword == false ? 1 : 0}]}>Not correct current password or new password</Text>                                
+                            <View style={{marginTop: 30, display: this.state.changeButton}}>
+                                <TouchableHighlight onPress={this._changeData} underlayColor="#1D8EAB" style={[styles.buttonLog, {backgroundColor: '#1D8EAB'}]}>
+                                    <Text style={{color: '#fff', fontSize: 16}}>Save changes</Text>
+                                </TouchableHighlight>
                             </View>
                         </View>
-                        <View>
-                            <TouchableHighlight onPress={this._logOut} underlayColor="#fff" style={[styles.buttonLog, {marginTop: 20}]}>
-                                <Text style={{color: '#FF6464', fontSize: 16}}>Log Out</Text>
-                            </TouchableHighlight>
-                        </View>
-                        <View style={{marginTop: 30, display: this.state.changeButton}}>
-                            <TouchableHighlight onPress={this._changeData} underlayColor="#1D8EAB" style={[styles.buttonLog, {backgroundColor: '#1D8EAB'}]}>
-                                <Text style={{color: '#fff', fontSize: 16}}>Save changes</Text>
-                            </TouchableHighlight>
-                        </View>
+                        
                     </View>
-                    
                 </View>
-                
             </ScrollView>
         )   
     }
@@ -317,7 +326,8 @@ const styles = StyleSheet.create({
         paddingLeft: 40,
         paddingRight: 40,
         paddingTop: Dimensions.get('window').height > 600 ? 50 : 10,
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginTop: -24
     },
     greyText: {
         color: '#C9C9C9',

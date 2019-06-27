@@ -28,7 +28,9 @@ export default class Leaderboard extends Component {
             booferUniverSearch: [],
             textPicker: 'Last 7',
             showPicker: 'none',
-            textPicker1: 'Title'
+            showPicker2: 'none',
+            textPicker1: 'Title',
+            clickHeader: false,
         }
         this._graphShow = this._graphShow.bind(this);
         this._back = this._back.bind(this);
@@ -37,6 +39,7 @@ export default class Leaderboard extends Component {
         this._filterScore = this._filterScore.bind(this);
         this._filterTitle = this._filterTitle.bind(this);
         this._searchTitle = this._searchTitle.bind(this);
+        this.handleClickHeader = this.handleClickHeader.bind(this);
     }
 
     _graphShow(arg) {        
@@ -260,6 +263,12 @@ export default class Leaderboard extends Component {
         this.setState({ arrUniverOut: arrBoofer });
     }
 
+    handleClickHeader = (value) => {
+        console.log('wdqdqdqw', value);
+        
+        this.setState({clickHeader: value});
+    }
+
     render() {
         if(this.state.authentication == true) {
             return (
@@ -270,7 +279,7 @@ export default class Leaderboard extends Component {
         }
         return (
             <ScrollView style={styles.leader} stickyHeaderIndices={[0]}>
-                <Header navigation={this.props.navigation} page="Leadboard" />
+                <Header navigation={this.props.navigation} page="Leadboard" click={this.handleClickHeader} style={{ width: '100%', height: this.state.clickHeader == false ? 50 : '100%', position: 'absolute', zIndex: -1 }} />
                 <View style={styles.wrapperLeader}>
                     <TouchableHighlight onPress={() => this._back()} underlayColor="#fff">
                         <Image style={styles.arrowLeft} source={arrowLeft} />
@@ -282,8 +291,8 @@ export default class Leaderboard extends Component {
                         <View>
                             {/* Picker */}
                             <TouchableHighlight onPress={ () => {
-                                if(this.state.showPicker == 'none') this.setState({ showPicker: 'flex' /* must have */ });
-                                else this.setState({ showPicker: 'none' /* must have */ });
+                                if(this.state.showPicker2 == 'none') this.setState({ showPicker2: 'flex' /* must have */ });
+                                else this.setState({ showPicker2: 'none' /* must have */ });
 
                             } } 
                                 key="Picker" 
@@ -297,23 +306,23 @@ export default class Leaderboard extends Component {
                                     position: 'relative', 
                                     zIndex: 10000000000000000,
                                 }}>
-                                        <Image source={upArrow} style={[styles.upArrow, { display: this.state.showPicker == 'none' ? 'flex' : 'none', position: this.state.showPicker == 'none' ? 'absolute' : 'relative' }]} />
-                                        <Image source={downArrow} style={[styles.downArrow, { display: this.state.showPicker == 'none' ? 'flex' : 'none', position: this.state.showPicker == 'none' ? 'absolute' : 'relative' }]} />
+                                        <Image source={upArrow} style={[styles.upArrow]} />
+                                        <Image source={downArrow} style={[styles.downArrow]} />
                                     <Text style={{
                                         fontSize: 14,
                                         fontFamily: 'SFUIText-Regular',
                                         marginRight: 30,
-                                        display: this.state.showPicker == 'none' ? 'flex' : 'none' 
+                                        display: this.state.showPicker2 == 'none' ? 'flex' : 'none' 
                                     }}> {this.state.textPicker1} </Text>
                                     <View 
                                     style={{
-                                        display: this.state.showPicker,
+                                        display: this.state.showPicker2,
                                         marginTop: 20
                                     }}>
                                         <Modal 
                                         animationType="fade"
                                         transparent={false}
-                                        visible={this.state.showPicker == 'none' ? false : true}
+                                        visible={this.state.showPicker2 == 'none' ? false : true}
                                         style={{ display: 'flex',
                                                  justifyContent: 'center',
                                                  alignItems: 'center',
@@ -325,7 +334,7 @@ export default class Leaderboard extends Component {
                                                 this.setState({
                                                     timePickerPersonal: 'title', // must have
                                                     textPicker1: 'Title', // must have
-                                                    showPicker: 'none'
+                                                    showPicker2: 'none'
                                                 });
                                                 this._filterTitle()
                                             }
@@ -338,7 +347,7 @@ export default class Leaderboard extends Component {
                                                 this.setState({
                                                     timePickerPersonal: 'score', 
                                                     textPicker1: 'Score', 
-                                                    showPicker: 'none', 
+                                                    showPicker2: 'none', 
                                                 });
                                                 this._filterScore();
                                             }
@@ -403,23 +412,23 @@ export default class Leaderboard extends Component {
                                                                 position: 'relative', 
                                                                 zIndex: 10000000000000000,
                                                             }}>
-                                                                    {/* <Image source={upArrow} style={[styles.upArrow, {display: this.state.showPicker[value.title] == 'none' || this.state.showPicker[value.title] == undefined ? 'flex' : 'none', }]} />
-                                                                    <Image source={downArrow} style={[styles.downArrow, {display: this.state.showPicker[value.title] == 'none' || this.state.showPicker[value.title] == undefined ? 'flex' : 'none',}]} /> */}
+                                                                    <Image source={upArrow} style={[styles.upArrow]} />
+                                                                    <Image source={downArrow} style={[styles.downArrow]} />
                                                                 <Text style={{
                                                                     fontSize: 14,
                                                                     fontFamily: 'SFUIText-Regular',
                                                                     marginRight: 30,
-                                                                    display: this.state.showPicker[value.title] == 'none' || this.state.showPicker[value.title] == undefined ? 'flex' : 'none' 
+                                                                    display: this.state.showPicker[value.title] == 'none' || this.state.showPicker[value.title] == undefined ? 'flex' : 'none',
                                                                 }}> {this.state.textPicker[value.title] == undefined ? 'Last 7' : this.state.textPicker[value.title]} </Text>
                                                                 <View 
                                                                 style={{
                                                                     display: this.state.showPicker[value.title] == undefined || this.state.showPicker[value.title] == 'none' ? 'none' : 'flex',
                                                                     marginTop: 20
                                                                 }}>
-                                                                    {/* <Modal 
+                                                                    <Modal 
                                                                     animationType="slide"
                                                                     transparent={false}
-                                                                    visible={false}
+                                                                    visible={this.state.showPicker[value.title] == 'none' || this.state.showPicker[value.title] == undefined ? false : true}
                                                                     style={{
                                                                             justifyContent: 'center',
                                                                             alignItems: 'center',
@@ -462,7 +471,7 @@ export default class Leaderboard extends Component {
                                                                         })}>
                                                                             <Text>Last Month</Text>
                                                                         </TouchableHighlight>
-                                                                    </Modal> */}
+                                                                    </Modal>
                                                                 </View>
                                                             </View>
                                                         </TouchableHighlight>
@@ -518,6 +527,7 @@ const styles = StyleSheet.create({
         paddingRight: 25,
         paddingTop: 25,
         paddingBottom: 25,
+        marginTop: 20
     },
     filterContainer: {
         display: 'flex',

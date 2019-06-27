@@ -37,7 +37,8 @@ export default class Profile extends Component {
             countArr: 5,
             normVariant: [],
             showPicker: 'none',
-            textPicker1: 'All'
+            textPicker1: 'All',
+            clickHeader: false,
         }
         this._back = this._back.bind(this);
         this._toQuestProfile = this._toQuestProfile.bind(this);
@@ -45,6 +46,7 @@ export default class Profile extends Component {
         this.correctFilter = this.correctFilter.bind(this);
         this.wrongFilter = this.wrongFilter.bind(this);
         this.allFilter = this.allFilter.bind(this);
+        this.handleClickHeader = this.handleClickHeader.bind(this);
     }
     _back() {
         this.props.navigation.goBack()
@@ -256,6 +258,12 @@ export default class Profile extends Component {
         });
     }
 
+    handleClickHeader = (value) => {
+        console.log('wdqdqdqw', value);
+        
+        this.setState({clickHeader: value});
+    }
+
     render() {
         if(this.state.authentication == true) {
             return (
@@ -267,8 +275,9 @@ export default class Profile extends Component {
         return (
             <ScrollView 
             style={styles.profile}
+            stickyHeaderIndices={[0]}
             >
-                <Header navigation={this.props.navigation} page="Profile" />
+                <Header navigation={this.props.navigation} page="Profile" click={this.handleClickHeader} style={{ width: '100%', height: this.state.clickHeader == false ? 50 : '100%', position: 'absolute', zIndex: -1 }} />
                 <View style={styles.wrapperProfile}>
                     <TouchableHighlight onPress={() => this._back()} underlayColor="transparent">
                         <Image style={styles.arrowLeft} source={arrowLeft} />
@@ -481,6 +490,7 @@ const styles = StyleSheet.create({
         paddingRight: 25,
         paddingTop: 25,
         paddingBottom: 25,
+        marginTop: 60
     },
     containerTitleProfile: {
         display: 'flex',

@@ -31,11 +31,13 @@ export default class Dashboard extends Component {
             showPicker: 'none',
             textPicker2: 'Last 7',
             showPicker2: 'none',
+            clickHeader: false,
         }
         this._itemMenu = this._itemMenu.bind(this);
         this._quizRoute = this._quizRoute.bind(this);
         this._outputAnswersUnvier = this._outputAnswersUnvier.bind(this);
         this._outputAnswersUser = this._outputAnswersUser.bind(this);
+        this.handleClickHeader = this.handleClickHeader.bind(this);
     }
 
     componentDidMount() {
@@ -50,13 +52,19 @@ export default class Dashboard extends Component {
                     
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                         let keysQues;
+                        console.log('data iser', data._value);
+                        let columnQues;
                         if(data.toJSON().questions != undefined) {
                             keysQues = Object.keys(data.toJSON().questions);
+                            columnQues = toString(keysQues.length);
                         } else {
                             keysQues = undefined;
+                            columnQues = '0'
                         }
                         
-                        this.setState({ dataUser: data.toJSON(), idQuis: keysQues });                        
+                        this.setState({ dataUser: data.toJSON(), 
+                            idQuis: keysQues, 
+                            columnQues });                        
                     })
                     .then(() => {
                         
@@ -423,8 +431,13 @@ export default class Dashboard extends Component {
         }
     }
 
+    handleClickHeader = (value) => {
+        this.setState({clickHeader: value});
+    }
+
     render() {
         const { navigation } = this.props;
+        console.log('change clickHeader', this.state.clickHeader);
         
         if(this.state.authentication == true) {
             return (
@@ -435,9 +448,9 @@ export default class Dashboard extends Component {
         }
 
         return (
-            <View style={{ position: 'relative', zIndex: -1 }}>
-                <ScrollView style={styles.wrapperDashboard}>
-                   <Header navigation={this.props.navigation} page="Dashboard" />
+            <View style={{ position: 'relative', zIndex: -1, backgroundColor: 'rgba(0, 0, 0, 0.04)',}}>
+                <ScrollView style={styles.wrapperDashboard} stickyHeaderIndices={[0]}>
+                   <Header navigation={this.props.navigation} page="Dashboard" click={this.handleClickHeader} style={{ width: '100%', height: this.state.clickHeader == false ? 50 : '100%', position: 'absolute', zIndex: -1 }} />
                     <TouchableHighlight onPress={() => this._quizRoute()} style={[styles.wrapperQuiz, {display: this.state.quizTake == undefined || navigation.getParam('answer', 'NO-ID') == true ? 'none' : 'flex'}]}>
                         <Text style={styles.textQuiz}>Take the quiz</Text>
                     </TouchableHighlight>
@@ -445,19 +458,19 @@ export default class Dashboard extends Component {
                     {/* Hero section */}
                     <View style={styles.wrapperHero}>
                         <Image source={body} style={styles.backgroundImage} />
-                        <Image source={ribs} style={{ alignSelf: 'center', position: 'absolute', top: 280, width: 120, height: 120 }} />
+                        <Image source={ribs} style={{ alignSelf: 'center', position: 'absolute', top: 160, width: 60, height: 60 }} />
                         <View style={styles.wrapperHeroText}>
-                            <Text style={[styles.textWelcome]}>Welcome, {this.state.dataUser.username}!</Text>
+                            <Text style={[styles.textWelcome]}>Welcome, {this.state.dataUser.firstName}!</Text>
                             <Text style={styles.textRad}>
-                                <Text style={styles.numberRad}>{this.state.dataUser.firstName} </Text>
-                                {this.state.dataUser.lastName}
+                                <Text style={styles.numberRad}>{this.state.columnQues} </Text>
+                                rad
                             </Text>
                         </View>
                     </View>
                     {/* Hero section */}
                     
                     {/* Diagrams */}
-                    <View style={styles.wrapperDiagram}>
+                    <View style={[styles.wrapperDiagram, { position: 'relative', zIndex: -1 }]}>
                         <View style={styles.containerPerfomanceDiagram}>
                             <View style={styles.wrapperTimePerfomance}>
                                 <Text style={styles.textPerfomance}>INSTITUTION PERFORMANCE</Text>
@@ -670,6 +683,9 @@ export default class Dashboard extends Component {
                         </View>
                     </View>
                     {/* Diagrams */}
+                    <View key="Footer" style={{ justifyContent: 'center', alignItems: 'center', paddingBottom: 20, paddingTop: 20 }}>
+                        <Text style={{ color: '#9EA0A5', fontSize: 14 }}>Copyright RadQD 2019</Text>
+                    </View>
                 </ScrollView>
             </View>
         )
@@ -680,8 +696,10 @@ const styles = StyleSheet.create({
     backgroundImage: {
         marginTop: 50,
         position: 'absolute',
-        top: 50,
-        alignSelf: 'center'
+        top: 20,
+        alignSelf: 'center',
+        width: 174,
+        height: 200
     },
     wrapperDashboard: {
         height: '100%',
@@ -693,9 +711,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
-        paddingBottom: 50,
-        paddingTop: 50,
+        paddingBottom: 20,
+        paddingTop: 20,
         elevation: 6,
+        marginTop: -100
     },
     wrapperHero: {
         paddingBottom: 50,
@@ -705,12 +724,12 @@ const styles = StyleSheet.create({
         opacity: 0.9,        
     },
     textWelcome: {
-        fontSize: 30,
+        fontSize: 20,
         color: '#3E3F42',
         fontFamily: 'SFUIText-Regular'
     },
     textRad: {
-        fontSize: 20,
+        fontSize: 17,
         marginTop: 20,
         color: "#3E3F42",
         fontFamily: 'SFUIText-Regular'

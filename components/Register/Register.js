@@ -91,7 +91,8 @@ export default class Register extends Component {
                             email: this.state.textEmail.toLowerCase(),
                             born: this.state.date,
                             state: data._value.state,
-                            university: snapshot.key
+                            university: snapshot.key,
+                            username: this.state.textEmail.toLowerCase()
                         }).then(() => {
                             firebase.auth().currentUser.sendEmailVerification().then(function() {
                                 console.log('send ')
@@ -101,7 +102,8 @@ export default class Register extends Component {
                             firebase.database().ref("university/" + snapshot.key + "/" + idUser).set({
                                 email: this.state.textEmail.toLowerCase(),
                                 born: this.state.date,
-                                state: data._value.state
+                                state: data._value.state,
+                                username: this.state.textEmail.toLowerCase()
                             })
                             .then(() => {
                                 this.setState({ authentication: false, authErr: false });
@@ -166,7 +168,7 @@ export default class Register extends Component {
                                     placeholderTextColor="#3E3F42" 
                                 />
                                 <Image style={styles.imageInput} source={mail} />
-                                <Text style={[styles.errText, {opacity: this.state.errorEmail == false ? 1 : 0}]}>Enter correct email address</Text>
+                                <Text style={[styles.errText, {opacity: this.state.errorEmail == false ? 1 : 0}]}>Please enter a complete email address</Text>
                             </View>
                             <View style={styles.itemInputForm}>
                                 <DatePicker
@@ -185,7 +187,7 @@ export default class Register extends Component {
                                 <TextInput
                                     style={styles.inputForm}
                                     onChangeText={(date) => {this.setState({date: date})}}
-                                    placeholder="Year"
+                                    placeholder=""
                                     value={this.state.date}
                                     placeholderTextColor="#3E3F42"
                                 />
@@ -204,7 +206,8 @@ export default class Register extends Component {
                                     secureTextEntry={true}
                                 />
                                 <Image style={styles.imageInputPass} source={padlock} />
-                                <Text style={[styles.errText, {opacity: this.state.errorPassword == false ? 1 : 0}]}>Enter the password</Text>
+                                <Text style={[styles.errText, {opacity: this.state.errorPassword == false ? 1 : 0}]}>Password must be a minimum of 6 characters
+</Text>
                             </View>
                         </View>
                         <View style={styles.mb30}>

@@ -116,14 +116,7 @@ export default class WrapSlider extends Component {
     }
 
     componentDidMount() {
-      firebase.auth().onAuthStateChanged((user) => {
-        if(user){
-          this.props.navigation.navigate('Dashboard');
-        } else {
-          console.log('here');
-        }
-        
-      });
+      
       let pos;
       this.state.slides.map( (item, i) => {        
         
@@ -140,6 +133,14 @@ export default class WrapSlider extends Component {
     }
 
     render() {
+        firebase.auth().onAuthStateChanged((user) => {
+          if(user){
+            this.props.navigation.navigate('Dashboard');
+          } else {
+            console.log('here');
+          }
+          
+        });
         const config = {
           velocityThreshold: 0.3,
           directionalOffsetThreshold: 80

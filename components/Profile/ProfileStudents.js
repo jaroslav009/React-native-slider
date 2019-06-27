@@ -31,7 +31,8 @@ export default class ProfileStudents extends Component {
             countArr: 1,
             showButtonUpload: 'flex',
             showPicker: 'none',
-            textPicker1: 'All'
+            textPicker1: 'All',
+            clickHeader: false,
         }
         this._back = this._back.bind(this);
         this._taskRoute = this._taskRoute.bind(this);
@@ -39,6 +40,7 @@ export default class ProfileStudents extends Component {
         this.correctFilter = this.correctFilter.bind(this);
         this.wrongFilter = this.wrongFilter.bind(this);
         this.allFilter = this.allFilter.bind(this);
+        this.handleClickHeader = this.handleClickHeader.bind(this);
     }
     _back() {
         this.props.navigation.goBack()
@@ -206,6 +208,12 @@ export default class ProfileStudents extends Component {
         });
     }
 
+    handleClickHeader = (value) => {
+        console.log('wdqdqdqw', value);
+        
+        this.setState({clickHeader: value});
+    }
+
     render() {
         
         if(this.state.authentication == true) {
@@ -216,8 +224,8 @@ export default class ProfileStudents extends Component {
             )
         } 
         return (
-            <ScrollView style={styles.profile}>
-                <Header style={styles.headerStyle} navigation={this.props.navigation} page="ProfileStudents" />
+            <ScrollView style={styles.profile} stickyHeaderIndices={[0]}>
+                <Header style={styles.headerStyle} navigation={this.props.navigation} page="ProfileStudents" click={this.handleClickHeader} style={{ width: '100%', height: this.state.clickHeader == false ? 50 : '100%', position: 'absolute', zIndex: -1 }} />
                 <View style={styles.wrapperProfile}>
                     <TouchableHighlight onPress={() => this._back()} underlayColor="transparent">
                         <Image style={styles.arrowLeft} source={arrowLeft} />
@@ -403,6 +411,7 @@ const styles = StyleSheet.create({
         paddingTop: 25,
         paddingBottom: 25,
         minHeight: Dimensions.get('window').height - 90,
+        marginTop: 60
     },
     containerTitleProfile: {
         display: 'flex',

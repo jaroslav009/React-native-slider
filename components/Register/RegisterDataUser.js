@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, View, TextInput, Button, ScrollView, Dimensions, ActivityIndicator, Alert } from 'react-native';
+import {StyleSheet, Text, View, TextInput, Button, ScrollView, Dimensions, ActivityIndicator, Alert, Modal, TouchableHighlight, Image } from 'react-native';
 import Logo from '../BasicComponents/Logo';
 import firebase from 'react-native-firebase';
+
+import upArrow from '../../uploads/img/up-arrow.png';
+import downArrow from '../../uploads/img/sort-down-triangular-symbol.png';
 
 function validateUser(user) {
     if(user.length < 2) {
@@ -24,6 +27,8 @@ export default class RegisterDataUser extends Component {
             errorUser: true,
             authentication: false,
             authErr: false,
+            textProffesion: 'Profesion',
+            showPicker: 'none'
         }
         this._onPressLearnMore = this._onPressLearnMore.bind(this);
     }
@@ -37,68 +42,63 @@ export default class RegisterDataUser extends Component {
     _onPressLearnMore() {
         this.setState({ authentication: true })
         const { navigation } = this.props;
-        if(this.state.textUser.length == 0) {
-            this.setState({ errorUser: false, authentication: false });
-        } else { 
-            // All good
-            firebase.database().ref("users/" + navigation.getParam('id', 'NO-ID')).update({
-                username: this.state.textUser,
+        // All good
+        firebase.database().ref("users/" + navigation.getParam('id', 'NO-ID')).update({
+            // username: this.state.textUser,
+            firstName: this.state.textFName,
+            lastName: this.state.textLName,
+            proffesion: this.state.textProffesion
+        })
+        .then(() => {
+            firebase.database().ref("university/" + navigation.getParam('univerId')).once("value", (data) => {
+                console.log('data.loggedUser', data.loggedUser, 'data', data);
+                if(data._value.loggedUser == undefined) {
+                    this.setState({ loggedUser: 1 });
+                } else {
+                    this.setState({ loggedUser: parseInt(data._value.loggedUser)+1 });
+                }
+            })
+            .then(() => {
+                firebase.database().ref("university/" + navigation.getParam('univerId')).update({
+                    loggedUser: this.state.loggedUser,
+                });
+            })
+        })
+        .then(() => {
+            console.log('success this.state.textUser' , this.state.textUser);        
+            firebase.database().ref("university/" + navigation.getParam('univerId') + "/" + navigation.getParam('id', 'NO-ID')).update({
                 firstName: this.state.textFName,
                 lastName: this.state.textLName,
-                proffesion: this.state.textProffesion
-            })
-            .then(() => {
-                firebase.database().ref("university/" + navigation.getParam('univerId')).once("value", (data) => {
-                    console.log('data.loggedUser', data.loggedUser, 'data', data);
-                    if(data._value.loggedUser == undefined) {
-                        this.setState({ loggedUser: 1 });
-                    } else {
-                        this.setState({ loggedUser: parseInt(data._value.loggedUser)+1 });
-                    }
-                })
-                .then(() => {
-                    firebase.database().ref("university/" + navigation.getParam('univerId')).update({
-                        loggedUser: this.state.loggedUser,
-                    });
-                })
-            })
-            .then(() => {
-                console.log('success this.state.textUser' , this.state.textUser);        
-                firebase.database().ref("university/" + navigation.getParam('univerId') + "/" + navigation.getParam('id', 'NO-ID')).update({
-                    firstName: this.state.textFName,
-                    lastName: this.state.textLName,
-                    proffesion: this.state.textProffesion,
-                    username: this.state.textUser,
-                }).then(() => {
-                    // firebase.auth().signOut();
-                    Alert.alert(
-                        '',
-                        'Verify your email!',
-                        [
-                          {text: 'OK', onPress: () => console.log('OK Pressed')},
-                        ],
-                        {cancelable: false},
-                      );
-                    this.props.navigation.navigate('Login')
-                }).catch((err) => {
-                    return console.log(err);
-                })        
+                proffesion: this.state.textProffesion,
+                // username: this.state.textUser,
+            }).then(() => {
+                // firebase.auth().signOut();
+                Alert.alert(
+                    '',
+                    "Thanks for registering! We're sending you a verification email now. Once you get it, just tap on the link inside to verify and access your account",
+                    [
+                      {text: 'OK', onPress: () => console.log('OK Pressed')},
+                    ],
+                    {cancelable: false},
+                  );
+                this.props.navigation.navigate('Login')
             }).catch((err) => {
-                this.setState({ authentication: false });
-                console.log('failed', err);
-            })
-            
-        }
+                return console.log(err);
+            })        
+        }).catch((err) => {
+            this.setState({ authentication: false });
+            console.log('failed', err);
+        })
     }
 
     render() {
-        // if(this.state.authentication == true) {
-        //     return (
-        //         <View style={styles.containerActivity}>
-        //             <ActivityIndicator size="large" /> 
-        //         </View>
-        //     )
-        // } 
+        if(this.state.authentication == true) {
+            return (
+                <View style={styles.containerActivity}>
+                    <ActivityIndicator size="large" /> 
+                </View>
+            )
+        } 
         return (
             <ScrollView>
                 <View style={styles.wrapperLogin} showsVerticalScrollIndicator={true}>
@@ -110,27 +110,13 @@ export default class RegisterDataUser extends Component {
                             </Text>
                         </View>
                         <View style={styles.wrapperFormLogin}>
-                            <View>
-                                <Text style={[styles.errText, {opacity: this.state.authErr == true ? 1 : 0}]}>Such user exists</Text>
-                            </View>
-                            <View style={[styles.itemInputForm, {marginBottom: 10}]}>
-                               
-                                <TextInput
-                                    style={[styles.inputForm, {paddingLeft: 10}]}
-                                    onChangeText={(text) => this.setState({textUser: text, errorUser: validateUser(text)})}
-                                    placeholder="User"
-                                    placeholderTextColor="#3E3F42" 
-                                />
-                                <Text style={[styles.errText, {opacity: this.state.errorUser == false ? 1 : 0}]}>Enter the user</Text>
-
-                            </View>
 
                             <View style={styles.itemInputForm}>
                                
                                 <TextInput
                                     style={[styles.inputForm, {paddingLeft: 10}]}
                                     onChangeText={(text) => this.setState({textFName: text})}
-                                    placeholder="Name"
+                                    placeholder="First name"
                                     placeholderTextColor="#3E3F42" 
                                 />
                             </View>
@@ -140,19 +126,88 @@ export default class RegisterDataUser extends Component {
                                 <TextInput
                                     style={[styles.inputForm, {paddingLeft: 10}]}
                                     onChangeText={(text) => this.setState({textLName: text})}
-                                    placeholder="Surname"
+                                    placeholder="Second name"
                                     placeholderTextColor="#3E3F42" 
                                 />
                             </View>
 
                             <View style={styles.itemInputForm}>
                                
-                                <TextInput
-                                    style={[styles.inputForm, {paddingLeft: 10}]}
-                                    onChangeText={(text) => this.setState({textProffesion: text})}
-                                    placeholder="Proffesion"
-                                    placeholderTextColor="#3E3F42" 
-                                />
+                                <TouchableHighlight onPress={ () => {
+                                        if(this.state.showPicker == 'none') this.setState({ showPicker: 'flex' /* must have */ });
+                                        else this.setState({ showPicker: 'none' /* must have */ });
+
+                                    } } 
+                                        key="Picker" 
+                                        underlayColor="transparent" 
+                                        style={{ 
+                                            backgroundColor: '#fff',
+                                            display: 'flex',
+                                        }}
+                                    >
+                                        <View style={{
+                                            position: 'relative', 
+                                            zIndex: 10000000000000000,
+                                        }}>
+                                                <Image source={upArrow} style={[styles.upArrow]} />
+                                                <Image source={downArrow} style={[styles.downArrow]} />
+                                            <Text style={[{
+                                                fontSize: 14,
+                                                fontFamily: 'SFUIText-Regular',
+                                                marginRight: 30,
+                                                padding: 5,
+                                                display: this.state.showPicker == 'none' ? 'flex' : 'none' ,
+                                                borderBottomColor: '#C9C9C9',
+                                                borderBottomWidth: 1,
+                                                color: '#3E3F42',
+                                                paddingBottom: 10,
+                                                width: '100%'
+
+                                            }]}> {this.state.textProffesion} </Text>
+                                            <View 
+                                            style={{
+                                                display: this.state.showPicker,
+                                                marginTop: 20
+                                            }}>
+                                                <Modal 
+                                                animationType="fade"
+                                                transparent={false}
+                                                visible={this.state.showPicker == 'none' ? false : true}
+                                                style={{ display: 'flex',
+                                                         justifyContent: 'center',
+                                                         alignItems: 'center',
+                                                         paddingTop: 20 }}
+                                                >
+                                                    <TouchableHighlight  style={[styles.pickerItem]}
+                                                    underlayColor="transparent"
+                                                    onPress={() => this.setState({
+                                                        textProffesion: 'Med school student', // must have
+                                                        showPicker: 'none'
+                                                    })}>
+                                                        <Text>Med school student</Text>
+                                                    </TouchableHighlight>
+                                                    <TouchableHighlight style={[styles.pickerItem]}
+                                                    underlayColor="transparent"
+                                                    onPress={() => this.setState({
+                                                        textProffesion: 'Postgrad', 
+                                                        showPicker: 'none', 
+                                                        
+                                                    })}>
+                                                        <Text>Postgrad</Text>
+                                                    </TouchableHighlight>
+                                                    <TouchableHighlight style={[styles.pickerItem]}
+                                                    underlayColor="transparent"
+                                                    onPress={() => this.setState({
+                                                        textProffesion: 'Attending/Other',
+                                                        showPicker: 'none'
+                                                    })}>
+                                                        <Text>Attending/Other</Text>
+                                                    </TouchableHighlight>
+                                                </Modal>
+                                            </View>
+                                        </View>
+                                    </TouchableHighlight>
+                                    {/* Picker */}
                             </View>
                             
                         </View>
@@ -268,5 +323,28 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         height: Dimensions.get('window').height
-    }
+    },
+    pickerItem: {
+        padding: 6,
+        zIndex: 100000,
+        elevation: 10,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    upArrow: {
+        width: 8,
+        height: 8,
+        position: 'absolute',
+        right: 10,
+        top: 5,
+        zIndex: 1000
+    },
+    downArrow: {
+        width: 8,
+        height: 8,
+        position: 'absolute',
+        right: 10,
+        top: 15,
+        zIndex: 1000
+    },
 })
