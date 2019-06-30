@@ -36,6 +36,7 @@ export default class Login extends Component {
         }
         this._onPressLearnMore = this._onPressLearnMore.bind(this);
         this._toRegister = this._toRegister.bind(this);
+        this._toResetPass = this._toResetPass.bind(this);
     }
 
     componentDidMount() {
@@ -99,7 +100,10 @@ export default class Login extends Component {
 
     _toRegister() {
         this.props.navigation.navigate('Register');
-        
+    }
+
+    _toResetPass() {
+        this.props.navigation.navigate('ResetPassword');
     }
 
     render() {
@@ -150,7 +154,9 @@ export default class Login extends Component {
                             </View>
                         </View>
                         <View style={styles.mb30}>
-                            <Text style={styles.greyText}>Forgot your password?</Text>
+                            <TouchableHighlight onPress={() => this._toResetPass()}>
+                                <Text style={styles.greyText}>Forgot your password?</Text>
+                            </TouchableHighlight>
                         </View>
                         <View>
                             <Button

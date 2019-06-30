@@ -210,9 +210,6 @@ export default class Register extends Component {
 </Text>
                             </View>
                         </View>
-                        <View style={styles.mb30}>
-                            <Text style={styles.greyText}>Forgot your password?</Text>
-                        </View>
                         <View>
                             <Button
                                 onPress={this._onPressLearnMore}

@@ -21,6 +21,7 @@ import About from './components/About/About';
 import Settings from './components/Settings/Settings';
 import ProfileStudents from './components/Profile/ProfileStudents';
 import QuizShowProfile from './components/Quiz/QuizShowProfile';
+import ResetPassword from './components/ResetPassword/ResetPassword';
 import { createStackNavigator, createAppContainer } from "react-navigation";
 
 import Header from './components/Header/Header'
@@ -39,7 +40,8 @@ const AppNavigator = createStackNavigator({
     Register: {screen : Register},
     RegisterDataUser: {screen : RegisterDataUser},
     ProfileStudents: {screen : ProfileStudents},
-    QuizShowProfile: {screen : QuizShowProfile}
+    QuizShowProfile: {screen : QuizShowProfile},
+    ResetPassword: {screen : ResetPassword}
   },
   {
     initialRouteName: 'WrapSlider',

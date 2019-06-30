@@ -48,15 +48,14 @@ export default class Dashboard extends Component {
                 firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => {
                     
                     this.setState({ snapshot: snapshot.key })
-                    
+                    console.log('user key', snapshot.key);
                     
                     firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
                         let keysQues;
-                        console.log('data iser', data._value);
                         let columnQues;
                         if(data.toJSON().questions != undefined) {
                             keysQues = Object.keys(data.toJSON().questions);
-                            columnQues = toString(keysQues.length);
+                            columnQues = keysQues.length;                           
                         } else {
                             keysQues = undefined;
                             columnQues = '0'
@@ -87,13 +86,9 @@ export default class Dashboard extends Component {
                                 keyDataUserQues = Object.keys(this.state.dataUser.questions);
                             }
                             let bool = 1;
-                            console.log('keyDataUserQues', keyDataUserQues);
                             
                             if(keyDataUserQues != undefined) {
                                 keyDataUserQues.map((value) => {
-                                    console.log('value', value);
-                                    console.log('data._value', data._value);
-                                    console.log('data._value bool', value == data._value);
                                     if(value == data._value) {
                                         this.setState({
                                             quizTake: undefined,
@@ -105,30 +100,42 @@ export default class Dashboard extends Component {
                                 });
                             }
 
-                            console.log('bool real', bool);
-                            
                             if(bool == 1) {
                                 this.setState({ quizTake: data._value });
                             } else {
                                 this.setState({ quizTake: undefined });
                             }
-                            
+                            this.setState({ quizTake: data._value });
+
+
+
                             // to do
-                            let date = new Date();
-                            console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ', date.getSe);
-                            if(date.getHours() == 12) {
-                                if(date.getMinutes() <= 10) {
-                                    // Nothing
+                                let date = new Date();
+                                console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ');
+                                if(date.getHours() == 12) {
+                                    if(date.getMinutes() <= 10) {
+                                        // Nothing
+                                    } else {
+                                        this.setState({
+                                            quizTake: undefined,
+                                        });
+                                    }
+                                    if(date.getMinutes() >= 5) {
+                                        firebase.database().ref("Cards/Open/"+data._value).update({
+                                            passed: true,
+                                        });
+                                    } else {}
                                 } else {
                                     this.setState({
                                         quizTake: undefined,
-                                    });
+                                    });            
                                 }
-                            } else {
-                                this.setState({
-                                    quizTake: undefined,
-                                });            
-                            }
+                                
+                                if(date.getHours() > 12) {
+                                    firebase.database().ref("Cards/Open/"+data._value).update({
+                                        passed: true,
+                                    });
+                                } else {}
                             // To do
                         })
                         .then(() => {
@@ -327,10 +334,6 @@ export default class Dashboard extends Component {
                 this.props.navigation.navigate('WrapSlider');
             }
         })
-        firebase.database().ref("university/Other").once("value", (data) => {
-            console.log('university/Other',data._value.loggedUser);
-            
-        })
     }
 
     _itemMenu() {
@@ -436,8 +439,8 @@ export default class Dashboard extends Component {
     }
 
     render() {
+        
         const { navigation } = this.props;
-        console.log('change clickHeader', this.state.clickHeader);
         
         if(this.state.authentication == true) {
             return (
@@ -450,8 +453,15 @@ export default class Dashboard extends Component {
         return (
             <View style={{ position: 'relative', zIndex: -1, backgroundColor: 'rgba(0, 0, 0, 0.04)',}}>
                 <ScrollView style={styles.wrapperDashboard} stickyHeaderIndices={[0]}>
-                   <Header navigation={this.props.navigation} page="Dashboard" click={this.handleClickHeader} style={{ width: '100%', height: this.state.clickHeader == false ? 50 : '100%', position: 'absolute', zIndex: -1 }} />
-                    <TouchableHighlight onPress={() => this._quizRoute()} style={[styles.wrapperQuiz, {display: this.state.quizTake == undefined || navigation.getParam('answer', 'NO-ID') == true ? 'none' : 'flex'}]}>
+                   <Header navigation={this.props.navigation} page="Dashboard" 
+                   click={this.handleClickHeader} 
+                   style={{ width: '100%',
+                    height: this.state.clickHeader == false ? 50 : '100%',
+                    position: 'absolute',
+                     zIndex: -1 }} />
+                    <TouchableHighlight onPress={() => this._quizRoute()} style={[styles.wrapperQuiz, {
+                        display: this.state.quizTake == undefined || navigation.getParam('answer', 'NO-ID') == true ? 'none' : 'flex',
+                        marginTop: this.state.clickHeader == undefined ? 0 : 60 }]}>
                         <Text style={styles.textQuiz}>Take the quiz</Text>
                     </TouchableHighlight>
 
