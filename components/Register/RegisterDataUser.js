@@ -34,7 +34,6 @@ export default class RegisterDataUser extends Component {
     }
 
     componentDidMount() {
-        console.log('RegisterDataUser');
         const { navigation } = this.props;
         this.setState({ authentication: false })
     }

@@ -45,12 +45,12 @@ export default class Dashboard extends Component {
         firebase.auth().onAuthStateChanged((user) => {
             if(user){
                 console.log('users', user);
-                firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", (snapshot) => {
+                firebase.database().ref("users").orderByChild("email").equalTo(user.email).once("child_added", async (snapshot) => {
                     
                     this.setState({ snapshot: snapshot.key })
                     console.log('user key', snapshot.key);
                     
-                    firebase.database().ref("users/"+snapshot.key).once("value", (data) => {
+                    await firebase.database().ref("users/"+snapshot.key).on("value", (data) => {
                         let keysQues;
                         let columnQues;
                         if(data.toJSON().questions != undefined) {
@@ -65,117 +65,87 @@ export default class Dashboard extends Component {
                             idQuis: keysQues, 
                             columnQues });                        
                     })
-                    .then(() => {
+                    await firebase.database().ref("Cards/Today").once("value", (data) => {
+                        let quisToday = false;
+                        if(this.state.idQuis != undefined) {
+                            this.state.idQuis.forEach((value) => {
+                                if(value == data._value) {
+                                    quisToday = true;
+                                }
+                            });
+                        }
                         
-                        firebase.database().ref("Cards/Today").once("value", (data) => {
-                            let quisToday = false;
-                            if(this.state.idQuis != undefined) {
-                                this.state.idQuis.forEach((value) => {
-                                    if(value == data._value) {
-                                        quisToday = true;
-                                    }
-                                });
-                            }
-                            
-                            
-                            if(quisToday == false) {
-                                this.setState({ quizTake: data._value });
-                            }
-                            let keyDataUserQues;
-                            if(this.state.dataUser.questions != undefined) {
-                                keyDataUserQues = Object.keys(this.state.dataUser.questions);
-                            }
-                            let bool = 1;
-                            
-                            if(keyDataUserQues != undefined) {
-                                keyDataUserQues.map((value) => {
-                                    if(value == data._value) {
-                                        this.setState({
-                                            quizTake: undefined,
-                                        });
-                                        console.log('bool ', 0);
-                                        
-                                        return bool = 0;
-                                    }
-                                });
-                            }
-
-                            if(bool == 1) {
-                                this.setState({ quizTake: data._value });
-                            } else {
-                                this.setState({ quizTake: undefined });
-                            }
+                        
+                        if(quisToday == false) {
                             this.setState({ quizTake: data._value });
+                        }
+                        let keyDataUserQues;
+                        if(this.state.dataUser.questions != undefined) {
+                            keyDataUserQues = Object.keys(this.state.dataUser.questions);
+                        }
+                        let bool = 1;
+                        
+                        if(keyDataUserQues != undefined) {
+                            keyDataUserQues.map((value) => {
+                                if(value == data._value) {
+                                    this.setState({
+                                        quizTake: undefined,
+                                    });
+                                    console.log('bool ', 0);
+                                    
+                                    return bool = 0;
+                                }
+                            });
+                        }
+
+                        if(bool == 1) {
+                            this.setState({ quizTake: data._value });
+                        } else {
+                            this.setState({ quizTake: undefined });
+                        }
+                        this.setState({ quizTake: data._value });
 
 
 
-                            // to do
-                                let date = new Date();
-                                console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ');
-                                if(date.getHours() == 12) {
-                                    if(date.getMinutes() <= 10) {
-                                        // Nothing
-                                    } else {
-                                        this.setState({
-                                            quizTake: undefined,
-                                        });
-                                    }
-                                    if(date.getMinutes() >= 5) {
-                                        firebase.database().ref("Cards/Open/"+data._value).update({
-                                            passed: true,
-                                        });
-                                    } else {}
+                        // to do
+                            let date = new Date();
+                            console.log('time ', date.getHours(), ' ', date.getMinutes(), ' ');
+                            if(date.getHours() == 12) {
+                                if(date.getMinutes() <= 10) {
+                                    // Nothing
                                 } else {
                                     this.setState({
                                         quizTake: undefined,
-                                    });            
+                                    });
                                 }
-                                
-                                if(date.getHours() > 12) {
+                                if(date.getMinutes() >= 5) {
                                     firebase.database().ref("Cards/Open/"+data._value).update({
                                         passed: true,
                                     });
                                 } else {}
-                            // To do
-                        })
-                        .then(() => {
-                            firebase.database().ref("university/"+this.state.dataUser.university+"/answerQuiz").once("value", (data) => {
-                                let dataDay = new Array();
-                                let sumCorrect;
-                                let dataCorrect = new Array();
-                                let dataWrong = new Array();
-                                const arrDay = [null, 'M', 'T', 'W', 'T', 'F', 'S', 'S'];
-                                let objKey;
+                            } else {
+                                this.setState({
+                                    quizTake: undefined,
+                                });            
+                            }
+                            
+                            if(date.getHours() > 12) {
+                                firebase.database().ref("Cards/Open/"+data._value).update({
+                                    passed: true,
+                                });
+                            } else {}
+                        // To do
+                    })
+                    .then(() => {
+                        firebase.database().ref("university/"+this.state.dataUser.university+"/answerQuiz").once("value", (data) => {
+                            let dataDay = new Array();
+                            let sumCorrect;
+                            let dataCorrect = new Array();
+                            let dataWrong = new Array();
+                            const arrDay = [null, 'M', 'T', 'W', 'T', 'F', 'S', 'S'];
+                            let objKey;
 
-                                if(data._value == null) {
-                                    for(let j = 1; j <= 4; j++) {
-                                        if(j == 1) objKey = 'last7';
-                                        if(j == 2) objKey = 'last14';
-                                        if(j == 3) objKey = 'last21';
-                                        if(j == 4) objKey = 'last30';
-                                        dataDay = [];
-                                        dataCorrect = [];
-                                        dataWrong = [];
-                                        sumCorrect=0;
-                                        for(let i = 1; i <= 7; i++) {
-                                            dataCorrect.push({ number: 0, name: arrDay[i] });
-                                            dataWrong.push({ number: 0, name: arrDay[i] });
-                                        }
-                                        dataDay.push(dataCorrect);
-                                        dataDay.push(dataWrong);
-                                        this.setState(state => {
-                                            const dataUniver = state.statisticUniver[objKey] = dataDay;
-                                            const dataCorrect = state.correctAnswersQuizUniversity[objKey] = sumCorrect;
-                                            return {
-                                                dataUniver,
-                                                dataCorrect
-                                            }
-                                        });
-    
-                                    }
-                                    return console.log('null')
-                                }
-
+                            if(data._value == null) {
                                 for(let j = 1; j <= 4; j++) {
                                     if(j == 1) objKey = 'last7';
                                     if(j == 2) objKey = 'last14';
@@ -185,25 +155,9 @@ export default class Dashboard extends Component {
                                     dataCorrect = [];
                                     dataWrong = [];
                                     sumCorrect=0;
-                                    if(data._value[objKey] == undefined) {
-                                        for(let i = 1; i <= 7; i++) {
-                                            dataCorrect.push({ number: 0, name: arrDay[i] });
-                                            dataWrong.push({ number: 0, name: arrDay[i] });
-                                        }
-                                        
-                                    }
-                                    else {
-                                        for(let i = 1; i <= 7; i++) {
-                                            if(data._value[objKey].data[i.toString(10)] != undefined) {
-                                                dataCorrect.push({ number: data._value[objKey].data[i.toString(10)].correctAnswers, name: arrDay[i] });
-                                                dataWrong.push({ number: data._value[objKey].data[i.toString(10)].wrongAnswers, name: arrDay[i] });
-                                                sumCorrect = sumCorrect+data._value[objKey].data[i.toString(10)].correctAnswers;
-                                            } else {
-                                                dataCorrect.push({ number: 0, name: arrDay[i] });
-                                                dataWrong.push({ number: 0, name: arrDay[i] });
-                                            }
-                                            
-                                        }
+                                    for(let i = 1; i <= 7; i++) {
+                                        dataCorrect.push({ number: 0, name: arrDay[i] });
+                                        dataWrong.push({ number: 0, name: arrDay[i] });
                                     }
                                     dataDay.push(dataCorrect);
                                     dataDay.push(dataWrong);
@@ -217,57 +171,61 @@ export default class Dashboard extends Component {
                                     });
 
                                 }
-                            })
-                        })
-                        .then(() => {
-                            firebase.database().ref("users/"+this.state.snapshot+"/answerQuiz/").on("value", (data) => {
-                                let dataDay = new Array();
-                                let dataCorrect = new Array();
-                                let dataWrong = new Array();
-                                const arrDay = [null, 'M', 'T', 'W', 'T', 'F', 'S', 'S'];
-                                let objKey;
-                                let sumCorrect;
-                                if(data._value == null) {
-                                    for(let j = 1; j <= 4; j++) {
-                                        if(j == 1) objKey = 'last7';
-                                        if(j == 2) objKey = 'last14';
-                                        if(j == 3) objKey = 'last21';
-                                        if(j == 4) objKey = 'last30';
-                                        dataDay = [];
-                                        dataCorrect = [];
-                                        dataWrong = [];
-                                        sumCorrect = 0;
-                                        for(let i = 1; i <= 7; i++) {                                            
+                                return console.log('null')
+                            }
+
+                            for(let j = 1; j <= 4; j++) {
+                                if(j == 1) objKey = 'last7';
+                                if(j == 2) objKey = 'last14';
+                                if(j == 3) objKey = 'last21';
+                                if(j == 4) objKey = 'last30';
+                                dataDay = [];
+                                dataCorrect = [];
+                                dataWrong = [];
+                                sumCorrect=0;
+                                if(data._value[objKey] == undefined) {
+                                    for(let i = 1; i <= 7; i++) {
+                                        dataCorrect.push({ number: 0, name: arrDay[i] });
+                                        dataWrong.push({ number: 0, name: arrDay[i] });
+                                    }
+                                    
+                                }
+                                else {
+                                    for(let i = 1; i <= 7; i++) {
+                                        if(data._value[objKey].data[i.toString(10)] != undefined) {
+                                            dataCorrect.push({ number: data._value[objKey].data[i.toString(10)].correctAnswers, name: arrDay[i] });
+                                            dataWrong.push({ number: data._value[objKey].data[i.toString(10)].wrongAnswers, name: arrDay[i] });
+                                            sumCorrect = sumCorrect+data._value[objKey].data[i.toString(10)].correctAnswers;
+                                        } else {
                                             dataCorrect.push({ number: 0, name: arrDay[i] });
                                             dataWrong.push({ number: 0, name: arrDay[i] });
                                         }
                                         
-                                        dataDay.push(dataCorrect);
-                                        dataDay.push(dataWrong);
-                                        this.setState(state => {
-                                            const dataUniver = state.statisticUser[objKey] = dataDay;
-                                            const dataCorrect = state.correctAnswersQuizUser[objKey] = sumCorrect;
-                                            return {
-                                                dataUniver,
-                                                dataCorrect
-                                            }
-                                        });
                                     }
-
-                                    dataDay.push(dataCorrect);
-                                    dataDay.push(dataWrong);
-
-                                    this.setState(state => {
-                                        const dataUniver = state.statisticUser[objKey] = dataDay;
-                                        const dataCorrect = state.correctAnswersQuizUser[objKey] = sumCorrect;
-                                        return {
-                                            dataUniver,
-                                            dataCorrect
-                                        }
-                                    });
-                                    return console.log('null')
                                 }
-                                
+                                dataDay.push(dataCorrect);
+                                dataDay.push(dataWrong);
+                                this.setState(state => {
+                                    const dataUniver = state.statisticUniver[objKey] = dataDay;
+                                    const dataCorrect = state.correctAnswersQuizUniversity[objKey] = sumCorrect;
+                                    return {
+                                        dataUniver,
+                                        dataCorrect
+                                    }
+                                });
+
+                            }
+                        })
+                    })
+                    .then(() => {
+                        firebase.database().ref("users/"+this.state.snapshot+"/answerQuiz/").on("value", (data) => {
+                            let dataDay = new Array();
+                            let dataCorrect = new Array();
+                            let dataWrong = new Array();
+                            const arrDay = [null, 'M', 'T', 'W', 'T', 'F', 'S', 'S'];
+                            let objKey;
+                            let sumCorrect;
+                            if(data._value == null) {
                                 for(let j = 1; j <= 4; j++) {
                                     if(j == 1) objKey = 'last7';
                                     if(j == 2) objKey = 'last14';
@@ -277,26 +235,9 @@ export default class Dashboard extends Component {
                                     dataCorrect = [];
                                     dataWrong = [];
                                     sumCorrect = 0;
-                                    if(data._value[objKey] == undefined) {
-                                        console.log('undefined', objKey);
-                                        
-                                        for(let i = 1; i <= 7; i++) {                                            
-                                            dataCorrect.push({ number: 0, name: arrDay[i] });
-                                            dataWrong.push({ number: 0, name: arrDay[i] });
-                                        }
-                                    }
-                                    else {
-                                        console.log('defined', objKey);
-                                        for(let i = 1; i <= 7; i++) {
-                                            if(data._value[objKey].data[i.toString(10)] != undefined) {
-                                                dataCorrect.push({ number: data._value[objKey].data[i.toString(10)].correctAnswers, name: arrDay[i] });
-                                                dataWrong.push({ number: data._value[objKey].data[i.toString(10)].wrongAnswers, name: arrDay[i] });
-                                                sumCorrect = sumCorrect+data._value[objKey].data[i.toString(10)].correctAnswers;
-                                            } else {
-                                                dataCorrect.push({ number: 0, name: arrDay[i] });
-                                                dataWrong.push({ number: 0, name: arrDay[i] });
-                                            }
-                                        }
+                                    for(let i = 1; i <= 7; i++) {                                            
+                                        dataCorrect.push({ number: 0, name: arrDay[i] });
+                                        dataWrong.push({ number: 0, name: arrDay[i] });
                                     }
                                     
                                     dataDay.push(dataCorrect);
@@ -310,15 +251,67 @@ export default class Dashboard extends Component {
                                         }
                                     });
                                 }
-                            })
-                        })
-                        .then(() => {
-                            this.setState({ authentication: false });
-                        })
-                        .catch(err => {
-                            console.log(`err ${err}`);
+
+                                dataDay.push(dataCorrect);
+                                dataDay.push(dataWrong);
+
+                                this.setState(state => {
+                                    const dataUniver = state.statisticUser[objKey] = dataDay;
+                                    const dataCorrect = state.correctAnswersQuizUser[objKey] = sumCorrect;
+                                    return {
+                                        dataUniver,
+                                        dataCorrect
+                                    }
+                                });
+                                return console.log('null')
+                            }
                             
+                            for(let j = 1; j <= 4; j++) {
+                                if(j == 1) objKey = 'last7';
+                                if(j == 2) objKey = 'last14';
+                                if(j == 3) objKey = 'last21';
+                                if(j == 4) objKey = 'last30';
+                                dataDay = [];
+                                dataCorrect = [];
+                                dataWrong = [];
+                                sumCorrect = 0;
+                                if(data._value[objKey] == undefined) {
+                                    console.log('undefined', objKey);
+                                    
+                                    for(let i = 1; i <= 7; i++) {                                            
+                                        dataCorrect.push({ number: 0, name: arrDay[i] });
+                                        dataWrong.push({ number: 0, name: arrDay[i] });
+                                    }
+                                }
+                                else {
+                                    console.log('defined', objKey);
+                                    for(let i = 1; i <= 7; i++) {
+                                        if(data._value[objKey].data[i.toString(10)] != undefined) {
+                                            dataCorrect.push({ number: data._value[objKey].data[i.toString(10)].correctAnswers, name: arrDay[i] });
+                                            dataWrong.push({ number: data._value[objKey].data[i.toString(10)].wrongAnswers, name: arrDay[i] });
+                                            sumCorrect = sumCorrect+data._value[objKey].data[i.toString(10)].correctAnswers;
+                                        } else {
+                                            dataCorrect.push({ number: 0, name: arrDay[i] });
+                                            dataWrong.push({ number: 0, name: arrDay[i] });
+                                        }
+                                    }
+                                }
+                                
+                                dataDay.push(dataCorrect);
+                                dataDay.push(dataWrong);
+                                this.setState(state => {
+                                    const dataUniver = state.statisticUser[objKey] = dataDay;
+                                    const dataCorrect = state.correctAnswersQuizUser[objKey] = sumCorrect;
+                                    return {
+                                        dataUniver,
+                                        dataCorrect
+                                    }
+                                });
+                            }
                         })
+                    })
+                    .then(() => {
+                        this.setState({ authentication: false });
                     })
                     .catch(err => {
                         console.log(`err ${err}`);
